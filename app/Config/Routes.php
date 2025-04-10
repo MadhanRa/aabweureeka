@@ -13,18 +13,12 @@ $routes->group('setup', ['namespace' => 'App\Controllers\setup'], static functio
 
     //routes interface
     $routes->resource('antarmuka', ['controller' => 'Antarmuka']);
-    // $routes->get('antarmuka/new', 'Antarmuka::new');
-    // $routes->get('antarmuka/(:segment)/new', 'Antarmuka::edit/$1');
-    // $routes->post('antarmuka', 'Antarmuka::create');
-    // $routes->post('antarmuka/(:any)', 'Antarmuka::delete/$1');
-    // $routes->put('antarmuka/(:segment)/edit', 'Antarmuka::edit/$1');
-    // $routes->get('antarmuka', 'Antarmuka::index');
 
     //routes klasifikasi
-    $routes->resource('klasifikasi', ['controller' => 'Klasifikasi']);
+    $routes->resource('klasifikasi');
 
     // routes pos neraca
-    $routes->resource('posneraca', ['controller' => 'Posneraca']);
+    $routes->resource('posneraca');
 
     //routes setup buku besar
     $routes->resource('buku', ['controller' => 'SetupBuku']);
@@ -51,17 +45,10 @@ $routes->group('setup_persediaan', ['namespace' => 'App\Controllers\setup_persed
     $routes->resource('kelompok');
 
     //routes setup stock
+    $routes->get('stock/getStock', 'Stock::getStock');
     $routes->resource('stock');
 
-    // routes setup harga
-    // $routes->get('/harga/new', 'Harga::new');
-    // $routes->get('/harga/(:segment)/new', 'Harga::edit/$1');
     $routes->resource('harga');
-    // $routes->post('/harga', 'Harga::create');
-    // $routes->post('/harga/(:any)', 'Harga::delete/$1');
-    // $routes->put('/harga/(:segment)/edit', 'Harga::edit/$1');
-    // $routes->put('/harga/(:segment)', 'Harga::update/$1');
-    // $routes->get('harga', 'Harga::index');
 });
 
 
@@ -507,16 +494,3 @@ $routes->get('/LaporanReturPenjualan', 'LaporanReturPenjualan::index');
 $routes->get('/LaporanReturPenjualan/printPDF/(:num)', 'LaporanReturPenjualan::printPDF/$1');
 $routes->get('/LaporanReturPenjualan/printPDF', 'LaporanReturPenjualan::printPDF');
 $routes->post('/LaporanReturPenjualan', 'LaporanReturPenjualan::index');
-
-
-
-
-
-
-
-
-
-// $routes->get('/posneraca', 'PosNeraca::index');
-// $routes->post('/posneraca/save', 'PosNeraca::save');
-// $routes->get('posneraca', 'PosNeraca::index');
-// $routes->get('/setup/posneraca', 'PosNeraca::index');

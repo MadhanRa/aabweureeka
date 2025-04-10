@@ -26,24 +26,25 @@
         <h4>Simple Table</h4>
       </div>
       <div class="card-body">
-        <form method="post" action="<?= site_url('setup/klasifikasi/' . $dtklasifikasi->id_klasifikasi) ?> ">
-          <?= csrf_field() ?>
-          <input type="hidden" name="_method" value="PUT">
+        <div class="form-container">
+          <form method="post" action="<?= site_url('setup/klasifikasi/' . $dtklasifikasi->id_klasifikasi) ?> ">
+            <?= csrf_field() ?>
+            <input type="hidden" name="_method" value="PUT">
 
-
-          <div class="form-group">
-            <label>Kode</label>
-            <input type="text" class="form-control" name="kode_klasifikasi" placeholder="Kode" required value="<?= $dtklasifikasi->kode_klasifikasi ?>">
-          </div>
-          <div class="form-group">
-            <label>Nama</label>
-            <input type="text" class="form-control" name="nama_klasifikasi" placeholder="Nama" style="text-transform: uppercase;" required value="<?= $dtklasifikasi->nama_klasifikasi ?>">
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Update Data</button>
-            <button type="reset" class="btn btn-danger">Reset</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <label>Kode</label>
+              <input type="text" class="form-control" name="kode_klasifikasi" placeholder="Kode" required value="<?= $dtklasifikasi->kode_klasifikasi ?>">
+            </div>
+            <div class="form-group">
+              <label>Nama</label>
+              <input type="text" class="form-control" name="nama_klasifikasi" placeholder="Nama" style="text-transform: uppercase;" required value="<?= $dtklasifikasi->nama_klasifikasi ?>">
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Update Data</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

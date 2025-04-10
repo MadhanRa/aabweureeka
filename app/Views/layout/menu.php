@@ -1,7 +1,7 @@
 <!-- DASHBOARD SETUP -->
 <li class="menu-header">Dashboard Setup</li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Setup</span></a>
+  <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-cogs"></i><span>Setup</span></a>
   <ul class="dropdown-menu">
     <li><a class="nav-link text-dark" href="<?= site_url('setup/periode') ?>">Periode Akuntansi</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup/antarmuka') ?>">Interface</a></li>
@@ -19,7 +19,7 @@
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Setup Persediaan</span></a>
+  <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-box-open"></i><span>Setup Persediaan</span></a>
   <ul class="dropdown-menu">
     <li><a class="nav-link text-dark" href="<?= site_url('setup_persediaan/satuan') ?>">Satuan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup_persediaan/lokasi') ?>">Lokasi</a></li>

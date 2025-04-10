@@ -33,9 +33,9 @@
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table border="2px" class="tablet able-striped table-md" id="myTable" style="border-color: #009548; border-width: 4px; border-style: solid;">
+          <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
             <thead>
-              <tr style="background-color: #009548; color: white;">
+              <tr class="eureeka-table-header">
                 <th>No</th>
                 <th>Kas</th>
                 <th>Biaya</th>

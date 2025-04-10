@@ -81,7 +81,7 @@
                     <div class="table-responsive">
                         <table border="2px" class="table-striped table-md" id="myTable" style="border-color: #009548; border-width: 2px; border-style: solid;">
                             <thead>
-                                <tr style="background-color: #009548; color: white;">
+                                <tr class="eureeka-table-header">
                                     <th>No</th>
                                     <th>Bulan</th>
                                     <th>Tahun</th>

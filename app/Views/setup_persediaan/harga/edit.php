@@ -15,40 +15,51 @@
       </div>
       <div class="card-body">
         <!-- Form to Edit Harga Data -->
-        <form method="post" action="<?= site_url('setup_persediaan/harga/' . $dtharga->id_harga) ?>">
-          <input type="hidden" name="_method" value="PUT">
-          <?= csrf_field() ?>
+        <div class="form-container">
+          <form method="post" action="<?= site_url('setup_persediaan/harga/' . $dtharga->id_harga) ?>">
+            <input type="hidden" name="_method" value="PUT">
+            <?= csrf_field() ?>
 
-          <div class="form-group">
-            <label>Kode</label>
-            <input type="text" class="form-control" name="kode_harga" value="<?= old('kode_harga', $dtharga->kode_harga) ?>" placeholder="Kode" required>
-          </div>
+            <div class="form-group">
+              <label>Nama Barang</label>
+              <select class="form-control" name="id_stock" required>
+                <option value="" hidden>Pilih Nama Barang</option>
+                <?php foreach ($dtstock as $key => $value) : ?>
+                  <option value="<?= $value->id_stock ?>" <?= $value->id_stock == $dtharga->id_stock ? 'selected' : '' ?>><?= $value->nama_barang ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label>Nama</label>
-            <input type="text" class="form-control" name="nama_barang" value="<?= old('nama_barang', $dtharga->nama_barang) ?>" placeholder="Nama Barang" required>
-          </div>
+            <div class="form-group">
+              <label>Harga Jual (EXC)</label>
+              <input type="text" class="form-control display-price" id="display_harga_jualexc"
+                value="Rp <?= number_format(floatval($dtharga->harga_jualexc), 0, ',', '.') ?>"
+                placeholder="Harga Jual (EXC)" oninput="formatHarga(this, 'harga_jualexc')" required>
+              <input type="hidden" name="harga_jualexc" id="harga_jualexc" value="<?= $dtharga->harga_jualexc ?>">
+            </div>
 
-          <div class="form-group">
-            <label>Harga Jual (EXC)</label>
-            <input type="text" class="form-control" name="harga_jualexc" value="<?= old('harga_jualexc', number_format(floatval($dtharga->harga_jualexc), 0, ',', '.')) ?>" placeholder="Harga Jual (EXC)" oninput="formatHarga(this)" required>
-          </div>
+            <div class="form-group">
+              <label>Harga Jual (INC)</label>
+              <input type="text" class="form-control display-price" id="display_harga_jualinc"
+                value="Rp <?= number_format(floatval($dtharga->harga_jualinc), 0, ',', '.') ?>"
+                placeholder="Harga Jual (INC)" oninput="formatHarga(this, 'harga_jualinc')" required>
+              <input type="hidden" name="harga_jualinc" id="harga_jualinc" value="<?= $dtharga->harga_jualinc ?>">
+            </div>
 
-          <div class="form-group">
-            <label>Harga Jual (INC)</label>
-            <input type="text" class="form-control" name="harga_jualinc" value="<?= old('harga_jualinc', number_format(floatval($dtharga->harga_jualinc), 0, ',', '.')) ?>" placeholder="Harga Jual (INC)" oninput="formatHarga(this)" required>
-          </div>
+            <div class="form-group">
+              <label>Harga Beli</label>
+              <input type="text" class="form-control display-price" id="display_harga_beli"
+                value="Rp <?= number_format(floatval($dtharga->harga_beli), 0, ',', '.') ?>"
+                placeholder="Harga Beli" oninput="formatHarga(this, 'harga_beli')" required>
+              <input type="hidden" name="harga_beli" id="harga_beli" value="<?= $dtharga->harga_beli ?>">
+            </div>
 
-          <div class="form-group">
-            <label>Harga Beli</label>
-            <input type="text" class="form-control" name="harga_beli" value="<?= old('harga_beli', number_format(floatval($dtharga->harga_beli), 0, ',', '.')) ?>" placeholder="Harga Beli" oninput="formatHarga(this)" required>
-          </div>
-
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Update Data</button>
-            <button type="reset" class="btn btn-danger">Reset</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Update Data</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -56,18 +67,36 @@
 
 <script>
   // Fungsi untuk memformat angka ke dalam format Rupiah
-  function formatHarga(input) {
-    let value = input.value.replace(/\./g, '').replace(',', '.');
-    let formattedValue = formatRupiah(value);
+  function formatHarga(input, hiddenFieldId) {
+    // Strip formatting characters first
+    let rawValue = input.value.replace(/[^\d]/g, '');
+
+    // Update the hidden field with the raw numeric value
+    document.getElementById(hiddenFieldId).value = rawValue;
+
+    // Format the display value
+    let formattedValue = formatRupiah(rawValue);
     input.value = formattedValue;
   }
 
   // Fungsi untuk format angka menjadi Rupiah
   function formatRupiah(angka) {
-    let numberString = angka.replace(/\D/g, ''); // Hapus semua karakter yang bukan angka
-    let formattedNumber = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Format menjadi ribuan
-    return formattedNumber ? 'Rp ' + formattedNumber : ''; // Tambahkan simbol "Rp"
+    if (!angka) return '';
+    let numberString = String(angka);
+    let formattedNumber = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return 'Rp ' + formattedNumber;
   }
+
+  // Make sure form submission includes the hidden values
+  document.querySelector('form').addEventListener('submit', function(e) {
+    // Ensure hidden fields have values before submission
+    document.querySelectorAll('.display-price').forEach(function(input) {
+      const displayId = input.id;
+      const hiddenId = displayId.replace('display_', '');
+      const rawValue = input.value.replace(/[^\d]/g, '');
+      document.getElementById(hiddenId).value = rawValue;
+    });
+  });
 </script>
 
 <?= $this->endSection(); ?>

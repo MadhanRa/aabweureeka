@@ -14,37 +14,36 @@
                 <h4>Edit Salesman</h4>
             </div>
             <div class="card-body">
-                <form method="post" action="<?= site_url('setup/salesman/' . $dtsetupsalesman->id_setupsalesman) ?>">
-                    <input type="hidden" name="_method" value="PUT">
-                    <?= csrf_field() ?>
+                <div class="form-container">
+                    <form method="post" action="<?= site_url('setup/salesman/' . $dtsalesman->id_salesman) ?>">
+                        <input type="hidden" name="_method" value="PUT">
+                        <?= csrf_field() ?>
 
-                    <div class="form-group">
-                        <label>Kode</label>
-                        <input type="text" class="form-control" name="kode_setupsalesman" placeholder="Kode" value="<?= isset($dtsetupsalesman->kode_setupsalesman) ? $dtsetupsalesman->kode_setupsalesman : old('kode_setupsalesman') ?>" readonly>
-                    </div>
+                        <div class="form-group">
+                            <label>Kode</label>
+                            <input type="text" class="form-control" name="kode_salesman" placeholder="Kode" value="<?= isset($dtsalesman->kode_salesman) ? $dtsalesman->kode_salesman : old('kode_salesman') ?>" readonly>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Nama</label>
-                        <input type="text" class="form-control" name="nama_setupsalesman" value="<?= esc($dtsetupsalesman->nama_setupsalesman) ?>" placeholder="Nama" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Lokasi</label>
-                        <select type="text" class="form-control" name="lokasi_setupsalesman" required>
-                            <option value="Lokasi 1" <?= $dtsetupsalesman->lokasi_setupsalesman == 'Lokasi 1' ? 'selected' : '' ?>>Lokasi 1</option>
-                            <option value="Lokasi 2" <?= $dtsetupsalesman->lokasi_setupsalesman == 'Lokasi 2' ? 'selected' : '' ?>>Lokasi 2</option>
-                            <option value="Lokasi 3" <?= $dtsetupsalesman->lokasi_setupsalesman == 'Lokasi 3' ? 'selected' : '' ?>>Lokasi 3</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal</label>
-                        <input type="date" class="form-control" name="tanggal_setupsalesman" value="<?= esc($dtsetupsalesman->tanggal_setupsalesman) ?>" placeholder="Tanggal" required>
-                    </div>
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" name="nama_salesman" value="<?= esc($dtsalesman->nama_salesman) ?>" placeholder="Nama" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lokasi</label>
+                            <select type="text" class="form-control" name="id_lokasi" required>
+                                <option value="">-- Pilih Lokasi --</option>
+                                <?php foreach ($dtlokasi as $lokasi) : ?>
+                                    <option value="<?= $lokasi->id_lokasi ?>" <?= ($lokasi->id_lokasi == $dtsalesman->id_lokasi) ? 'selected' : '' ?>><?= $lokasi->nama_lokasi ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Update Data</button>
-                        <a href="<?= site_url('setupsalesman') ?>" class="btn btn-danger">Batal</a>
-                    </div>
-                </form>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Update Data</button>
+                            <a href="<?= site_url('setup/salesman') ?>" class="btn btn-danger">Batal</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 

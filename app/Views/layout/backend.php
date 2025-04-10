@@ -4,21 +4,32 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-
   <?= $this->renderSection("title") ?>
 
   <!-- General CSS Files -->
-  <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="<?= base_url() ?>/template/node_modules/@fortawesome/fontawesome-free/css/all.css">
+  <link rel="stylesheet" href="<?= base_url('template/node_modules/bootstrap/dist/css/bootstrap.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('template/node_modules/@fortawesome/fontawesome-free/css/all.css') ?>">
 
   <!-- CSS Libraries -->
+  <link rel="stylesheet" href="<?= base_url('template/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('template/node_modules/datatables.net-select-bs4/css/select.bootstrap4.min.css') ?>">
+  <!-- CSS Libraries -->
+  <link rel="stylesheet" href="<?= base_url('template/node_modules/izitoast/dist/css/iziToast.min.css') ?>">
 
   <!-- Template CSS -->
-  <link rel="stylesheet" href="<?= base_url() ?>/template/assets/css/style.css">
-  <link rel="stylesheet" href="<?= base_url() ?>/template/assets/css/components.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.css" />
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="<?= base_url('template/assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('template/assets/css/components.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('template/assets/css/custom.css') ?>">
+
+
+  <!-- JQuery -->
+  <script src="<?= base_url('template/node_modules/jquery/dist/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('template/node_modules/nicescroll/dist/jquery.nicescroll.js') ?>"></script>
+
+  <!-- Data Tables -->
+  <script src="<?= base_url('template/node_modules/datatables/media/js/jquery.dataTables.min.js') ?>"></script>
+  <script src="<?= base_url('template/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js') ?>"></script>
+  <script src="<?= base_url('template/node_modules/datatables.net-select-bs4/js/select.bootstrap4.min.js') ?>"></script>
 
   <style>
     .btn-read {
@@ -319,25 +330,21 @@
   </div>
 
   <!-- General JS Scripts -->
-  <script src="<?= base_url() ?>/template/node_modules/jquery/dist/jquery.min.js"></script>
-  <script src="<?= base_url() ?>/template/node_modules/datatables/media/js/jquery.dataTables.min.js"></script>
-  <script src="<?= base_url() ?>/template/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script src="<?= base_url() ?>/template/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="<?= base_url() ?>/template/node_modules/nicescroll/dist/jquery.nicescroll.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
-  <script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
-
-  <script src="<?= base_url() ?>/template/assets/js/stisla.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="<?= base_url('template/node_modules/bootstrap/dist/js/bootstrap.min.js') ?>"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 
-  <!-- JS Libraies -->
+  <script src="<?= base_url('template/assets/js/stisla.js') ?>"></script>
+
+  <!-- JS Library -->
+  <script src="<?= base_url('template/node_modules/izitoast/dist/js/iziToast.min.js') ?>"></script>
+  <script src="<?= base_url('template/node_modules/sweetalert/dist/sweetalert.min.js') ?>"></script>
 
   <!-- Template JS File -->
-  <script src="<?= base_url() ?>/template/assets/js/scripts.js"></script>
-  <script src="<?= base_url() ?>/template/assets/js/custom.js"></script>
+  <script src="<?= base_url('template/assets/js/scripts.js') ?>"></script>
+  <script src="<?= base_url('template/assets/js/custom.js') ?>"></script>
 
   <!-- Page Specific JS File -->
 

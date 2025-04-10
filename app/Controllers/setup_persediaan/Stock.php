@@ -4,9 +4,8 @@ namespace App\Controllers\setup_persediaan;
 
 use App\Models\setup_persediaan\ModelGroup;
 use App\Models\setup_persediaan\ModelStock;
-use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup_persediaan\ModelKelompok;
-use App\Models\ModelSetupsupplier;
+use App\Models\setup\ModelSetupsupplier;
 use App\Models\setup_persediaan\ModelSatuan;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -19,7 +18,6 @@ class Stock extends ResourceController
     {
         $this->objSatuan = new ModelSatuan();
         $this->objStock = new ModelStock();
-        $this->objLokasi = new ModelLokasi();
         $this->objKelompok = new ModelKelompok();
         $this->objGroup = new ModelGroup();
         $this->objSetupsupplier = new ModelSetupsupplier();
@@ -33,13 +31,21 @@ class Stock extends ResourceController
      */
     public function index()
     {
-        $data['dtstock'] = $this->objStock->getAll();
         $data['dtstock'] = $this->objStock->getStockWithRelations();
-        $data['dtlokasi'] = $this->objLokasi->findAll();
-        $data['dtgroup'] = $this->db->table('group1')->get()->getResult();
-        $data['dtkelompok'] = $this->db->table('kelompok1')->get()->getResult();
-        $data['dtsupplier'] = $this->db->table('setupsupplier1')->get()->getResult();
+        // d($data);
         return view('setup_persediaan/stock/index', $data);
+    }
+
+    public function getStock()
+    {
+        if ($this->request->isAJAX()) {
+            $data['dtstock'] = $this->objStock->getStockWithRelations();
+            $msg = [
+                'data' => view('setup_persediaan/stock/data', $data)
+            ];
+
+            return $this->response->setJSON($msg);
+        }
     }
 
     /**
@@ -61,16 +67,21 @@ class Stock extends ResourceController
      */
     public function new()
     {
-        // $builder = $this->db->table('stock1');
-        // $query = $builder->get();
-        // $data['dtstock'] = $query->getResult();
+        helper('form');
+
         $data['dtsatuan'] = $this->objSatuan->findAll();
-        $data['dtlokasi'] = $this->objLokasi->findAll();
-        $data['dtstock'] = $this->objStock->getStockWithRelations();
         $data['dtgroup'] = $this->db->table('group1')->get()->getResult();
         $data['dtkelompok'] = $this->db->table('kelompok1')->get()->getResult();
         $data['dtsupplier'] = $this->db->table('setupsupplier1')->get()->getResult();
-        return view('setup_persediaan/stock/new', $data);
+
+        if ($this->request->isAJAX()) {
+            $msg = [
+                'data' => view('setup_persediaan/stock/new', $data)
+            ];
+
+            echo json_encode($msg);
+        }
+        // return view('setup_persediaan/stock/new', $data);
     }
 
     /**
@@ -80,23 +91,50 @@ class Stock extends ResourceController
      */
     public function create()
     {
-        $data = $this->request->getPost();
-        $data = [
-            'id_stock' => $this->request->getVar('id_stock'),
-            'id_lokasi' => $this->request->getVar('id_lokasi'),
-            'kode' => $this->request->getVar('kode'),
-            'nama_barang' => $this->request->getVar('nama_barang'),
-            'id_group' => $this->request->getVar('id_group'),
-            'id_kelompok' => $this->request->getVar('id_kelompok'),
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-            'jumlah' => $this->request->getVar('jumlah'),
-            'id_satuan' => $this->request->getVar('id_satuan'),
-            'jml_harga' => $this->request->getVar('jml_harga'),
-            'tanggal' => $this->request->getVar('tanggal'),
-        ];
-        $this->objStock->insert($data);
 
-        return redirect()->to(site_url('setup_persediaan/stock'))->with('Sukses', 'Data Berhasil Disimpan');
+        if ($this->request->isAJAX()) {
+
+            $validation =  \Config\Services::validation();
+            $valid = $this->validate([
+                'kode' => [
+                    'label' => 'Kode',
+                    'rules' => 'required|is_unique[stock1.kode]',
+                    'errors' => [
+                        'required' => '{field} harus diisi.',
+                        'is_unique' => '{field} sudah ada, coba yang lain.'
+                    ]
+                ],
+            ]);
+
+            if (!$valid) {
+                $msg = [
+                    'error' => [
+                        'kode' => $validation->getError('kode'),
+                    ]
+                ];
+            } else {
+                $data = [
+                    'id_stock' => $this->request->getVar('id_stock'),
+                    'kode' => $this->request->getVar('kode'),
+                    'nama_barang' => $this->request->getVar('nama_barang'),
+                    'id_group' => $this->request->getVar('id_group'),
+                    'id_kelompok' => $this->request->getVar('id_kelompok'),
+                    'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+                    'id_satuan' => $this->request->getVar('id_satuan'),
+                    'id_satuan2' => $this->request->getVar('id_satuan2'),
+                    'conv_factor' => $this->request->getVar('conv_factor'),
+                    'min_stock' => $this->request->getVar('min_stock'),
+                ];
+                $this->objStock->insert($data);
+
+                $msg = [
+                    'success' => 'Data Berhasil Disimpan'
+                ];
+            }
+            return $this->response->setJSON($msg);
+        }
+
+        // return redirect()->to(site_url('setup_persediaan/stock'))->with('Sukses', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -108,22 +146,26 @@ class Stock extends ResourceController
      */
     public function edit($id = null)
     {
-        // Ambil data berdasarkan ID
-        $dtstock = $this->objStock->find($id);
+        helper('form');
+        if ($this->request->isAJAX()) {
+            // Ambil data berdasarkan ID
+            $data['stock'] = $this->objStock->find($id);
 
-        // Cek jika data tidak ditemukan
-        if (!$dtstock) {
-            return redirect()->to(site_url('kelompok'))->with('error', 'Data tidak ditemukan');
+            $data['dtsatuan'] = $this->objSatuan->findAll();
+            $data['dtgroup'] = $this->db->table('group1')->get()->getResult();
+            $data['dtkelompok'] = $this->db->table('kelompok1')->get()->getResult();
+            $data['dtsupplier'] = $this->db->table('setupsupplier1')->get()->getResult();
+
+            if ($this->request->isAJAX()) {
+                $msg = [
+                    'data' => view('setup_persediaan/stock/edit', $data)
+                ];
+
+                return $this->response->setJSON($msg);
+            }
+        } else {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Halaman Tidak Ditemukan']);
         }
-
-
-        // Lanjutkan jika semua pengecekan berhasil
-        $data['dtstock'] = $dtstock;
-        $data['dtlokasi'] = $this->objLokasi->findAll();
-        $data['dtgroup'] = $this->db->table('group1')->get()->getResult();
-        $data['dtkelompok'] = $this->db->table('kelompok1')->get()->getResult();
-        $data['dtsupplier'] = $this->db->table('setupsupplier1')->get()->getResult();
-        return view('setup_persediaan/stock/edit', $data);
     }
 
     /**
@@ -135,24 +177,23 @@ class Stock extends ResourceController
      */
     public function update($id = null)
     {
-        $data = $this->request->getPost();
-        $data = [
-            'id_stock' => $this->request->getVar('id_stock'),
-            'id_lokasi' => $this->request->getVar('id_lokasi'),
-            'kode' => $this->request->getVar('kode'),
-            'nama_barang' => $this->request->getVar('nama_barang'),
-            'id_group' => $this->request->getVar('id_group'),
-            'id_kelompok' => $this->request->getVar('id_kelompok'),
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-            'satuan_stock' => $this->request->getVar('satuan_stock'),
-            'satuan' => $this->request->getVar('satuan'),
-            'jml_harga' => $this->request->getVar('jml_harga'),
-            'tanggal' => $this->request->getVar('tanggal'),
-        ];
-        // Update data berdasarkan ID
-        $this->objStock->update($id, $data);
+        if ($this->request->isAJAX()) {
+            $data = $this->request->getPost();
 
-        return redirect()->to(site_url('setup_persediaan/stock'))->with('Sukses', 'Data Berhasil Disimpan');
+            if ($this->objStock->update($id, $data)) {
+                $msg = [
+                    'success' => 'Data Berhasil Diubah'
+                ];
+            } else {
+                $msg = [
+                    'error' => 'Gagal Mengubah Data'
+                ];
+            }
+
+            return $this->response->setJSON($msg);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Halaman Tidak Ditemukan']);
+        }
     }
 
     /**
@@ -164,7 +205,19 @@ class Stock extends ResourceController
      */
     public function delete($id = null)
     {
-        $this->db->table('stock1')->where(['id_stock' => $id])->delete();
-        return redirect()->to(site_url('setup_persediaan/stock'))->with('Sukses', 'Data Berhasil Dihapus');
+        if ($this->request->isAJAX()) {
+            if ($this->objStock->delete($id)) {
+                $msg = [
+                    'success' => 'Data Berhasil Dihapus'
+                ];
+            } else {
+                $msg = [
+                    'error' => 'Gagal Menghapus Data'
+                ];
+            }
+            return $this->response->setJSON($msg);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Halaman Tidak Ditemukan']);
+        }
     }
 }

@@ -15,24 +15,26 @@
         <h4>Simple Table</h4>
       </div>
       <div class="card-body">
-        <form method="post" action="<?= site_url('setup/klasifikasi') ?> ">
-          <?= csrf_field() ?>
+        <div class="form-container">
+          <form method="post" action="<?= site_url('setup/klasifikasi') ?> ">
+            <?= csrf_field() ?>
 
 
-          <div class="form-group">
-            <label>Kode</label>
-            <input type="text" class="form-control" name="kode_klasifikasi" placeholder="Kode" required>
-          </div>
-          <div class="form-group">
-            <label>Nama</label>
-            <input type="text" class="form-control" name="nama_klasifikasi" placeholder="Nama" style="text-transform: uppercase;" required>
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Simpan Data</button>
-            <button type="reset" class="btn btn-danger">Reset</button>
-          </div>
+            <div class="form-group">
+              <label>Kode</label>
+              <input type="text" class="form-control" name="kode_klasifikasi" placeholder="Kode" required>
+            </div>
+            <div class="form-group">
+              <label>Nama</label>
+              <input type="text" class="form-control" name="nama_klasifikasi" placeholder="Nama" style="text-transform: uppercase;" required>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Simpan Data</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </div>
       </div>
-      </form>
     </div>
   </div>
 

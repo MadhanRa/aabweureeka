@@ -3,15 +3,19 @@
 namespace App\Controllers\setup_persediaan;
 
 use App\Models\setup_persediaan\ModelHarga;
+use App\Models\setup_persediaan\ModelStock;
+use App\Models\setup_persediaan\ModelKelompok;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Harga extends ResourceController
 {
-    protected $objHarga, $db;
+    protected $objHarga, $db, $modelStock, $modelKelompok;
     function __construct()
     {
         $this->objHarga = new ModelHarga();
+        $this->modelStock = new ModelStock();
+        $this->modelKelompok = new ModelKelompok();
         $this->db = \Config\Database::connect();
     }
 
@@ -22,8 +26,28 @@ class Harga extends ResourceController
      */
     public function index()
     {
-        $data['dtharga'] = $this->objHarga->findAll();
-        return view('setup_persediaan/harga/index', $data);
+        // Ambil parameter pencarian dari URL
+        $searchKelompok = $this->request->getGet('search_kelompok');
+
+        // Siapkan query dasar
+        $query = $this->objHarga->join('stock1', 'stock1.id_stock = harga1.id_stock');
+
+        // Jika ada parameter pencarian kelompok, tambahkan filter
+        if (!empty($searchKelompok)) {
+            $query->where('stock1.id_kelompok', $searchKelompok);
+        }
+
+        // Dapatkan data harga berdasarkan filter
+        $dtharga = $query->findAll();
+
+        // Data untuk dropdown filter
+        $dtkelompok = $this->modelKelompok->findAll();
+
+        return view('setup_persediaan/harga/index', [
+            'dtharga' => $dtharga,
+            'dtkelompok' => $dtkelompok,
+            'searchKelompok' => $searchKelompok,
+        ]);
     }
 
     /**
@@ -45,9 +69,8 @@ class Harga extends ResourceController
      */
     public function new()
     {
-        $builder = $this->db->table('harga1');
-        $query = $builder->get();
-        $data['dtharga'] = $query->getResult();
+        $data['dtstock'] = $this->modelStock->findAll();
+
         return view('setup_persediaan/harga/new', $data);
     }
 
@@ -61,8 +84,7 @@ class Harga extends ResourceController
         $data = $this->request->getPost();
         $data = [
             'id_harga' => $this->request->getVar('id_harga'),
-            'kode_harga' => $this->request->getVar('kode_harga'),
-            'nama_barang' => $this->request->getVar('nama_barang'),
+            'id_stock' => $this->request->getVar('id_stock'),
             'harga_jualexc' => $this->request->getVar('harga_jualexc'),
             'harga_jualinc' => $this->request->getVar('harga_jualinc'),
             'harga_beli' => $this->request->getVar('harga_beli'),
@@ -88,7 +110,7 @@ class Harga extends ResourceController
         if (!$dtharga) {
             return redirect()->to(site_url('setup_persediaan/harga'))->with('error', 'Data tidak ditemukan');
         }
-
+        $data['dtstock'] = $this->modelStock->findAll();
 
         // Lanjutkan jika semua pengecekan berhasil
         $data['dtharga'] = $dtharga;

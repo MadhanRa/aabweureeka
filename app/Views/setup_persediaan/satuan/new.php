@@ -15,28 +15,28 @@
         <h4>Simple Table</h4>
       </div>
       <div class="card-body">
-        <form method="post" action="<?= site_url('setup_persediaan/satuan') ?> ">
-          <?= csrf_field() ?>
+        <div class="form-container">
+          <form method="post" action="<?= site_url('setup_persediaan/satuan') ?> ">
+            <?= csrf_field() ?>
 
-
-          <div class="form-group">
-            <label>Kode</label>
-            <input type="text" class="form-control" name="kode_satuan" placeholder="Kode Satuan" required>
-          </div>
-          <div class="form-group">
-            <label>Nama</label>
-            <input type="text" class="form-control" name="nama_satuan" placeholder="Nama Satuan" required>
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Simpan Data</button>
-            <button type="reset" class="btn btn-danger">Reset</button>
-          </div>
+            <div class="form-group">
+              <label>Kode</label>
+              <input type="text" class="form-control" name="kode_satuan" placeholder="Kode Satuan" required>
+            </div>
+            <div class="form-group">
+              <label>Nama</label>
+              <input type="text" class="form-control" name="nama_satuan" placeholder="Nama Satuan" required>
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-success">Simpan Data</button>
+              <button type="reset" class="btn btn-danger">Reset</button>
+            </div>
+          </form>
+        </div>
       </div>
-      </form>
     </div>
   </div>
 
-  </div>
 </section>
 
 <?= $this->endSection(); ?>

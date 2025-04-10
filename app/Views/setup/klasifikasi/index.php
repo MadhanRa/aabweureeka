@@ -9,7 +9,7 @@
 <section class="section">
   <div class="section-header">
     <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('setup/klasifikasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>Klasifikasi</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -29,13 +29,16 @@
     <!-- HALAMAN DINAMIS -->
     <div class="card">
       <div class="card-header">
-        <h4>Klasifikasi</h4>
+        <h4>Setup Klasifikasi</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('setup/klasifikasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+        </div>
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table border="2px" class="table-striped table-md" id="myTable" style="border-color: #009548; border-width: 2px; border-style: solid;">
+          <table class="table table-striped display eureeka-table nowrap compact" id="myTable">
             <thead>
-              <tr style="background-color: #009548; color: white;">
+              <tr class="eureeka-table-header">
                 <th>No</th>
                 <th>Kode</th>
                 <th>Nama</th>
@@ -51,12 +54,12 @@
 
                   <td class="text-center">
                     <!-- Tombol Edit Data -->
-                    <a href="<?= site_url('setup/klasifikasi/' . $value->id_klasifikasi . '/edit') ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
+                    <a href="<?= site_url('setup/klasifikasi/' . $value->id_klasifikasi . '/edit') ?>" class="btn btn-warning"><i class="fas fa-pencil-alt mr-1"></i> Edit</a>
                     <!-- Tombol Hapus Data -->
                     <form action="<?= site_url('setup/klasifikasi/' . $value->id_klasifikasi) ?>" method="post" id="del-<?= $value->id_klasifikasi ?>" class="d-inline">
                       <?= csrf_field() ?>
                       <input type="hidden" name="_method" value="DELETE">
-                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_klasifikasi ?>)"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_klasifikasi ?>)"><i class="fas fa-trash"></i> Hapus</button>
                     </form>
                   </td>
                 </tr>
@@ -68,8 +71,18 @@
 
     </div>
   </div>
-
-  </div>
 </section>
+
+<script>
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+        targets: 3,
+        orderable: false,
+        searchable: false
+      }],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>

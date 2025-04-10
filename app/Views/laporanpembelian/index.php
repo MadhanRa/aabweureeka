@@ -16,7 +16,7 @@
     <div class="card-body">
       <div class="row">
         <div class="col">
-        <a href="<?= base_url('LaporanPembelian/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&supplier=' . $supplier) ?>" class="btn btn-success" target="_blank">
+          <a href="<?= base_url('LaporanPembelian/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&supplier=' . $supplier) ?>" class="btn btn-success" target="_blank">
             <i class="fas fa-print"></i> Cetak PDF
           </a>
         </div>
@@ -39,37 +39,37 @@
   <!-- Tabel Data -->
   <div class="section-body">
     <div class="card-body">
-    <form action="<?= site_url('laporanpembelian') ?>" method="POST">
-   <?= csrf_field() ?>
-   <div class="row g-3">
-      <div class="col">
-         <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
-      </div>
-      <div class="col">
-         <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
-      </div>
-      <div class="col">
-         <select name="supplier" class="form-control">
-            <option value="">-- Semua Supplier --</option>
-            <?php foreach ($dtsetupsupplier as $sup): ?>
-               <option value="<?= $sup->id_setupsupplier ?>" <?= $supplier == $sup->id_setupsupplier ? 'selected' : '' ?>>
+      <form action="<?= site_url('laporanpembelian') ?>" method="POST">
+        <?= csrf_field() ?>
+        <div class="row g-3">
+          <div class="col">
+            <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
+          </div>
+          <div class="col">
+            <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
+          </div>
+          <div class="col">
+            <select name="supplier" class="form-control">
+              <option value="">-- Semua Supplier --</option>
+              <?php foreach ($dtsetupsupplier as $sup): ?>
+                <option value="<?= $sup->id_setupsupplier ?>" <?= $supplier == $sup->id_setupsupplier ? 'selected' : '' ?>>
                   <?= $sup->nama ?>
-               </option>
-            <?php endforeach; ?>
-         </select>
-      </div>
-      <div class="col">
-         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
-      </div>
-   </div>
-</form>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="col">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+          </div>
+        </div>
+      </form>
 
       <div class="card-body">
-        
+
         <div class="table-responsive">
-          <table border="2px" class="tablet able-striped table-md" id="myTable" style="border-color: #009548; border-width: 4px; border-style: solid;">
+          <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
             <thead>
-              <tr style="background-color: #009548; color: white;">
+              <tr class="eureeka-table-header">
                 <th>No</th>
                 <th>Tanggal</th>
                 <th>Nota</th>
@@ -111,18 +111,18 @@
                 </tr>
               <?php endforeach; ?>
             </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="12" style="text-align: right;">Subtotal:</th>
-                  <th><?= "Rp " . number_format($subtotal, 0, ',', '.') ?></th>
-                  <th colspan="3"></th>
-                </tr>
-                <tr>
-                  <th colspan="12" style="text-align: right;">Grand Total:</th>
-                  <th><?= "Rp " . number_format($grandtotal, 0, ',', '.') ?></th>
-                  <th colspan="3"></th>
-                </tr>
-              </tfoot>
+            <tfoot>
+              <tr>
+                <th colspan="12" style="text-align: right;">Subtotal:</th>
+                <th><?= "Rp " . number_format($subtotal, 0, ',', '.') ?></th>
+                <th colspan="3"></th>
+              </tr>
+              <tr>
+                <th colspan="12" style="text-align: right;">Grand Total:</th>
+                <th><?= "Rp " . number_format($grandtotal, 0, ',', '.') ?></th>
+                <th colspan="3"></th>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

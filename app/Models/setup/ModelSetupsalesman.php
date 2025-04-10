@@ -7,16 +7,19 @@ use CodeIgniter\Model;
 class ModelSetupsalesman extends Model
 {
     protected $table            = 'setupsalesman1';
-    protected $primaryKey       = 'id_setupsalesman';
+    protected $primaryKey       = 'id_salesman';
     // protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_setupsalesman', 'nama_setupsalesman', 'lokasi_setupsalesman', 'tanggal_setupsalesman'];
+    protected $allowedFields    = ['kode_salesman', 'nama_salesman', 'id_lokasi', 'saldo'];
 
-    public function getAll()
+
+    public function getSalesmanwithLokasi()
     {
-        return $this->findAll(); // Mengambil semua data dari tabel lokasi1
+        return $this->select('setupsalesman1.*, lokasi1.nama_lokasi')
+            ->join('lokasi1', 'lokasi1.id_lokasi = setupsalesman1.id_lokasi', 'left')
+            ->findAll();
     }
 
     // protected bool $allowEmptyInserts = false;

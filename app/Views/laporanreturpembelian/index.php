@@ -39,41 +39,41 @@
   <!-- Tabel Data -->
   <div class="section-body">
     <div class="card-body">
-    <form action="<?= site_url('laporanreturpembelian') ?>" method="POST">
-   <?= csrf_field() ?>
-   <div class="row g-3">
-      <div class="col">
-         <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
-      </div>
-      <div class="col">
-         <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
-      </div>
-      <div class="col">
-         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
-      </div>
-   </div>
-</form>
+      <form action="<?= site_url('laporanreturpembelian') ?>" method="POST">
+        <?= csrf_field() ?>
+        <div class="row g-3">
+          <div class="col">
+            <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
+          </div>
+          <div class="col">
+            <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
+          </div>
+          <div class="col">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+          </div>
+        </div>
+      </form>
 
       <div class="card-body">
-        
+
         <div class="table-responsive">
-          <table border="2px" class="tablet able-striped table-md" id="myTable" style="border-color: #009548; border-width: 4px; border-style: solid;">
+          <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
             <thead>
-              <tr style="background-color: #009548; color: white;">
-                  <th>No</th>
-                  <th>Tanggal</th>
-                  <th>Nota</th>
-                  <th>Supplier</th>
-                  <th>Nama Stock</th>
-                  <th>Satuan</th>
-                  <th>Qty 1</th>
-                  <th>Qty 2</th>
-                  <th>Harga Satuan</th>
-                  <th>Jumlah Harga</th>
-                  <th>Disc. 1</th>
-                  <th>Disc. 2</th>
-                  <th>Total</th>
-                  
+              <tr class="eureeka-table-header">
+                <th>No</th>
+                <th>Tanggal</th>
+                <th>Nota</th>
+                <th>Supplier</th>
+                <th>Nama Stock</th>
+                <th>Satuan</th>
+                <th>Qty 1</th>
+                <th>Qty 2</th>
+                <th>Harga Satuan</th>
+                <th>Jumlah Harga</th>
+                <th>Disc. 1</th>
+                <th>Disc. 2</th>
+                <th>Total</th>
+
                 <!-- <th>Action</th> -->
               </tr>
             </thead>
@@ -81,38 +81,38 @@
               <!-- Iterasi Data -->
               <?php foreach ($dtreturpembelian as $key => $value) : ?>
                 <tr>
-                    <td><?= $key + 1 ?></td>
-                    <td><?= $value->tanggal ?></td>
-                    <td><?= $value->nota ?></td>
-                    <td><?= $value->nama_supplier ?></td>
-                    <td><?= $value->nama_stock ?></td>
-                    <td><?= $value->kode_satuan ?></td>
-                    <td><?= $value->qty_1 ?></td>
-                    <td><?= $value->qty_2 ?></td>
-                    <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
-                    <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
-                    <td><?= $value->disc_1 ?></td>
-                    <td><?= $value->disc_2 ?></td>
-                    <td><?= "Rp " . number_format($value->total, 0, ',', '.') ?></td>
+                  <td><?= $key + 1 ?></td>
+                  <td><?= $value->tanggal ?></td>
+                  <td><?= $value->nota ?></td>
+                  <td><?= $value->nama_supplier ?></td>
+                  <td><?= $value->nama_stock ?></td>
+                  <td><?= $value->kode_satuan ?></td>
+                  <td><?= $value->qty_1 ?></td>
+                  <td><?= $value->qty_2 ?></td>
+                  <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
+                  <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
+                  <td><?= $value->disc_1 ?></td>
+                  <td><?= $value->disc_2 ?></td>
+                  <td><?= "Rp " . number_format($value->total, 0, ',', '.') ?></td>
                   <!-- <td>
 
                   <!-- Tombol Print -->
-                  </td> 
+                  </td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="12" style="text-align: right;">Subtotal:</th>
-                  <th><?= "Rp " . number_format($subtotal, 0, ',', '.') ?></th>
-                  <th colspan="3"></th>
-                </tr>
-                <tr>
-                  <th colspan="12" style="text-align: right;">Grand Total:</th>
-                  <th><?= "Rp " . number_format($grandtotal, 0, ',', '.') ?></th>
-                  <th colspan="3"></th>
-                </tr>
-              </tfoot>
+            <tfoot>
+              <tr>
+                <th colspan="12" style="text-align: right;">Subtotal:</th>
+                <th><?= "Rp " . number_format($subtotal, 0, ',', '.') ?></th>
+                <th colspan="3"></th>
+              </tr>
+              <tr>
+                <th colspan="12" style="text-align: right;">Grand Total:</th>
+                <th><?= "Rp " . number_format($grandtotal, 0, ',', '.') ?></th>
+                <th colspan="3"></th>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>

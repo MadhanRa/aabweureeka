@@ -1,0 +1,724 @@
+INFO - 2025-04-10 06:29:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:29:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:29:39 --> CSRF token verified.
+INFO - 2025-04-10 06:29:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:29:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:29:48 --> CSRF token verified.
+INFO - 2025-04-10 06:29:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:29:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:30:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:30:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:30:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:30:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:30:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:31:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:31:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:31:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:31:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:31:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 06:31:58 --> ErrorException: include(C:\laragon\www\aabweureeka\vendor\composer/../../app/Controllers/Setupbiaya.php): Failed to open stream: No such file or directory
+[Method: GET, Route: setupbiaya]
+in VENDORPATH\composer\ClassLoader.php on line 571.
+ 1 VENDORPATH\composer\ClassLoader.php(571): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(C:\\laragon\\www\\aabweureeka\\vendor\\composer/../../app/Controllers/Setupbiaya.php): Failed to open stream: No such file or directory', 'C:\\laragon\\www\\aabweureeka\\vendor\\composer\\ClassLoader.php', 571)
+ 2 VENDORPATH\composer\ClassLoader.php(571): include()
+ 3 VENDORPATH\composer\ClassLoader.php(428): Composer\Autoload\includeFile('C:\\laragon\\www\\aabweureeka\\vendor\\composer/../../app/Controllers/Setupbiaya.php')
+ 4 [internal function]: Composer\Autoload\ClassLoader->loadClass('App\\Controllers\\Setupbiaya')
+ 5 SYSTEMPATH\CodeIgniter.php(887): class_exists('\\App\\Controllers\\Setupbiaya', true)
+ 6 SYSTEMPATH\CodeIgniter.php(496): CodeIgniter\CodeIgniter->startController()
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+11 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 06:32:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:32:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:34:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:35:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:35:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:35:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:37:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:58:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:58:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:58:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:58:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 06:59:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:01:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:02:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:10:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:10:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:11:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:11:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:12:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:16:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:16:28 --> CSRF token verified.
+INFO - 2025-04-10 07:16:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:16:28 --> mysqli_sql_exception: Unknown column 'kode_setupsalesman' in 'field list' in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('INSERT INTO `se...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `se...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `se...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(2340): CodeIgniter\Database\BaseConnection->query('INSERT INTO `se...', Array, false)
+#4 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\BaseModel.php(840): CodeIgniter\Model->doInsert(Array)
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Model.php(802): CodeIgniter\BaseModel->insert(Array, true)
+#7 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(99): CodeIgniter\Model->insert(Array)
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->create()
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#15 {main}
+CRITICAL - 2025-04-10 07:16:28 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'kode_setupsalesman' in 'field list'
+[Method: POST, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2340): CodeIgniter\Database\BaseConnection->query('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (:kode_setupsalesman:, :nama_setupsalesman:, :lokasi_setupsalesman:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(840): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(802): CodeIgniter\BaseModel->insert([...], true)
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(99): CodeIgniter\Model->insert([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->create()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:16:28 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'kode_setupsalesman' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (\'001-A\', \'ASEP\', NULL)')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (\'001-A\', \'ASEP\', NULL)')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2340): CodeIgniter\Database\BaseConnection->query('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (:kode_setupsalesman:, :nama_setupsalesman:, :lokasi_setupsalesman:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(840): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(802): CodeIgniter\BaseModel->insert([...], true)
+ 7 APPPATH\Controllers\setup\SetupSalesman.php(99): CodeIgniter\Model->insert([...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->create()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:16:28 --> [Caused by] mysqli_sql_exception: Unknown column 'kode_setupsalesman' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (\'001-A\', \'ASEP\', NULL)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (\'001-A\', \'ASEP\', NULL)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (\'001-A\', \'ASEP\', NULL)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2340): CodeIgniter\Database\BaseConnection->query('INSERT INTO `setupsalesman1` (`kode_setupsalesman`, `nama_setupsalesman`, `lokasi_setupsalesman`) VALUES (:kode_setupsalesman:, :nama_setupsalesman:, :lokasi_setupsalesman:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(840): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(802): CodeIgniter\BaseModel->insert([...], true)
+ 8 APPPATH\Controllers\setup\SetupSalesman.php(99): CodeIgniter\Model->insert([...])
+ 9 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->create()
+10 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+11 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:16:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:17:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:17:34 --> CSRF token verified.
+INFO - 2025-04-10 07:17:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 07:17:34 --> CodeIgniter\Database\Exceptions\DataException: There is no data to insert.
+[Method: POST, Route: setup/salesman]
+in SYSTEMPATH\BaseModel.php on line 826.
+ 1 SYSTEMPATH\BaseModel.php(826): CodeIgniter\Database\Exceptions\DataException::forEmptyDataset('insert')
+ 2 SYSTEMPATH\Model.php(802): CodeIgniter\BaseModel->insert([], true)
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(99): CodeIgniter\Model->insert([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->create()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:18:43 --> CSRF token verified.
+INFO - 2025-04-10 07:18:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:18:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 07:18:43 --> ErrorException: Undefined property: stdClass::$kode_setupsalesman
+[Method: GET, Route: setup/salesman]
+in APPPATH\Views\setup\salesman\index.php on line 54.
+ 1 APPPATH\Views\setup\salesman\index.php(54): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: stdClass::$kode_setupsalesman', 'C:\\laragon\\www\\aabweureeka\\app\\Views\\setup\\salesman\\index.php', 54)
+ 2 SYSTEMPATH\View\View.php(234): include('C:\\laragon\\www\\aabweureeka\\app\\Views\\setup\\salesman\\index.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1169): CodeIgniter\View\View->render('setup/salesman/index', [], true)
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(43): view('setup/salesman/index', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:22:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:22:44 --> mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#13 {main}
+CRITICAL - 2025-04-10 07:22:44 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+[Method: GET, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 2 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:22:44 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 4 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:22:44 --> [Caused by] mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 5 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:23:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:23:26 --> mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#13 {main}
+CRITICAL - 2025-04-10 07:23:26 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+[Method: GET, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 2 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:23:26 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 4 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:23:26 --> [Caused by] mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 5 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:24:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:24:09 --> mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#13 {main}
+CRITICAL - 2025-04-10 07:24:09 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+[Method: GET, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 2 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:24:09 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 4 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:24:09 --> [Caused by] mysqli_sql_exception: Table 'aabw.lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 5 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:25:54 --> mysqli_sql_exception: Table 'aabw.nama_lokasi' doesn't exist in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#13 {main}
+CRITICAL - 2025-04-10 07:25:54 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.nama_lokasi' doesn't exist
+[Method: GET, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 2 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:25:54 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'aabw.nama_lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 4 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:25:54 --> [Caused by] mysqli_sql_exception: Table 'aabw.nama_lokasi' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 5 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:26:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:26:05 --> mysqli_sql_exception: Unknown database 'lokasi1' in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#13 {main}
+CRITICAL - 2025-04-10 07:26:05 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'lokasi1'
+[Method: GET, Route: setup/salesman]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 2 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:26:05 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'lokasi1'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 4 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:26:05 --> [Caused by] mysqli_sql_exception: Unknown database 'lokasi1'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `setupsalesman1`
+JOIN `lokasi1`.`nama_lokasi` ON `lokasi1`.`id_lokasi` = `setupsalesman1`.`id_lokasi`', [], false)
+ 5 APPPATH\Models\setup\ModelSetupsalesman.php(22): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\setup\SetupSalesman.php(42): App\Models\setup\ModelSetupsalesman->getSalesmanwithLokasi()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:26:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 07:26:17 --> ErrorException: Undefined property: stdClass::$lokasi
+[Method: GET, Route: setup/salesman]
+in APPPATH\Views\setup\salesman\index.php on line 56.
+ 1 APPPATH\Views\setup\salesman\index.php(56): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: stdClass::$lokasi', 'C:\\laragon\\www\\aabweureeka\\app\\Views\\setup\\salesman\\index.php', 56)
+ 2 SYSTEMPATH\View\View.php(234): include('C:\\laragon\\www\\aabweureeka\\app\\Views\\setup\\salesman\\index.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1169): CodeIgniter\View\View->render('setup/salesman/index', [], true)
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(43): view('setup/salesman/index', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:27:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:28:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:28:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:28:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:33:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:43 --> CSRF token verified.
+INFO - 2025-04-10 07:35:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:58 --> CSRF token verified.
+INFO - 2025-04-10 07:35:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:35:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:38:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:38:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:38:42 --> CSRF token verified.
+INFO - 2025-04-10 07:38:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-04-10 07:38:42 --> mysqli_sql_exception: Unknown column 'id_setupsalesman' in 'where clause' in C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('DELETE FROM `se...', 0)
+#1 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('DELETE FROM `se...')
+#2 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('DELETE FROM `se...')
+#3 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(2843): CodeIgniter\Database\BaseConnection->query('DELETE FROM `se...', Array, false)
+#4 C:\laragon\www\aabweureeka\app\Controllers\setup\SetupSalesman.php(160): CodeIgniter\Database\BaseBuilder->delete()
+#5 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->delete('9')
+#6 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+#7 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#9 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\laragon\www\aabweureeka\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 C:\laragon\www\aabweureeka\vendor\codeigniter4\framework\system\rewrite.php(44): require_once('C:\\laragon\\www\\...')
+#12 {main}
+CRITICAL - 2025-04-10 07:38:42 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'id_setupsalesman' in 'where clause'
+[Method: DELETE, Route: setup/salesman/9]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2843): CodeIgniter\Database\BaseConnection->query('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = :id_setupsalesman:', [...], false)
+ 2 APPPATH\Controllers\setup\SetupSalesman.php(160): CodeIgniter\Database\BaseBuilder->delete()
+ 3 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->delete('9')
+ 4 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 5 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:38:42 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'id_setupsalesman' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = \'9\'')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = \'9\'')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2843): CodeIgniter\Database\BaseConnection->query('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = :id_setupsalesman:', [...], false)
+ 4 APPPATH\Controllers\setup\SetupSalesman.php(160): CodeIgniter\Database\BaseBuilder->delete()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->delete('9')
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+11 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+CRITICAL - 2025-04-10 07:38:42 --> [Caused by] mysqli_sql_exception: Unknown column 'id_setupsalesman' in 'where clause'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = \'9\'', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = \'9\'')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = \'9\'')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2843): CodeIgniter\Database\BaseConnection->query('DELETE FROM `setupsalesman1`
+WHERE `id_setupsalesman` = :id_setupsalesman:', [...], false)
+ 5 APPPATH\Controllers\setup\SetupSalesman.php(160): CodeIgniter\Database\BaseBuilder->delete()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupSalesman->delete('9')
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupSalesman))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 07:39:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:39:25 --> CSRF token verified.
+INFO - 2025-04-10 07:39:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:39:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:39:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:42:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:44:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:46:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:48:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:51:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:51:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 07:51:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:08:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:08:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:09:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:15:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:19:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:20:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:22:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:22:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:28:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:29:16 --> CSRF token verified.
+INFO - 2025-04-10 09:29:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:29:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:31:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:31:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:38:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:39:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:39:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:40:18 --> CSRF token verified.
+INFO - 2025-04-10 09:40:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:40:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:40:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:41:25 --> CSRF token verified.
+INFO - 2025-04-10 09:41:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:41:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:41:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:46:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 09:46:55 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "setuppelanggan/edit.php"
+[Method: GET, Route: setup/pelanggan/5/edit]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 41.
+ 1 SYSTEMPATH\View\View.php(222): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('setuppelanggan/edit.php')
+ 2 SYSTEMPATH\Common.php(1169): CodeIgniter\View\View->render('setuppelanggan/edit', [], true)
+ 3 APPPATH\Controllers\setup\SetupPelanggan.php(111): view('setuppelanggan/edit', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupPelanggan->edit('5')
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupPelanggan))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 09:46:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:47:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-04-10 09:47:24 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "setuppelanggan/edit.php"
+[Method: GET, Route: setup/pelanggan/5/edit]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 41.
+ 1 SYSTEMPATH\View\View.php(222): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('setuppelanggan/edit.php')
+ 2 SYSTEMPATH\Common.php(1169): CodeIgniter\View\View->render('setuppelanggan/edit', [], true)
+ 3 APPPATH\Controllers\setup\SetupPelanggan.php(111): view('setuppelanggan/edit', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\setup\SetupPelanggan->edit('5')
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\setup\SetupPelanggan))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\laragon\\www\\aabweureeka\\public\\index.php')
+INFO - 2025-04-10 09:48:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:48:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:48:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:48:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:51:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:52:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:53:34 --> CSRF token verified.
+INFO - 2025-04-10 09:53:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:53:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:54:52 --> CSRF token verified.
+INFO - 2025-04-10 09:54:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 09:54:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-04-10 11:36:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

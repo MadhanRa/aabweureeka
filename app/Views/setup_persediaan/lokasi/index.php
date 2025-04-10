@@ -1,15 +1,14 @@
 <?= $this->extend("layout/backend") ?>;
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Setup Lokasi</title>
+<title>Akuntansi Eureeka - Setup Lokasi</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('setup_persediaan/lokasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>Lokasi</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -30,12 +29,15 @@
     <div class="card">
       <div class="card-header">
         <h4>Setup Lokasi</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('setup_persediaan/lokasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+        </div>
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table border="2px" class="display compact" id="myTable" style="border-color: #009548; border-width: 4px; border-style: solid;">
+          <table class="table table-striped table-md eureeka-table" id="myTable">
             <thead>
-              <tr style="background-color: #009548; color: white;">
+              <tr class="eureeka-table-header">
                 <th>No</th>
                 <th>Kode</th>
                 <th>Nama</th>
@@ -51,16 +53,15 @@
 
                   <td class="text-center">
                     <!-- Tombol Edit Data -->
-                    <a href="<?= site_url('setup_persediaan/lokasi/' . $value->id_lokasi) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
+                    <a href="<?= site_url('setup_persediaan/lokasi/' . $value->id_lokasi) .  '/edit' ?>" class="btn btn-warning mr-1"><i class="fas fa-pencil-alt"></i> Edit</a>
                     <input type="hidden" name="_method" value="PUT">
                     <!-- Tombol Hapus Data -->
                     <form action="<?= site_url('setup_persediaan/lokasi/' . $value->id_lokasi) ?>" method="post" id="del-<?= $value->id_lokasi ?>" class="d-inline">
                       <?= csrf_field() ?>
                       <input type="hidden" name="_method" value="DELETE">
-                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_lokasi ?>)"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_lokasi ?>)"><i class="fas fa-trash"></i> Hapus</button>
                     </form>
                   </td>
-                  <!-- <td><a href="#" class="btn btn-secondary">Detail</a></td> -->
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -70,8 +71,18 @@
 
     </div>
   </div>
-
-  </div>
 </section>
+
+<script>
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+        targets: 3,
+        orderable: false,
+        searchable: false
+      }],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>

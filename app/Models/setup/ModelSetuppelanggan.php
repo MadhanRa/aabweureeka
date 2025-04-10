@@ -12,12 +12,8 @@ class ModelSetuppelanggan extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe', 'tanggal', 'saldo'];
+    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe', 'saldo'];
 
-    public function getAll()
-    {
-        return $this->findAll(); // Mengambil semua data dari tabel lokasi1
-    }
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

@@ -9,64 +9,89 @@ class ModelStock extends Model
     protected $table            = 'stock1';
     protected $primaryKey       = 'id_stock';
     protected $returnType       = 'object';
-    protected $allowedFields    = ['id_lokasi', 'id_group', 'id_kelompok', 'id_setupsupplier', 'kode_lokasi', 'nama_lokasi', 'kode', 'nama_barang', 'id_satuan', 'jumlah', 'jml_harga'];
-    // protected $useTimestamps = true;
-
-    function getAll()
-    {
-        $builder = $this->db->table('stock1');
-        $builder->join('lokasi1', 'lokasi1.id_lokasi = stock1.id_lokasi');
-        $query   = $builder->get();
-        return $query->getResult();
-    }
+    protected $allowedFields    = ['id_group', 'id_kelompok', 'id_setupsupplier', 'kode', 'nama_barang', 'min_stock', 'id_satuan', 'id_satuan2', 'conv_factor'];
+    protected $useTimestamps = true;
+    // Dates
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    // protected $deletedField  = 'deleted_at';
 
     public function getStockWithRelations()
     {
         return $this->select('stock1.*, 
-                          lokasi1.nama_lokasi, 
                           group1.nama_group, 
                           kelompok1.nama_kelompok, 
-                          satuan1.kode_satuan, 
+                          satuan1.kode_satuan as kode_satuan,
+                          satuan2.kode_satuan as kode_satuan2,
                           setupsupplier1.nama as nama_setupsupplier')
-            ->join('lokasi1', 'lokasi1.id_lokasi = stock1.id_lokasi', 'left')
             ->join('group1', 'group1.id_group = stock1.id_group', 'left')
             ->join('kelompok1', 'kelompok1.id_kelompok = stock1.id_kelompok', 'left')
             ->join('setupsupplier1', 'setupsupplier1.id_setupsupplier = stock1.id_setupsupplier', 'left')
             ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left')
             ->findAll();
     }
 
+    public function baseQuery()
+    {
+        return $this->select('stock1.*, 
+                          group1.nama_group, 
+                          kelompok1.nama_kelompok, 
+                          satuan1.kode_satuan as kode_satuan,
+                          satuan2.kode_satuan as kode_satuan2,
+                          setupsupplier1.nama as nama_setupsupplier')
+            ->join('group1', 'group1.id_group = stock1.id_group', 'left')
+            ->join('kelompok1', 'kelompok1.id_kelompok = stock1.id_kelompok', 'left')
+            ->join('setupsupplier1', 'setupsupplier1.id_setupsupplier = stock1.id_setupsupplier', 'left')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left');
+    }
 
-    // protected $useAutoIncrement = true;
-    // protected $useSoftDeletes   = false;
-    // protected $protectFields    = true;
+    public function ajaxGetData($start, $length)
+    {
+        $result = $this->baseQuery()
+            ->findAll($length, $start);
+        return $result;
+    }
 
-    // protected bool $allowEmptyInserts = false;
-    // protected bool $updateOnlyChanged = true;
+    public function ajaxGetDataSearch($search, $start, $length)
+    {
+        $result = $this->baseQuery()
+            ->like('stock1.kode', $search)
+            ->orLike('stock1.nama_barang', $search)
+            ->orLike('group1.nama_group', $search)
+            ->orLike('kelompok1.nama_kelompok', $search)
+            ->orLike('setupsupplier1.nama', $search)
+            ->findAll($length, $start);
+        return $result;
+    }
 
-    // protected array $casts = [];
-    // protected array $castHandlers = [];
+    public function ajaxGetTotal()
+    {
+        $result = $this->countAll();
 
-    // // Dates
-    // protected $dateFormat    = 'datetime';
-    // protected $createdField  = 'created_at';
-    // protected $updatedField  = 'updated_at';
-    // protected $deletedField  = 'deleted_at';
+        if (isset($result)) {
+            return $result;
+        }
 
-    // // Validation
-    // protected $validationRules      = [];
-    // protected $validationMessages   = [];
-    // protected $skipValidation       = false;
-    // protected $cleanValidationRules = true;
+        return 0;
+    }
 
-    // // Callbacks
-    // protected $allowCallbacks = true;
-    // protected $beforeInsert   = [];
-    // protected $afterInsert    = [];
-    // protected $beforeUpdate   = [];
-    // protected $afterUpdate    = [];
-    // protected $beforeFind     = [];
-    // protected $afterFind      = [];
-    // protected $beforeDelete   = [];
-    // protected $afterDelete    = [];
+    public function ajaxGetTotalSearch($search)
+    {
+        $result = $this->baseQuery()
+            ->like('stock1.kode', $search)
+            ->orLike('stock1.nama_barang', $search)
+            ->orLike('group1.nama_group', $search)
+            ->orLike('kelompok1.nama_kelompok', $search)
+            ->orLike('setupsupplier1.nama', $search)
+            ->countAllResults();
+
+        if (isset($result)) {
+            return $result;
+        }
+
+        return 0;
+    }
 }

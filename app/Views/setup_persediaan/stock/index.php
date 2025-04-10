@@ -9,7 +9,7 @@
 <section class="section">
   <div class="section-header">
     <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('setup_persediaan/stock/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>Stock</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -24,71 +24,52 @@
       </div>
     </div>
   <?php endif; ?>
-
   <div class="section-body">
     <!-- HALAMAN DINAMIS -->
     <div class="card">
       <div class="card-header">
         <h4>Setup Stock</h4>
+        <div class="card-header-action">
+          <a href="javascript:void(0)" class="btn btn-primary" onclick="tambah_data()"><i class="fas fa-plus"></i> Tambah Data</a>
+          <a href="javascript:void(0)" class="btn btn-warning" onclick="reload_table()"><i class="fas fa-redo-alt"></i> Refresh Data</a>
+        </div>
       </div>
       <div class="card-body">
-        <div class="table-responsive">
-          <table border="2px" class="tablet able-striped table-md display nowrap compact" id="myTable" style="border-color: #009548; border-width: 4px; border-style: solid;">
-            <thead>
-              <tr style="background-color: #009548; color: white;">
-                <th>#</th>
-                <th>Nama Lokasi</th>
-                <th>Kode</th>
-                <th>Nama Barang</th>
-                <th>Group</th>
-                <th>Kelompok</th>
-                <th>Supplier</th>
-                <th>Jumlah</th>
-                <th>Satuan</th>
-                <th>Jml Harga</th>
-                <th>Tanggal</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- TEMPAT FOREACH -->
-              <?php foreach ($dtstock as $key => $value) : ?>
-                <tr>
-                  <td><?= $key + 1 ?></td>
-                  <td><?= $value->nama_lokasi ?></td>
-                  <td><?= $value->kode ?></td>
-                  <td><?= $value->nama_barang ?></td>
-                  <td><?= $value->nama_group ?></td>
-                  <td><?= $value->nama_kelompok ?></td>
-                  <td><?= $value->nama_setupsupplier ?></td>
-                  <td><?= $value->jumlah ?></td>
-                  <td><?= $value->kode_satuan ?></td>
-                  <td><?= $value->jml_harga ?></td>
-                  <td><?= $value->tanggal ?></td>
+        <div class="table-responsive" id="view-table">
 
-
-                  <td class="text-center">
-                    <!-- Tombol Edit Data -->
-                    <a href="<?= site_url('setup_persediaan/stock/' . $value->id_stock) .  '/edit' ?>"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
-                    <!-- Tombol Hapus Data -->
-                    <form action="<?= site_url('setup_persediaan/stock/' . $value->id_stock) ?>" method="post" id="del-<?= $value->id_stock ?>" class="d-inline">
-                      <?= csrf_field() ?>
-                      <input type="hidden" name="_method" value="DELETE">
-                      <a href="#" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_stock ?>)"><i class="fas fa-trash"></i> Hapus</a>
-                    </form>
-
-                  </td>
-                  <!-- <td><a href="#" class="btn btn-secondary">Detail</a></td> -->
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
   </div>
-
-  </div>
 </section>
+<div id="modalPlace" style="display: none;"></div>
 
+<script>
+  function reload_table() {
+    $.ajax({
+      url: "<?= site_url('setup_persediaan/stock/getStock') ?>",
+      type: "GET",
+      success: function(response) {
+        $('#view-table').html(response.data);
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    reload_table();
+  });
+
+  function tambah_data() {
+    $.ajax({
+      url: "<?= site_url('setup_persediaan/stock/new') ?>",
+      type: "GET",
+      dataType: "json",
+      success: function(response) {
+        $('#modalPlace').html(response.data);
+        $('#modalPlace').show();
+        $('#modalTambah').modal('show');
+      }
+    });
+  }
+</script>
 <?= $this->endSection(); ?>
