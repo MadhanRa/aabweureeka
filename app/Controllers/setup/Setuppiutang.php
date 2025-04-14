@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\setup;
 
-use App\Models\ModelSetuppiutang;
+use App\Models\setup\ModelSetuppiutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -34,11 +34,11 @@ class Setuppiutang extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         $data['dtsetuppiutang'] = $this->objSetuppiutang->findAll();
-        return view('setuppiutang/index', $data);
+        return view('setup/piutang/index', $data);
     }
 
     /**
@@ -63,7 +63,7 @@ class Setuppiutang extends ResourceController
         $builder = $this->db->table('setuppiutang1');
         $query = $builder->get();
         $data['dtsetuppiutang'] = $query->getResult();
-        return view('setuppiutang/new', $data);
+        return view('setup/piutang/new', $data);
     }
 
     /**
@@ -96,19 +96,19 @@ class Setuppiutang extends ResourceController
      */
     public function edit($id = null)
     {
-         // Ambil data berdasarkan ID
-       $dtsetuppiutang = $this->objSetuppiutang->find($id);
+        // Ambil data berdasarkan ID
+        $dtsetuppiutang = $this->objSetuppiutang->find($id);
 
-       // Cek jika data tidak ditemukan
-       if (!$dtsetuppiutang) {
-           return redirect()->to(site_url('setuppiutang'))->with('error', 'Data tidak ditemukan');
-       }
+        // Cek jika data tidak ditemukan
+        if (!$dtsetuppiutang) {
+            return redirect()->to(site_url('setuppiutang'))->with('error', 'Data tidak ditemukan');
+        }
 
 
-       // Lanjutkan jika semua pengecekan berhasil
-       $data['dtsetuppiutang'] = $dtsetuppiutang;
-       
-       return view('setuppiutang/edit', $data);
+        // Lanjutkan jika semua pengecekan berhasil
+        $data['dtsetuppiutang'] = $dtsetuppiutang;
+
+        return view('setup/piutang/edit', $data);
     }
 
     /**

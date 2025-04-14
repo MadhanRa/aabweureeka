@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\setup;
 
-use App\Models\ModelSetupsupplier;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupSupplier extends ResourceController
 {
-    protected $objSetupsupplier;
+    protected $supplierModel;
     protected $db;
     function __construct()
     {
-        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->supplierModel = new ModelSetupsupplier();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -22,8 +22,8 @@ class SetupSupplier extends ResourceController
      */
     public function index()
     {
-        $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
-        return view('setupsupplier/index', $data);
+        $data['dtsetupsupplier'] = $this->supplierModel->findAll();
+        return view('setup/supplier/index', $data);
     }
 
     /**
@@ -45,10 +45,10 @@ class SetupSupplier extends ResourceController
      */
     public function new()
     {
-        $builder = $this->db->table('setupsupplier1');
-        $query = $builder->get();
-        $data['dtsetupsupplier'] = $query->getResult();
-        return view('setupsupplier/new', $data);
+        // Buat supplier kode
+        $count = $this->supplierModel->countAllResults();
+        $data['kode_supplier'] = sprintf('%03d', $count + 1);
+        return view('setup/supplier/new', $data);
     }
 
     /**
@@ -58,22 +58,32 @@ class SetupSupplier extends ResourceController
      */
     public function create()
     {
-        $data = $this->request->getPost();
-        $data = [
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-            'kode' => $this->request->getVar('kode'),
-            'nama' => $this->request->getVar('nama'),
-            'alamat' => $this->request->getVar('alamat'),
-            'telepon' => $this->request->getVar('telepon'),
-            'contact_person' => $this->request->getVar('contact_person'),
-            'npwp' => $this->request->getVar('npwp'),
-            'tanggal' => $this->request->getVar('tanggal'),
-            'saldo' => $this->request->getVar('saldo'),
-            'tipe' => $this->request->getVar('tipe'),
-        ];
-        $this->db->table('setupsupplier1')->insert($data);
+        $namaSalesman = $this->request->getVar('nama');
+        $kodeSalesman = $this->request->getVar('kode');
 
-        return redirect()->to(site_url('setupsupplier'))->with('Sukses', 'Data Berhasil Disimpan');
+        // Ekstrak huruf pertama dari nama
+        $initial = strtoupper(substr($namaSalesman, 0, 1));
+
+        // Buat kode otomatis
+        $kodeSetupSalesman = $kodeSalesman . '-' . $initial;
+
+
+        $data = $this->request->getPost([
+            'nama',
+            'alamat',
+            'telepon',
+            'contact_person',
+            'npwp',
+            'tipe',
+        ]);
+
+        $data['kode'] = $kodeSetupSalesman;
+        $data['saldo'] = '0';
+
+        if ($this->supplierModel->insert($data)) {
+            return redirect()->to(site_url('setup/supplier'))->with('Sukses', 'Data Berhasil Disimpan');
+        }
+        return redirect()->to(site_url('setup/supplier/new'))->with('error', 'Data Gagal Disimpan');
     }
 
     /**
@@ -86,18 +96,18 @@ class SetupSupplier extends ResourceController
     public function edit($id = null)
     {
         // Ambil data berdasarkan ID
-       $dtsetupsupplier = $this->objSetupsupplier->find($id);
+        $dtsetupsupplier = $this->supplierModel->find($id);
 
-       // Cek jika data tidak ditemukan
-       if (!$dtsetupsupplier) {
-           return redirect()->to(site_url('setupsupplier'))->with('error', 'Data tidak ditemukan');
-       }
+        // Cek jika data tidak ditemukan
+        if (!$dtsetupsupplier) {
+            return redirect()->to(site_url('setup/supplier'))->with('error', 'Data tidak ditemukan');
+        }
 
 
-       // Lanjutkan jika semua pengecekan berhasil
-       $data['dtsetupsupplier'] = $dtsetupsupplier;
-       
-       return view('setupsupplier/edit', $data);
+        // Lanjutkan jika semua pengecekan berhasil
+        $data['dtsetupsupplier'] = $dtsetupsupplier;
+
+        return view('setup/supplier/edit', $data);
     }
 
     /**
@@ -110,22 +120,10 @@ class SetupSupplier extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getPost();
-        $data = [
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-            'kode' => $this->request->getVar('kode'),
-            'nama' => $this->request->getVar('nama'),
-            'alamat' => $this->request->getVar('alamat'),
-            'telepon' => $this->request->getVar('telepon'),
-            'contact_person' => $this->request->getVar('contact_person'),
-            'npwp' => $this->request->getVar('npwp'),
-            'tanggal' => $this->request->getVar('tanggal'),
-            'saldo' => $this->request->getVar('saldo'),
-            'tipe' => $this->request->getVar('tipe'),
-        ];
         // Update data berdasarkan ID
-        $this->objSetupsupplier->update($id, $data);
+        $this->supplierModel->update($id, $data);
 
-        return redirect()->to(site_url('setupsupplier'))->with('Sukses', 'Data Berhasil Disimpan');
+        return redirect()->to(site_url('setup/supplier'))->with('Sukses', 'Data Berhasil Diupdate');
     }
 
     /**
@@ -138,6 +136,6 @@ class SetupSupplier extends ResourceController
     public function delete($id = null)
     {
         $this->db->table('setupsupplier1')->where(['id_setupsupplier' => $id])->delete();
-        return redirect()->to(site_url('setupsupplier'))->with('Sukses', 'Data Berhasil Dihapus');
+        return redirect()->to(site_url('setup/supplier'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

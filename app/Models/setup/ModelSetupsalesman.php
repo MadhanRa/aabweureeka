@@ -22,6 +22,14 @@ class ModelSetupsalesman extends Model
             ->findAll();
     }
 
+    public function getSalesmanById($id)
+    {
+        return $this->select('setupsalesman1.*, lokasi1.nama_lokasi')
+            ->join('lokasi1', 'lokasi1.id_lokasi = setupsalesman1.id_lokasi', 'left')
+            ->where('id_salesman', $id)
+            ->first();
+    }
+
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
 

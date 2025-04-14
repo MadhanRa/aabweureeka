@@ -24,10 +24,21 @@ $routes->group('setup', ['namespace' => 'App\Controllers\setup'], static functio
     $routes->resource('buku', ['controller' => 'SetupBuku']);
 
     //routes salesman
+    $routes->get('salesman/(:segment)/piutang', 'SetupSalesman::getPiutang/$1');
+    $routes->post('salesman/(:segment)/piutang', 'SetupSalesman::addPiutang/$1');
+    $routes->get('salesman/piutang/(:segment)/edit', 'SetupSalesman::editPiutang/$1');
+    $routes->put('salesman/piutang/(:segment)/edit', 'SetupSalesman::updatePiutang/$1');
+    $routes->delete('salesman/piutang/(:segment)', 'SetupSalesman::deletePiutang/$1');
     $routes->resource('salesman', ['controller' => 'SetupSalesman']);
 
     //routes setuppelanggan
     $routes->resource('pelanggan', ['controller' => 'SetupPelanggan']);
+
+    //routes setupsupplier
+    $routes->resource('supplier', ['controller' => 'SetupSupplier']);
+
+    //routes setup hutang
+    $routes->resource('piutang', ['controller' => 'SetupPiutang']);
 });
 
 $routes->group('setup_persediaan', ['namespace' => 'App\Controllers\setup_persediaan'], static function ($routes) {
@@ -72,17 +83,6 @@ $routes->put('/setupbank/(:segment)/edit', 'Setupbank::edit/$1');
 $routes->get('setupbank', 'Setupbank::index');
 
 
-
-//routes setupsupplier
-$routes->get('/setupsupplier/new', 'SetupSupplier::new');
-// $routes->get('/setupsupplier/(:segment)/new', 'SetupSupplier::edit/$1');
-$routes->resource('setupsupplier');
-$routes->post('/setupsupplier', 'SetupSupplier::create');
-$routes->post('/setupsupplier/(:any)', 'SetupSupplier::delete/$1');
-$routes->put('/setupsupplier/(:segment)/edit', 'SetupSupplier::edit/$1');
-$routes->put('/setupsupplier/(:segment)', 'SetupSupplier::update/$1');
-$routes->get('setupsupplier', 'SetupSupplier::index');
-
 //routes Kelompokproduksi
 $routes->get('/kelompokproduksi/new', 'Kelompokproduksi::new');
 // $routes->get('/kelompokproduksi/(:segment)/new', 'Kelompokproduksi::edit/$1');
@@ -103,15 +103,6 @@ $routes->put('/setupuser/(:segment)/edit', 'Setupuser::edit/$1');
 $routes->put('/setupuser/(:segment)', 'Setupuser::update/$1');
 $routes->get('setupuser', 'Setupuser::index');
 
-//routes setuppiutang
-$routes->get('/setuppiutang/new', 'Setuppiutang::new');
-// $routes->get('/setuppiutang/(:segment)/new', 'Setuppiutang::edit/$1');
-$routes->resource('setuppiutang');
-$routes->post('/setuppiutang', 'Setuppiutang::create');
-$routes->post('/setuppiutang/(:any)', 'Setuppiutang::delete/$1');
-$routes->put('/setuppiutang/(:segment)/edit', 'Setuppiutang::edit/$1');
-$routes->put('/setuppiutang/(:segment)', 'SetupPiutang::update/$1');
-$routes->get('setuppiutang', 'Setuppiutang::index');
 
 //routes pindahlokasi
 $routes->get('/pindahlokasi/new', 'PindahLokasi::new');
