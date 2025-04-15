@@ -41,10 +41,13 @@ $routes->group('setup', ['namespace' => 'App\Controllers\setup'], static functio
     $routes->resource('pelanggan', ['controller' => 'SetupPelanggan']);
 
     //routes setupsupplier
+    $routes->get('supplier/(:segment)/hutang', 'SetupSupplier::getHutang/$1');
+    $routes->get('supplier/(:segment)/hutang/new', 'SetupSupplier::newHutang/$1');
+    $routes->post('supplier/(:segment)/hutang', 'SetupSupplier::createHutang/$1');
+    $routes->get('supplier/hutang/(:segment)/edit', 'SetupSupplier::editHutang/$1');
+    $routes->put('supplier/hutang/(:segment)/edit', 'SetupSupplier::updateHutang/$1');
+    $routes->delete('supplier/hutang/(:segment)', 'SetupSupplier::deleteHutang/$1');
     $routes->resource('supplier', ['controller' => 'SetupSupplier']);
-
-    //routes setup hutang
-    $routes->resource('piutang', ['controller' => 'SetupPiutang']);
 });
 
 $routes->group('setup_persediaan', ['namespace' => 'App\Controllers\setup_persediaan'], static function ($routes) {

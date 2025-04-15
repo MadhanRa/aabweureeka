@@ -11,7 +11,6 @@
     <li><a class="nav-link text-dark" href="<?= site_url('setup/salesman') ?>">Salesman</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup/pelanggan') ?>">Pelanggan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup/supplier') ?>">Supplier</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('setup/piutang') ?>">Piutang lain-lain</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setupbiaya') ?>">Biaya</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('kelompokproduksi') ?>">Kelompok Produksi</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setupbank') ?>">Bank</a></li>

@@ -58,9 +58,14 @@
                   <td><?= $value->alamat ?></td>
                   <td><?= $value->telepon ?></td>
                   <td><?= $value->contact_person ?></td>
-                  <td><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
+                  <td class="saldo-detail-<?= $value->id_setupsupplier ?>"><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
 
                   <td class="text-center">
+                    <!-- Tombol Detail -->
+                    <a href="javascript:void(0)" onclick="lihat_data(<?= $value->id_setupsupplier ?>)"
+                      id="btn-detail-<?= $value->id_setupsupplier ?>"
+                      class="btn btn-info"><i class="fas fa-eye"></i> Detail</a>
+
                     <!-- Tombol Edit Data -->
                     <a href="<?= site_url('setup/supplier/' . $value->id_setupsupplier) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
                     <input type="hidden" name="_method" value="PUT">
@@ -79,10 +84,38 @@
         </div>
       </div>
     </div>
+    <div id="detail-content">
+
+    </div>
   </div>
 </section>
+<div id="modalPlace" style="display: none;"></div>
+
 
 <script>
+  function lihat_data(id) {
+    $.ajax({
+      url: "<?= site_url('setup/supplier/') ?>" + id,
+      type: "GET",
+      dataType: "json",
+      beforeSend: function() {
+        $('#btn-detail-' + id).addClass('disabled');
+        $('#btn-detail-' + id).addClass('btn-progress');
+      },
+      complete: function() {
+        $('#btn-detail-' + id).removeClass('disabled');
+        $('#btn-detail-' + id).removeClass('btn-progress');
+      },
+      success: function(response) {
+        if (response.success) {
+          $('#detail-content').html(response.data);
+        } else {
+          alert(response.error);
+        }
+      }
+    });
+  }
+
   $(document).ready(function() {
     $('#myTable').DataTable({
       columnDefs: [{

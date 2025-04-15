@@ -172,7 +172,7 @@ class SetupPelanggan extends ResourceController
 
     public function getPiutang($id = null)
     {
-        $data['dtpiutang'] = $this->hutangPiutangModel->getPiutang($id, 'pelanggan');
+        $data['dtpiutang'] = $this->hutangPiutangModel->getHutangPiutang($id, 'pelanggan');
         if ($this->request->isAJAX()) {
             $msg = [
                 'data' => view('setup/pelanggan/data_piutang', $data)
@@ -353,7 +353,7 @@ class SetupPelanggan extends ResourceController
                         'updatedSaldo' => $updatedSaldo,
                     ]);
                 } else {
-                    throw new \Exception('Data gagal diupdate!');
+                    throw new \Exception('Data gagal dihapus!');
                 }
             } catch (\Exception $e) {
                 $this->db->transRollback();

@@ -177,7 +177,7 @@ class SetupSalesman extends ResourceController
 
     public function getPiutang($id = null)
     {
-        $data['dtpiutang'] = $this->hutangPiutangModel->getPiutang($id, 'salesman');
+        $data['dtpiutang'] = $this->hutangPiutangModel->getHutangPiutang($id, 'salesman');
         if ($this->request->isAJAX()) {
             $msg = [
                 'data' => view('setup/salesman/data_piutang', $data)

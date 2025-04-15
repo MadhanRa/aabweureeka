@@ -12,7 +12,7 @@ class ModelHutangPiutang extends Model
     protected $allowedFields    = ['tanggal', 'nota', 'tanggal_jt', 'saldo', 'relasi_id', 'relasi_tipe', 'jenis'];
 
 
-    public function getPiutang($id, $relasi_tipe)
+    public function getHutangPiutang($id, $relasi_tipe)
     {
         return $this->where(['relasi_id' => $id, 'relasi_tipe' => $relasi_tipe])->findAll();
     }
