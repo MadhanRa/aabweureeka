@@ -26,6 +26,7 @@
 
   <div class="section-body">
     <!-- HALAMAN DINAMIS -->
+
     <div class="card">
       <div class="card-header">
         <h4>Setup Pelanggan</h4>
@@ -58,9 +59,15 @@
                   <td><?= $value->alamat_pelanggan ?></td>
                   <td><?= $value->kota_pelanggan ?></td>
                   <td><?= $value->telp_pelanggan ?></td>
-                  <td><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
+                  <td class="saldo-detail-<?= $value->id_pelanggan ?>"><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
 
                   <td class="text-center">
+
+                    <!-- Tombol Detail -->
+                    <a href="javascript:void(0)" onclick="lihat_data(<?= $value->id_pelanggan ?>)"
+                      id="btn-detail-<?= $value->id_pelanggan ?>"
+                      class="btn btn-info"><i class="fas fa-eye"></i> Detail</a>
+
                     <!-- Tombol Edit Data -->
                     <a href="<?= site_url('setup/pelanggan/' . $value->id_pelanggan) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt "></i> Edit</a>
                     <input type="hidden" name="_method" value="PUT">
@@ -71,7 +78,6 @@
                       <button class="btn btn-danger" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_pelanggan ?>)"><i class="fas fa-trash"></i> Hapus</button>
                     </form>
                   </td>
-                  <!-- <td><a href="#" class="btn btn-secondary">Detail</a></td> -->
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -79,10 +85,39 @@
         </div>
       </div>
     </div>
+
+    <div id="detail-content">
+
+    </div>
   </div>
 </section>
+<div id="modalPlace" style="display: none;"></div>
+
 
 <script>
+  function lihat_data(id) {
+    $.ajax({
+      url: "<?= site_url('setup/pelanggan/') ?>" + id,
+      type: "GET",
+      dataType: "json",
+      beforeSend: function() {
+        $('#btn-detail-' + id).addClass('disabled');
+        $('#btn-detail-' + id).addClass('btn-progress');
+      },
+      complete: function() {
+        $('#btn-detail-' + id).removeClass('disabled');
+        $('#btn-detail-' + id).removeClass('btn-progress');
+      },
+      success: function(response) {
+        if (response.success) {
+          $('#detail-content').html(response.data);
+        } else {
+          alert(response.error);
+        }
+      }
+    });
+  }
+
   $(document).ready(function() {
     $('#myTable').DataTable({
       columnDefs: [{

@@ -3,17 +3,20 @@
 namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetuppelanggan;
+use App\Models\setup\ModelHutangPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupPelanggan extends ResourceController
 {
     protected $pelangganModel;
+    protected $hutangPiutangModel;
     protected $db;
     // INISIALISASI OBJECT DATA
     function __construct()
     {
         $this->pelangganModel = new ModelSetuppelanggan();
+        $this->hutangPiutangModel = new ModelHutangPiutang();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -36,9 +39,25 @@ class SetupPelanggan extends ResourceController
      */
     public function show($id = null)
     {
-        //
-    }
+        // Ambil data berdasarkan ID
+        $data['data'] = $this->pelangganModel->find($id);
 
+        // Cek jika data tidak ditemukan
+        if (!$data) {
+            return $this->response->setJSON([
+                'error' => 'Data tidak ditemukan'
+            ]);
+        }
+
+        if ($this->request->isAJAX()) {
+            $msg = [
+                'success' => true,
+                'data' => view('setup/pelanggan/detail', $data),
+            ];
+
+            return $this->response->setJSON($msg);
+        }
+    }
     /**
      * Return a new resource object, with default properties.
      *
@@ -149,5 +168,200 @@ class SetupPelanggan extends ResourceController
     {
         $this->db->table('setuppelanggan1')->where(['id_pelanggan' => $id])->delete();
         return redirect()->to(site_url('setup/pelanggan'))->with('Sukses', 'Data Berhasil Dihapus');
+    }
+
+    public function getPiutang($id = null)
+    {
+        $data['dtpiutang'] = $this->hutangPiutangModel->getPiutang($id, 'pelanggan');
+        if ($this->request->isAJAX()) {
+            $msg = [
+                'data' => view('setup/pelanggan/data_piutang', $data)
+            ];
+            return $this->response->setJSON($msg);
+        }
+    }
+
+    public function newPiutang($id = null)
+    {
+        helper('form');
+
+        if ($this->request->isAJAX()) {
+            $data['id'] = $id;
+            $msg = [
+                'data' => view('setup/pelanggan/new_piutang', $data)
+            ];
+            return $this->response->setJSON($msg);
+        }
+    }
+
+
+    public function createPiutang($id = null)
+    {
+        if ($this->request->isAJAX()) {
+            $this->db->transBegin();
+
+            try {
+                $saldoPiutang = $this->request->getVar('saldo');
+
+                $data = [
+                    'tanggal' => $this->request->getVar('tanggal'),
+                    'nota' => $this->request->getVar('nota'),
+                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
+                    'saldo' => $saldoPiutang,
+                    'relasi_id' => $id,
+                    'relasi_tipe' => 'pelanggan',
+                    'jenis' => 'piutang'
+                ];
+
+                // Masukkan data ke dalam tabel
+                if ($this->hutangPiutangModel->insert($data)) {
+                    // Ambil data pelanggan yang bersangkutan
+                    $pelanggan = $this->pelangganModel->find($id);
+
+                    if (!$pelanggan) {
+                        throw new \Exception('Pelanggan tidak ditemukan');
+                    }
+
+                    // Hitung saldo baru
+                    $updatedSaldo = (float)$pelanggan->saldo + (float)$saldoPiutang;
+                    // Update saldo pelanggan
+                    $this->pelangganModel->update($id, ['saldo' => $updatedSaldo]);
+                    // Commit transaksi jika semua berhasil
+                    $this->db->transCommit();
+
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'message' => 'Data berhasil disimpan!',
+                        'id' => $id,
+                        'updatedSaldo' => $updatedSaldo,
+                    ]);
+                } else {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Data gagal disimpan!',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Rollback transaksi jika terjadi kesalahan
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan, data Gagal Disimpan: ' . $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    public function editPiutang($piutang_id = null)
+    {
+        helper('form');
+
+        if ($this->request->isAJAX()) {
+            $data['data'] = $this->hutangPiutangModel->find($piutang_id);
+            $msg = [
+                'data' => view('setup/pelanggan/edit_piutang', $data)
+            ];
+            return $this->response->setJSON($msg);
+        }
+    }
+
+    public function updatePiutang($id_hutang_piutang = null)
+    {
+        if ($this->request->isAJAX()) {
+            $this->db->transBegin();
+
+            try {
+                // Ambil data asli
+                $originalPiutang = $this->hutangPiutangModel->find($id_hutang_piutang);
+                $originalAmount = (float)$originalPiutang->saldo;
+                $newAmount = (float)$this->request->getVar('saldo');
+                $pelangganId = $originalPiutang->relasi_id;
+
+                $data = [
+                    'tanggal' => $this->request->getVar('tanggal'),
+                    'nota' => $this->request->getVar('nota'),
+                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
+                    'saldo' => $newAmount,
+                ];
+
+                // Update data berdasarkan ID
+                if ($this->hutangPiutangModel->update($id_hutang_piutang, $data)) {
+                    // Ambil data pelanggan yang bersangkutan
+                    $pelanggan = $this->pelangganModel->find($pelangganId);
+
+                    if (!$pelanggan) {
+                        throw new \Exception('pelanggan tidak ditemukan');
+                    }
+
+                    // Hitung perbedaan saldo dan update
+                    $saldoDifference = $newAmount - $originalAmount;
+                    $updatedSaldo = (float)$pelanggan->saldo + $saldoDifference;
+
+                    // Update saldo pelanggan
+                    $this->pelangganModel->update($pelangganId, ['saldo' => $updatedSaldo]);
+                    // Commit transaksi jika semua berhasil
+                    $this->db->transCommit();
+
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'message' => 'Data berhasil diupdate!',
+                        'id' => $pelangganId,
+                        'updatedSaldo' => $updatedSaldo,
+                    ]);
+                } else {
+                    throw new \Exception('Data gagal diupdate!');
+                }
+            } catch (\Exception $e) {
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Data gagal diupdate: ' . $e->getMessage()
+                ]);
+            }
+        }
+    }
+
+    public function deletePiutang($id_hutang_piutang = null)
+    {
+        if ($this->request->isAJAX()) {
+            $this->db->transBegin();
+
+            try {
+                // Ambil data piutang sebelum dihapus
+                $piutang = $this->hutangPiutangModel->find($id_hutang_piutang);
+                $jumlahPiutang = (float)$piutang->saldo;
+                $pelangganId = $piutang->relasi_id;
+
+                // Hapus data piutang
+                if ($this->hutangPiutangModel->delete($id_hutang_piutang)) {
+                    // Ambil data pelanggan
+                    $pelanggan = $this->pelangganModel->find($pelangganId);
+
+                    if (!$pelanggan) {
+                        throw new \Exception('Pelanggan tidak ditemukan');
+                    }
+
+                    // Hitung saldo baru
+                    $updatedSaldo = (float)$pelanggan->saldo - $jumlahPiutang;
+                    $this->pelangganModel->update($pelangganId, ['saldo' => $updatedSaldo]);
+
+                    $this->db->transCommit();
+                    return $this->response->setJSON([
+                        'success' => true,
+                        'message' => 'Data berhasil dihapus!',
+                        'id' => $pelangganId,
+                        'updatedSaldo' => $updatedSaldo,
+                    ]);
+                } else {
+                    throw new \Exception('Data gagal diupdate!');
+                }
+            } catch (\Exception $e) {
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Data gagal dihapus: ' . $e->getMessage()
+                ]);
+            }
+        }
     }
 }

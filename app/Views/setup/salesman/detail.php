@@ -2,33 +2,39 @@
     <div class="card-header">
         <h4>Detail Salesman</h4>
     </div>
-    <div class="card-body" id="detail-content">
-        <table class="table w-auto">
-            <tr>
-                <td><strong>Kode Salesman</strong></td>
-                <td>:</td>
-                <td><?= $dtsalesman->kode_salesman ?></td>
-            </tr>
-            <tr>
-                <td><strong>Nama Salesman</strong></td>
-                <td>:</td>
-                <td><?= $dtsalesman->nama_salesman ?></td>
-            </tr>
-            <tr>
-                <td><strong>Lokasi</strong></td>
-                <td>:</td>
-                <td><?= $dtsalesman->nama_lokasi ?></td>
-            </tr>
-            <tr>
-                <td><strong>Saldo</strong></td>
-                <td>:</td>
-                <td id="saldo-detail"><?= 'Rp ' . number_format($dtsalesman->saldo, 0, ',', '.') ?></td>
-            </tr>
-        </table>
-        <!-- Tombol Tambah Piutang Salesman -->
-        <button class="btn btn-primary mt-3" id="modal-piutang"><i class="fas fa-plus"></i> Tambah Piutang</button>
-        <div class="table-responsive mt-3" id="piutang-table">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <table class="table w-auto">
+                    <tr>
+                        <td><strong>Kode Salesman</strong></td>
+                        <td>:</td>
+                        <td><?= $dtsalesman->kode_salesman ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nama Salesman</strong></td>
+                        <td>:</td>
+                        <td><?= $dtsalesman->nama_salesman ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lokasi</strong></td>
+                        <td>:</td>
+                        <td><?= $dtsalesman->nama_lokasi ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Saldo</strong></td>
+                        <td>:</td>
+                        <td id="saldo-detail"><strong><?= 'Rp ' . number_format($dtsalesman->saldo, 0, ',', '.') ?></strong></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-8">
+                <!-- Tombol Tambah Piutang Salesman -->
+                <button class="btn btn-primary mt-3" id="btn-modal-piutang"><i class="fas fa-plus"></i> Tambah Piutang</button>
+                <div class="table-responsive mt-3" id="piutang-table">
 
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -69,7 +75,7 @@
     $(document).ready(function() {
         reload_table();
 
-        $("#modal-piutang").fireModal({
+        $("#btn-modal-piutang").fireModal({
             title: 'Tambah Piutang',
             body: $('#piutang-modal-body'),
             autoFocus: true,

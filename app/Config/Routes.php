@@ -32,6 +32,12 @@ $routes->group('setup', ['namespace' => 'App\Controllers\setup'], static functio
     $routes->resource('salesman', ['controller' => 'SetupSalesman']);
 
     //routes setuppelanggan
+    $routes->get('pelanggan/(:segment)/piutang', 'SetupPelanggan::getPiutang/$1');
+    $routes->get('pelanggan/(:segment)/piutang/new', 'SetupPelanggan::newPiutang/$1');
+    $routes->post('pelanggan/(:segment)/piutang', 'SetupPelanggan::createPiutang/$1');
+    $routes->get('pelanggan/piutang/(:segment)/edit', 'SetupPelanggan::editPiutang/$1');
+    $routes->put('pelanggan/piutang/(:segment)/edit', 'SetupPelanggan::updatePiutang/$1');
+    $routes->delete('pelanggan/piutang/(:segment)', 'SetupPelanggan::deletePiutang/$1');
     $routes->resource('pelanggan', ['controller' => 'SetupPelanggan']);
 
     //routes setupsupplier
