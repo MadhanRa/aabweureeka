@@ -12,110 +12,112 @@
         <!-- HALAMAN DINAMIS -->
         <div class="card">
             <div class="card-header">
-                <h4>Isi Data Interface</h4>
+                <h4>Edit Data Interface</h4>
             </div>
             <div class="card-body">
-                <form method="post" action="<?= site_url('setup/antarmuka') ?> ">
+                <form method="post" action="<?= site_url('setup/antarmuka/') . $dtantarmuka->id_interface ?> ">
+                    <input type="hidden" name="_method" value="PUT">
+
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Kas dan Setara Kas</label>
-                                <input type="text" class="form-control" name="kas_interface" required>
+                                <input type="text" class="form-control" name="kas_interface" value="<?= $dtantarmuka->kas_interface ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Biaya</label>
-                                <input type="text" class="form-control" name="biaya" required>
+                                <input type="text" class="form-control" name="biaya" value="<?= $dtantarmuka->biaya ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Hutang Dagang</label>
-                                <input type="text" class="form-control" name="hutang" required>
+                                <input type="text" class="form-control" name="hutang" value="<?= $dtantarmuka->hutang ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>HPP</label>
-                                <input type="text" class="form-control" name="hpp" required>
+                                <input type="text" class="form-control" name="hpp" value="<?= $dtantarmuka->hpp ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>BG Terima Mundur</label>
-                                <input type="text" class="form-control" name="terima_mundur" required>
+                                <input type="text" class="form-control" name="terima_mundur" value="<?= $dtantarmuka->terima_mundur ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Klasifikasi Laba Ditahan</label>
-                                <input type="text" class="form-control" name="kl_laba_ditahan" required>
+                                <input type="text" class="form-control" name="kl_laba_ditahan" value="<?= $dtantarmuka->kl_laba_ditahan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Klasifikasi Hutang Lancar</label>
-                                <input type="text" class="form-control" name="hutang_lancar" required>
+                                <input type="text" class="form-control" name="hutang_lancar" value="<?= $dtantarmuka->hutang_lancar ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Neraca Laba Bulan Berjalan</label>
-                                <input type="text" class="form-control" name="neraca_laba" required>
+                                <input type="text" class="form-control" name="neraca_laba" value="<?= $dtantarmuka->neraca_laba ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Piutang Salesman</label>
-                                <input type="text" class="form-control" name="piutang_salesman" required>
+                                <input type="text" class="form-control" name="piutang_salesman" value="<?= $dtantarmuka->piutang_salesman ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Rekening Biaya Produksi</label>
-                                <input type="text" class="form-control" name="rekening_biaya" required>
+                                <input type="text" class="form-control" name="rekening_biaya" value="<?= $dtantarmuka->rekening_biaya ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Piutang Dagang</label>
-                                <input type="text" class="form-control" name="piutang_dagang" required>
+                                <input type="text" class="form-control" name="piutang_dagang" value="<?= $dtantarmuka->piutang_dagang ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Penjualan</label>
-                                <input type="text" class="form-control" name="penjualan" required>
+                                <input type="text" class="form-control" name="penjualan" value="<?= $dtantarmuka->penjualan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Retur Penjualan</label>
-                                <input type="text" class="form-control" name="retur_penjualan" required>
+                                <input type="text" class="form-control" name="retur_penjualan" value="<?= $dtantarmuka->retur_penjualan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Disc. Penjualan</label>
-                                <input type="text" class="form-control" name="diskon_penjualan" required>
+                                <input type="text" class="form-control" name="diskon_penjualan" value="<?= $dtantarmuka->diskon_penjualan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Laba Bulan Berjalan</label>
-                                <input type="text" class="form-control" name="laba_bulan" required>
+                                <input type="text" class="form-control" name="laba_bulan" value="<?= $dtantarmuka->laba_bulan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Laba Tahun Berjalan</label>
-                                <input type="text" class="form-control" name="laba_tahun" required>
+                                <input type="text" class="form-control" name="laba_tahun" value="<?= $dtantarmuka->laba_tahun ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Laba Ditahan</label>
-                                <input type="text" class="form-control" name="laba_ditahan" required>
+                                <input type="text" class="form-control" name="laba_ditahan" value="<?= $dtantarmuka->laba_ditahan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Potongan Pembelian</label>
-                                <input type="text" class="form-control" name="potongan_pembelian" required>
+                                <input type="text" class="form-control" name="potongan_pembelian" value="<?= $dtantarmuka->potongan_pembelian ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>PPN Masukan</label>
-                                <input type="text" class="form-control" name="ppn_masukan" required>
+                                <input type="text" class="form-control" name="ppn_masukan" value="<?= $dtantarmuka->ppn_masukan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>PPN Keluaran</label>
-                                <input type="text" class="form-control" name="ppn_keluaran" required>
+                                <input type="text" class="form-control" name="ppn_keluaran" value="<?= $dtantarmuka->ppn_keluaran ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Potongan Penjualan</label>
-                                <input type="text" class="form-control" name="potongan_penjualan" required>
+                                <input type="text" class="form-control" name="potongan_penjualan" value="<?= $dtantarmuka->potongan_penjualan ?>" required>
                             </div>
                             <div class="form-group">
                                 <label>Bank</label>
-                                <input type="text" class="form-control" name="bank" required>
+                                <input type="text" class="form-control" name="bank" value="<?= $dtantarmuka->bank ?>" required>
                             </div>
                         </div>
                     </div>
 
 
                     <div class="form-group">
+                        <a href="<?= site_url('setup/antarmuka') ?>" class="btn btn-danger">Batal</a>
                         <button type="submit" class="btn btn-success">Simpan Data</button>
-                        <button type="reset" class="btn btn-danger">Reset</button>
                     </div>
                 </form>
             </div>

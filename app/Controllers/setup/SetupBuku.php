@@ -58,14 +58,13 @@ class SetupBuku extends ResourceController
      */
     public function create()
     {
-
-        $data = $this->request->getPost();
         $data = [
             'kode_setupbuku' => $this->request->getVar('kode_setupbuku'),
             'nama_setupbuku' => $this->request->getVar('nama_setupbuku'),
             'id_posneraca' => $this->request->getVar('id_posneraca'),
             'tanggal_awal_saldo' => $this->request->getVar('tanggal_awal_saldo'),
-            'saldo_setupbuku' => $this->request->getVar('saldo_setupbuku'),
+            'saldo_awal' => $this->request->getVar('saldo_awal'),
+            'saldo_berjalan' => $this->request->getVar('saldo_awal'),
         ];
         $this->objSetupBuku->insert($data);
 
@@ -95,14 +94,14 @@ class SetupBuku extends ResourceController
      */
     public function update($id = null)
     {
-        $data = $this->request->getPost();
         $data = [
             'id_setupbuku' => $id,
             'kode_setupbuku' => $this->request->getVar('kode_setupbuku'),
             'nama_setupbuku' => $this->request->getVar('nama_setupbuku'),
             'id_posneraca' => $this->request->getVar('id_posneraca'),
             'tanggal_awal_saldo' => $this->request->getVar('tanggal_awal_saldo'),
-            'saldo_setupbuku' => $this->request->getVar('saldo_setupbuku'),
+            'saldo_awal' => $this->request->getVar('saldo_awal'),
+            'saldo_berjalan' => $this->request->getVar('saldo_awal'),
         ];
         $this->objSetupBuku->save($data);
 
@@ -118,6 +117,7 @@ class SetupBuku extends ResourceController
      */
     public function delete($id = null)
     {
-        //
+        $this->objSetupBuku->delete($id);
+        return redirect()->to(site_url('setup/buku'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

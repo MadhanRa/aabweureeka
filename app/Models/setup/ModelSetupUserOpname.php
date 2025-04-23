@@ -1,29 +1,22 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\setup;
 
 use CodeIgniter\Model;
 
-class ModelKelompokproduksi extends Model
+class ModelSetupUserOpname extends Model
 {
-    protected $table            = 'kelompokproduksi1';
-    protected $primaryKey       = 'id_kelproduksi';
+    protected $table            = 'setupuser1';
+    protected $primaryKey       = 'id_user';
     // protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_kelproduksi', 'nama_kelproduksi', 'id_interface'];
+    protected $allowedFields    = ['kode_user', 'nama_user', 'password', 'kode_aktivasi', 'nonaktif'];
 
     public function getAll()
     {
         return $this->findAll(); // Mengambil semua data dari tabel lokasi1
-    }
-
-    public function getGroupWithInterface()
-    {
-        return $this->select('kelompokproduksi1.*, interface1.rekening_biaya')
-                    ->join('interface1', 'interface1.id_interface = kelompokproduksi1.id_interface', 'left')
-                    ->findAll();
     }
 
     // protected bool $allowEmptyInserts = false;

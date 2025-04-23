@@ -42,8 +42,9 @@
                                 <th>Kode Akun</th>
                                 <th>Nama Akun</th>
                                 <th>Pos Neraca</th>
-                                <th>Tanggal</th>
-                                <th>Saldo (Debit/Kredit)</th>
+                                <th>Tanggal Awal</th>
+                                <th>Saldo Awal</th>
+                                <th>Saldo Berjalan</th>
                                 <th>action</th>
                             </tr>
                         </thead>
@@ -55,7 +56,8 @@
                                     <td><?= $value->nama_setupbuku ?></td>
                                     <td><?= $value->nama_posneraca ?></td>
                                     <td><?= $value->tanggal_awal_saldo ?></td>
-                                    <td><?= 'Rp ' . number_format($value->saldo_setupbuku, 0, ',', '.') ?></td>
+                                    <td><?= 'Rp ' . number_format((float)$value->saldo_awal, 0, ',', '.') ?></td>
+                                    <td><?= 'Rp ' . number_format((float)$value->saldo_berjalan, 0, ',', '.') ?></td>
 
                                     <td class="text-center">
                                         <!-- Tombol Edit Data -->

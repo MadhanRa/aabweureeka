@@ -40,8 +40,8 @@
               <input type="text" class="form-control" name="nama_klasifikasi" placeholder="Nama" style="text-transform: uppercase;" required value="<?= $dtklasifikasi->nama_klasifikasi ?>">
             </div>
             <div class="form-group">
+              <a href="<?= site_url('setup/klasifikasi') ?>" class="btn btn-danger">Batal</a>
               <button type="submit" class="btn btn-success">Update Data</button>
-              <button type="reset" class="btn btn-danger">Reset</button>
             </div>
           </form>
         </div>

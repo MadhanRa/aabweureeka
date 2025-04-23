@@ -8,8 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('setupuser/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>User Stock Opname</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -30,6 +29,9 @@
     <div class="card">
       <div class="card-header">
         <h4>Setup User Stock Opname</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('setup/useropname/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+        </div>
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -39,7 +41,7 @@
                 <th>No</th>
                 <th>Kode</th>
                 <th>Nama</th>
-                <th>Check</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -48,22 +50,21 @@
               <?php foreach ($dtsetupuser as $key => $value) : ?>
                 <tr>
                   <td><?= $key + 1 ?></td>
-                  <td><?= $value->kode_setupuser ?></td>
-                  <td><?= $value->nama_setupuser ?></td>
-                  <td><?= $value->check_setupuser ?></td>
+                  <td><?= $value->kode_user ?></td>
+                  <td><?= $value->nama_user ?></td>
+                  <td><span class="badge badge-<?= ($value->nonaktif == 0) ? 'info' : 'warning' ?>"><?= ($value->nonaktif == 0) ? 'Aktif' : 'Nonaktif' ?></span></td>
 
                   <td class="text-center">
                     <!-- Tombol Edit Data -->
-                    <a href="<?= site_url('setupuser/' . $value->id_setupuser) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
+                    <a href="<?= site_url('setup/useropname/' . $value->id_user) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
                     <input type="hidden" name="_method" value="PUT">
                     <!-- Tombol Hapus Data -->
-                    <form action="<?= site_url('setupuser/' . $value->id_setupuser) ?>" method="post" id="del-<?= $value->id_setupuser ?>" class="d-inline">
+                    <form action="<?= site_url('setup/useropname/' . $value->id_user) ?>" method="post" id="del-<?= $value->id_user ?>" class="d-inline">
                       <?= csrf_field() ?>
                       <input type="hidden" name="_method" value="DELETE">
-                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_setupuser ?>)"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_user ?>)"><i class="fas fa-trash"></i></button>
                     </form>
                   </td>
-                  <!-- <td><a href="#" class="btn btn-secondary">Detail</a></td> -->
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -71,8 +72,6 @@
         </div>
       </div>
     </div>
-  </div>
-
   </div>
 </section>
 

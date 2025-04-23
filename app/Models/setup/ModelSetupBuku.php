@@ -11,7 +11,7 @@ class ModelSetupBuku extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_setupbuku', 'nama_setupbuku', 'id_posneraca', 'nama_posneraca', 'tanggal_awal_saldo', 'saldo_setupbuku'];
+    protected $allowedFields    = ['kode_setupbuku', 'nama_setupbuku', 'id_posneraca', 'nama_posneraca', 'tanggal_awal_saldo', 'saldo_awal', 'saldo_berjalan'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -22,7 +22,6 @@ class ModelSetupBuku extends Model
     // // Dates
     protected $useTimestamps = true;
     // protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
 

@@ -2,18 +2,18 @@
 
 namespace App\Controllers\setup;
 
-use App\Models\ModelAntarmuka;
+use App\Models\setup\ModelAntarmuka;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Antarmuka extends ResourceController
 {
 
-    private $objAntarmuka;
+    private $modelAntarmuka;
     private $db;
     function __construct()
     {
-        $this->objAntarmuka = new ModelAntarmuka();
+        $this->modelAntarmuka = new ModelAntarmuka();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -23,7 +23,7 @@ class Antarmuka extends ResourceController
      */
     public function index()
     {
-        $data['dtantarmuka'] = $this->objAntarmuka->findAll();
+        $data['dtantarmuka'] = $this->modelAntarmuka->findAll();
         return view('setup/antarmuka/index', $data);
     }
 
@@ -67,7 +67,7 @@ class Antarmuka extends ResourceController
             'hutang' => $this->request->getVar('hutang'),
             'hpp' => $this->request->getVar('hpp'),
             'terima_mundur' => $this->request->getVar('terima_mundur'),
-            'laba_ditahan' => $this->request->getVar('laba_ditahan'),
+            'kl_laba_ditahan' => $this->request->getVar('kl_laba_ditahan'),
             'hutang_lancar' => $this->request->getVar('hutang_lancar'),
             'neraca_laba' => $this->request->getVar('neraca_laba'),
             'piutang_salesman' => $this->request->getVar('piutang_salesman'),
@@ -78,6 +78,7 @@ class Antarmuka extends ResourceController
             'diskon_penjualan' => $this->request->getVar('diskon_penjualan'),
             'laba_bulan' => $this->request->getVar('laba_bulan'),
             'laba_tahun' => $this->request->getVar('laba_tahun'),
+            'laba_ditahan' => $this->request->getVar('laba_ditahan'),
             'potongan_pembelian' => $this->request->getVar('potongan_pembelian'),
             'ppn_masukan' => $this->request->getVar('ppn_masukan'),
             'ppn_keluaran' => $this->request->getVar('ppn_keluaran'),
@@ -86,7 +87,7 @@ class Antarmuka extends ResourceController
         ];
         $this->db->table('interface1')->insert($data);
 
-        return redirect()->to(site_url('antarmuka'))->with('Sukses', 'Data Berhasil Disimpan');
+        return redirect()->to(site_url('setup/antarmuka'))->with('Sukses', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -98,7 +99,8 @@ class Antarmuka extends ResourceController
      */
     public function edit($id = null)
     {
-        //
+        $data['dtantarmuka'] = $this->modelAntarmuka->find($id);
+        return view('setup/antarmuka/edit', $data);
     }
 
     /**
@@ -120,6 +122,6 @@ class Antarmuka extends ResourceController
     public function delete($id = null)
     {
         $this->db->table('interface1')->where(['id_interface' => $id])->delete();
-        return redirect()->to(site_url('antarmuka'))->with('Sukses', 'Data Berhasil Dihapus');
+        return redirect()->to(site_url('setup/antarmuka'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

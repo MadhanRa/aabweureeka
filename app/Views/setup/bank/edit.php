@@ -1,0 +1,51 @@
+<?= $this->extend("layout/backend") ?>;
+
+<?= $this->section("content") ?>
+
+<section class="section">
+    <div class="section-header">
+        <!-- <h1>APA INI</h1> -->
+        <a href="<?= site_url('setup/bank') ?>" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Kembali </a>
+    </div>
+
+    <div class="section-body">
+        <!-- HALAMAN DINAMIS -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Tambah Bank</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-container">
+                    <form method="post" action="<?= site_url('setup/bank/' . $dtsetupbank->id_setupbank) ?> ">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="_method" value="PUT">
+
+                        <div class="form-group">
+                            <label>Kode</label>
+                            <input type="text" class="form-control" name="kode_setupbank" value="<?= $dtsetupbank->kode_setupbank ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" name="nama_setupbank" value="<?= $dtsetupbank->nama_setupbank ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rekening Bank</label>
+                            <select class="form-control" name="id_setupbuku" required>
+                                <option value="" hidden>--Pilih Rekening--</option>
+                                <?php foreach ($dtrekening as $setupbuku) : ?>
+                                    <option value="<?= $setupbuku->id_setupbuku ?>" <?= ($dtsetupbank->id_setupbuku == $setupbuku->id_setupbuku) ? 'selected' : '' ?>><?= $setupbuku->kode_setupbuku . '-' . $setupbuku->nama_setupbuku ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <a href="<?= site_url('setup/bank') ?>" class="btn btn-danger">Batal</a>
+                            <button type="submit" class="btn btn-success">Simpan Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?= $this->endSection(); ?>

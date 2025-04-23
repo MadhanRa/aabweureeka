@@ -1,24 +1,27 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\setup;
 
 use CodeIgniter\Model;
 
-class ModelAntarmuka extends Model
+class ModelKelompokproduksi extends Model
 {
-    protected $table            = 'interface1';
-    protected $primaryKey       = 'id_interface';
+    protected $table            = 'kelompokproduksi1';
+    protected $primaryKey       = 'id_kelproduksi';
     // protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kas_interface','biaya','hutang','hpp',	'terima_mundur','laba_ditahan',	'hutang_lancar','neraca_laba','piutang_salesman','rekening_biaya','piutang_dagang','penjualan',	'retur_penjualan', 'diskon_penjualan','laba_bulan','laba_tahun','potongan_pembelian','ppn_masukan','ppn_keluaran','potongan_penjualan',	'bank'];
+    protected $allowedFields    = ['kode_kelproduksi', 'nama_kelproduksi', 'id_setupbuku'];
 
 
-    public function getAll()
+    public function getKelProduksiWithBukuBesar()
     {
-        return $this->findAll(); // Mengambil semua data dari tabel lokasi1
+        return $this->select('kelompokproduksi1.*, setupbuku1.nama_setupbuku')
+            ->join('setupbuku1', 'kelompokproduksi1.id_setupbuku = setupbuku1.id_setupbuku')
+            ->findAll();
     }
+
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\setup;
 
 use CodeIgniter\Model;
 
-class ModelSetupbank extends Model
+class ModelSetupBank extends Model
 {
     protected $table            = 'setupbank1';
     protected $primaryKey       = 'id_setupbank';
@@ -12,18 +12,18 @@ class ModelSetupbank extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_setupbank', 'nama_setupbank', 'id_interface'];
+    protected $allowedFields    = ['kode_setupbank', 'nama_setupbank', 'id_setupbuku'];
 
     public function getAll()
     {
         return $this->findAll(); // Mengambil semua data dari tabel lokasi1
     }
-    
-    public function getGroupWithInterface()
+
+    public function getGroupWithBukuBesar()
     {
-        return $this->select('setupbank1.*, interface1.rekening_biaya')
-                    ->join('interface1', 'interface1.id_interface = setupbank1.id_interface', 'left')
-                    ->findAll();
+        return $this->select('setupbank1.*, setupbuku1.nama_setupbuku')
+            ->join('setupbuku1', 'setupbuku1.id_setupbuku = setupbank1.id_setupbuku', 'left')
+            ->findAll();
     }
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

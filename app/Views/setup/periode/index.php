@@ -79,7 +79,7 @@
                     </div>
                 <?php else : ?>
                     <div class="table-responsive">
-                        <table border="2px" class="table-striped table-md" id="myTable" style="border-color: #009548; border-width: 2px; border-style: solid;">
+                        <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
                             <thead>
                                 <tr class="eureeka-table-header">
                                     <th>No</th>

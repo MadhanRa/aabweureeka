@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\setup;
 
 use CodeIgniter\Model;
 
-class ModelSetupbiaya extends Model
+class ModelSetupBiaya extends Model
 {
     protected $table            = 'setupbiaya1';
     protected $primaryKey       = 'id_setupbiaya';
@@ -12,13 +12,13 @@ class ModelSetupbiaya extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_setupbiaya', 'nama_setupbiaya', 'id_interface'];
+    protected $allowedFields    = ['kode_setupbiaya', 'nama_setupbiaya', 'id_setupbuku'];
 
-    public function getGroupWithInterface()
+    public function getBiayaWithRekening()
     {
-        return $this->select('setupbiaya1.*, interface1.rekening_biaya')
-                    ->join('interface1', 'interface1.id_interface = setupbiaya1.id_interface', 'left')
-                    ->findAll();
+        return $this->select('setupbiaya1.*, setupbuku1.nama_setupbuku')
+            ->join('setupbuku1', 'setupbiaya1.id_setupbuku = setupbuku1.id_setupbuku')
+            ->findAll();
     }
 
     // protected bool $allowEmptyInserts = false;

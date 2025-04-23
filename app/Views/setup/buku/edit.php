@@ -45,16 +45,17 @@
 
                     </div>
                     <div class="form-group">
-                        <label>Saldo</label>
-                        <input type="text" class="form-control" name="saldo_setupbuku" value="<?= $dtsetupbuku->saldo_setupbuku ?>" required>
+                        <label>Saldo Awal</label>
+                        <input type="text" class="form-control display-price" id="display_saldo" placeholder="Saldo Awal" oninput="formatHarga(this, 'saldo')" value="Rp <?= number_format(floatval($dtsetupbuku->saldo_awal), 0, ',', '.') ?>" required>
+                        <input type="hidden" name="saldo_awal" id="saldo" value="<?= $dtsetupbuku->saldo_awal ?>">
                     </div>
                     <div class="form-group">
                         <label>Tanggal Awal Saldo</label>
                         <input type="date" class="form-control" name="tanggal_awal_saldo" value="<?= $dtsetupbuku->tanggal_awal_saldo ?>" required>
                     </div>
                     <div class="form-group">
+                        <a href="<?= site_url('setup/buku') ?>" class="btn btn-danger">Batal</a>
                         <button type="submit" class="btn btn-success">Simpan Data</button>
-                        <button type="reset" class="btn btn-danger">Reset</button>
                     </div>
             </div>
             </form>
@@ -65,6 +66,37 @@
 </section>
 
 <script>
+    // Fungsi untuk format angka menjadi Rupiah
+    function formatRupiah(angka) {
+        if (!angka) return '';
+        let numberString = String(angka);
+        let formattedNumber = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return 'Rp ' + formattedNumber;
+    }
+    // Fungsi untuk memformat angka ke dalam format Rupiah
+    function formatHarga(input, hiddenFieldId) {
+        // Strip formatting characters first
+        let rawValue = $(input).val().replace(/[^\d]/g, '');
+
+        // Update the hidden field with the raw numeric value
+        $('#' + hiddenFieldId).val(rawValue);
+
+        // Format the display value
+        let formattedValue = formatRupiah(rawValue);
+        $(input).val(formattedValue);
+    }
+
+    // Make sure form submission includes the hidden values
+    $('form').on('submit', function(e) {
+        // Ensure hidden fields have values before submission
+        $('.display-price').each(function() {
+            const displayId = $(this).attr('id');
+            const hiddenId = displayId.replace('display_', '');
+            const rawValue = $(this).val().replace(/[^\d]/g, '');
+            $('#' + hiddenId).val(rawValue);
+        });
+    });
+
     function validateForm() {
         const posNeraca = document.querySelector('select[name="id_posneraca"]');
         if (posNeraca.value === "") {

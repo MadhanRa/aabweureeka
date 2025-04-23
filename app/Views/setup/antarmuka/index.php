@@ -8,8 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('antarmuka/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>Interface</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -30,84 +29,141 @@
     <div class="card">
       <div class="card-header">
         <h4>Setup Interface</h4>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
-            <thead>
-              <tr class="eureeka-table-header">
-                <th>No</th>
-                <th>Kas</th>
-                <th>Biaya</th>
-                <th>Hutang Dagang</th>
-                <th>HPP</th>
-                <th>BG Terima Mundur</th>
-                <th>Klasifikasi Laba Ditahan</th>
-                <th>Klasifikasi Hutang Lancar</th>
-                <th>Neraca Laba Bulan Berjalan</th>
-                <th>Piutang Salesman</th>
-                <th>Rek. Biaya Produksi</th>
-                <th>Piutang Dagang</th>
-                <th>Penjualan</th>
-                <th>Retur Penjualan</th>
-                <th>Disc. Penjualan</th>
-                <th>Laba Bulan Berjalan</th>
-                <th>Laba Ditahan</th>
-                <th>Potongan Pembelian</th>
-                <th>PPN Masukan</th>
-                <th>PPN Keluaran</th>
-                <th>Potongan Pembelian</th>
-                <th>Bank</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($dtantarmuka as $key => $value) : ?>
-                <tr>
-                  <td><?= $key + 1 ?></td>
-                  <td><?= $value->kas_interface ?></td>
-                  <td><?= $value->biaya ?></td>
-                  <td><?= $value->hutang ?></td>
-                  <td><?= $value->hpp ?></td>
-                  <td><?= $value->terima_mundur ?></td>
-                  <td><?= $value->laba_ditahan ?></td>
-                  <td><?= $value->hutang_lancar ?></td>
-                  <td><?= $value->neraca_laba ?></td>
-                  <td><?= $value->piutang_salesman ?></td>
-                  <td><?= $value->rekening_biaya ?></td>
-                  <td><?= $value->piutang_dagang ?></td>
-                  <td><?= $value->penjualan ?></td>
-                  <td><?= $value->retur_penjualan ?></td>
-                  <td><?= $value->diskon_penjualan ?></td>
-                  <td><?= $value->laba_bulan ?></td>
-                  <td><?= $value->laba_tahun ?></td>
-                  <td><?= $value->potongan_pembelian ?></td>
-                  <td><?= $value->ppn_masukan ?></td>
-                  <td><?= $value->ppn_keluaran ?></td>
-                  <td><?= $value->potongan_penjualan ?></td>
-                  <td><?= $value->bank ?></td>
-
-                  <td class="text-center">
-                    <!-- Tombol Edit Data -->
-
-                    <!-- Tombol Hapus Data -->
-                    <form action="<?= site_url('antarmuka/' . $value->id_interface) ?>" method="post" id="del-<?= $value->id_interface ?>" class="d-inline">
-                      <?= csrf_field() ?>
-                      <input type="hidden" name="_method" value="DELETE">
-                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_interface ?>)"><i class="fas fa-trash"></i></button>
-                    </form>
-                  </td>
-                  <!-- <td><a href="#" class="btn btn-secondary">Detail</a></td> -->
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+        <div class="card-header-action">
+          <!-- // Kalau belum ada data interface, tampilkan tombol tambah data -->
+          <?php if (empty($dtantarmuka)) : ?>
+            <a href="<?= site_url('setup/antarmuka/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+          <?php else : ?>
+            <a href="<?= site_url('setup/antarmuka/') . $dtantarmuka[0]->id_interface . '/edit' ?>" class="btn btn-warning"><i class="fas fa-plus"></i> Edit Data</a>
+          <?php endif; ?>
         </div>
       </div>
+      <div class="card-body">
+        <?php if (!empty($dtantarmuka)) : ?>
+          <div class="row">
+            <div class="col-lg-6">
+              <table class="table w-auto">
+                <tr>
+                  <td><strong>Kas</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->kas_interface ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Biaya</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->biaya ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Hutang Dagang</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->hutang ?></td>
+                </tr>
+                <tr>
+                  <td><strong>HPP</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->hpp ?></td>
+                </tr>
+                <tr>
+                  <td><strong>BG Terima Mundur</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->terima_mundur ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Klasifikasi Laba Ditahan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->laba_ditahan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Klasifikasi Hutang Lancar</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->hutang_lancar ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Neraca Laba Bulan Berjalan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->neraca_laba ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Piutang Salesman</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->piutang_salesman ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Rek. Biaya Produksi</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->rekening_biaya ?></td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-lg-6">
+              <table class="table w-auto">
+                <tr>
+                  <td><strong>Piutang Dagang</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->piutang_dagang ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Penjualan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->penjualan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Retur Penjualan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->retur_penjualan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Disc. Penjualan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->diskon_penjualan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Laba Bulan Berjalan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->laba_bulan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Laba Ditahan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->laba_tahun ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Potongan Pembelian</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->potongan_pembelian ?></td>
+                </tr>
 
+                <tr>
+                  <td><strong>PPN Masukan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->ppn_masukan ?></td>
+                </tr>
+
+                <tr>
+                  <td><strong>PPN Keluaran</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->ppn_keluaran ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Potongan Penjualan</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->potongan_penjualan ?></td>
+                </tr>
+                <tr>
+                  <td><strong>Bank</strong></td>
+                  <td>:</td>
+                  <td><?= $dtantarmuka[0]->bank ?></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        <?php else : ?>
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i> Belum ada data interface yang tersedia. Silahkan tambahkan data terlebih dahulu.
+          </div>
+        <?php endif; ?>
+      </div>
     </div>
-  </div>
-
   </div>
 </section>
 

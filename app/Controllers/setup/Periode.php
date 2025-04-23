@@ -2,7 +2,7 @@
 
 namespace App\Controllers\setup;
 
-use App\Models\ModelPeriode;
+use App\Models\setup\ModelPeriode;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 

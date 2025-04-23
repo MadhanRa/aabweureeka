@@ -109,7 +109,7 @@ class Posneraca extends ResourceController
 
         // Cek jika data tidak ditemukan
         if (!$dtposneraca) {
-            return redirect()->to(site_url('posneraca'))->with('error', 'Data tidak ditemukan');
+            return redirect()->to(site_url('setup/posneraca'))->with('error', 'Data tidak ditemukan');
         }
 
 
@@ -151,6 +151,6 @@ class Posneraca extends ResourceController
     public function delete($id = null)
     {
         $this->db->table('pos_neraca')->where(['id_posneraca' => $id])->delete();
-        return redirect()->to(site_url('posneraca'))->with('Sukses', 'Data Berhasil Dihapus');
+        return redirect()->to(site_url('setup/posneraca'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

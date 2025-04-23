@@ -11,10 +11,10 @@
     <li><a class="nav-link text-dark" href="<?= site_url('setup/salesman') ?>">Salesman</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup/pelanggan') ?>">Pelanggan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('setup/supplier') ?>">Supplier</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('setupbiaya') ?>">Biaya</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('kelompokproduksi') ?>">Kelompok Produksi</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('setupbank') ?>">Bank</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('setupuser') ?>">User Stock Opname</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('setup/biaya') ?>">Klasifikasi Biaya dan Pendapatan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('setup/kelompokproduksi') ?>">Kelompok Produksi</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('setup/bank') ?>">Bank</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('setup/useropname') ?>">User Stock Opname</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">

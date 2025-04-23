@@ -1,23 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\setup;
 
 use CodeIgniter\Model;
 
-class ModelSetupuser extends Model
+class ModelAntarmuka extends Model
 {
-    protected $table            = 'setupuser1';
-    protected $primaryKey       = 'id_setupuser';
+    protected $table            = 'interface1';
+    protected $primaryKey       = 'id_interface';
     // protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_setupuser', 'nama_setupuser', 'check_setupuser'];
+    protected $allowedFields    = ['kas_interface', 'biaya', 'hutang', 'hpp',    'terima_mundur', 'kl_laba_ditahan',    'hutang_lancar', 'neraca_laba', 'piutang_salesman', 'rekening_biaya', 'piutang_dagang', 'penjualan',    'retur_penjualan', 'diskon_penjualan', 'laba_bulan', 'laba_tahun', 'laba_ditahan', 'potongan_pembelian', 'ppn_masukan', 'ppn_keluaran', 'potongan_penjualan',    'bank'];
 
-    public function getAll()
-    {
-        return $this->findAll(); // Mengambil semua data dari tabel lokasi1
-    }
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

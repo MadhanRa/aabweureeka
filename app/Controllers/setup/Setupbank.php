@@ -1,23 +1,27 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\setup;
 
-use App\Models\ModelAntarmuka;
-use App\Models\ModelSetupbank;
+use App\Models\setup\ModelAntarmuka;
+use App\Models\setup\ModelPosneraca;
+use App\Models\setup\ModelSetupBank;
+use App\Models\setup\ModelSetupBuku;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
-class Setupbank extends ResourceController
+class SetupBank extends ResourceController
 {
-    protected $objSetupbank, $db, $objAntarmuka;
+    protected $modelBank, $db, $modelAntarmuka, $modelPosneraca, $modelSetupBuku;
     // INISIALISASI OBJECT DATA
     function __construct()
     {
-        $this->objSetupbank = new ModelSetupbank();
-        $this->objAntarmuka = new ModelAntarmuka();
+        $this->modelBank = new ModelSetupBank();
+        $this->modelPosneraca = new ModelPosneraca();
+        $this->modelAntarmuka = new ModelAntarmuka();
+        $this->modelSetupBuku = new ModelSetupBuku();
         $this->db = \Config\Database::connect();
     }
-    
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -25,17 +29,10 @@ class Setupbank extends ResourceController
      */
     public function index()
     {
-        // Ambil data rekening dari tabel interface1
-        $ModelAntarmuka = new ModelAntarmuka();
-        $dtinterface = $ModelAntarmuka->findAll(); // Mengambil semua data rekening
-        
-        $data['dtinterface'] = $dtinterface;
-        $data['dtsetupbank'] = $this->objSetupbank->findAll();
-        $data['dtsetupbank'] = $this->objSetupbank->getGroupWithInterface();
-        $data['dtinterface'] = $this->db->table('interface1')->get()->getResult();
 
-    // Pastikan $data dikirim ke view
-    return view('setupbank/index', $data);
+        $data['dtsetupbank'] = $this->modelBank->getGroupWithBukuBesar();
+        // Pastikan $data dikirim ke view
+        return view('setup/bank/index', $data);
     }
 
     /**
@@ -57,7 +54,16 @@ class Setupbank extends ResourceController
      */
     public function new()
     {
-        //
+        // Ambil kode bank dari interface
+        $kode_bank_interface = $this->modelAntarmuka->findAll()[0]->bank;
+
+        // Ambil id_posneraca bank dari posneraca
+        $id_bank_posneraca = $this->modelPosneraca->where('kode_posneraca', $kode_bank_interface)->first()->id_posneraca;
+
+        // Ambil rekening bank dari buku besar
+        $data['dtrekening'] = $this->modelSetupBuku->where('id_posneraca', $id_bank_posneraca)->findAll();
+
+        return view('setup/bank/new', $data);
     }
 
     /**
@@ -67,16 +73,14 @@ class Setupbank extends ResourceController
      */
     public function create()
     {
-        $data = $this->request->getPost();
         $data = [
-            'id_setupbank' => $this->request->getVar('id_setupbank'),
             'kode_setupbank' => $this->request->getVar('kode_setupbank'),
             'nama_setupbank' => $this->request->getVar('nama_setupbank'),
-            'id_interface' => $this->request->getVar('id_interface'),
+            'id_setupbuku' => $this->request->getVar('id_setupbuku'),
         ];
-        $this->db->table('setupbank1')->insert($data);
+        $this->modelBank->insert($data);
 
-        return redirect()->to(site_url('setupbank'))->with('Sukses', 'Data Berhasil Disimpan');
+        return redirect()->to(site_url('setup/bank'))->with('Sukses', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -88,7 +92,18 @@ class Setupbank extends ResourceController
      */
     public function edit($id = null)
     {
-        //
+        // Ambil kode bank dari interface
+        $kode_bank_interface = $this->modelAntarmuka->findAll()[0]->bank;
+
+        // Ambil id_posneraca bank dari posneraca
+        $id_bank_posneraca = $this->modelPosneraca->where('kode_posneraca', $kode_bank_interface)->first()->id_posneraca;
+
+        // Ambil rekening bank dari buku besar
+        $data['dtrekening'] = $this->modelSetupBuku->where('id_posneraca', $id_bank_posneraca)->findAll();
+
+        $data['dtsetupbank'] = $this->modelBank->find($id);
+
+        return view('setup/bank/edit', $data);
     }
 
     /**
@@ -100,7 +115,14 @@ class Setupbank extends ResourceController
      */
     public function update($id = null)
     {
-        //
+        $data = [
+            'kode_setupbank' => $this->request->getVar('kode_setupbank'),
+            'nama_setupbank' => $this->request->getVar('nama_setupbank'),
+            'id_setupbuku' => $this->request->getVar('id_setupbuku'),
+        ];
+        $this->modelBank->update($id, $data);
+
+        return redirect()->to(site_url('setup/bank'))->with('Sukses', 'Data Berhasil Diperbarui');
     }
 
     /**
@@ -112,6 +134,7 @@ class Setupbank extends ResourceController
      */
     public function delete($id = null)
     {
-        //
+        $this->modelBank->delete($id);
+        return redirect()->to(site_url('setup/bank'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }
