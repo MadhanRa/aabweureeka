@@ -41,7 +41,25 @@ class SetupUserOpname extends ResourceController
      */
     public function show($id = null)
     {
-        //
+        // Ambil data berdasarkan ID
+        $dtsetupuser = $this->modelSetupUser->find($id);
+
+        // Cek jika data tidak ditemukan
+        if (!$dtsetupuser) {
+            return redirect()->to(site_url('setup/useropname'))->with('error', 'Data tidak ditemukan');
+        }
+
+        $data['data'] = $dtsetupuser;
+        $data['dtlokasi'] = $this->modelLokasi->findAll();
+        $data['dtuserlokasi'] = $this->modelUserLokasi->where('id_user', $id)->findColumn('id_lokasi');
+
+        if ($this->request->isAJAX()) {
+            $msg = [
+                'success' => true,
+                'data' => view('setup/setupuser/detail', $data),
+            ];
+            return $this->response->setJSON($msg);
+        }
     }
 
     /**

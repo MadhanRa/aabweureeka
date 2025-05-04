@@ -25,6 +25,8 @@
   <!-- JQuery -->
   <script src="<?= base_url('template/node_modules/jquery/dist/jquery.min.js') ?>"></script>
   <script src="<?= base_url('template/node_modules/nicescroll/dist/jquery.nicescroll.js') ?>"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
   <!-- Data Tables -->
   <script src="<?= base_url('template/node_modules/datatables/media/js/jquery.dataTables.min.js') ?>"></script>

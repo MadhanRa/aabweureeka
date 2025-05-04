@@ -61,4 +61,13 @@ class ModelSetupBuku extends Model
 
         return parent::save($data);
     }
+
+    public function getRekeningKas($kodeKas)
+    {
+        return $this->select('setupbuku1.id_setupbuku, setupbuku1.kode_setupbuku, setupbuku1.nama_setupbuku, setupbuku1.id_posneraca')
+            ->join('pos_neraca', 'setupbuku1.id_posneraca = pos_neraca.id_posneraca')
+            ->whereIn('pos_neraca.kode_posneraca', $kodeKas)
+            ->orderBy('setupbuku1.kode_setupbuku', 'ASC')
+            ->findAll();
+    }
 }

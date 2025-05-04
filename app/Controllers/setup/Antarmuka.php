@@ -61,8 +61,7 @@ class Antarmuka extends ResourceController
     {
         $data = $this->request->getPost();
         $data = [
-            'id_interface' => $this->request->getVar('id_interface'),
-            'kas_interface' => $this->request->getVar('kas_interface'),
+            'kas_setara' => $this->request->getVar('kas_setara'),
             'biaya' => $this->request->getVar('biaya'),
             'hutang' => $this->request->getVar('hutang'),
             'hpp' => $this->request->getVar('hpp'),
@@ -110,7 +109,36 @@ class Antarmuka extends ResourceController
      *
      * @return ResponseInterface
      */
-    public function update($id = null) {}
+    public function update($id = null)
+    {
+        $data = [
+            'kas_setara' => $this->request->getVar('kas_setara'),
+            'biaya' => $this->request->getVar('biaya'),
+            'hutang' => $this->request->getVar('hutang'),
+            'hpp' => $this->request->getVar('hpp'),
+            'terima_mundur' => $this->request->getVar('terima_mundur'),
+            'kl_laba_ditahan' => $this->request->getVar('kl_laba_ditahan'),
+            'hutang_lancar' => $this->request->getVar('hutang_lancar'),
+            'neraca_laba' => $this->request->getVar('neraca_laba'),
+            'piutang_salesman' => $this->request->getVar('piutang_salesman'),
+            'rekening_biaya' => $this->request->getVar('rekening_biaya'),
+            'piutang_dagang' => $this->request->getVar('piutang_dagang'),
+            'penjualan' => $this->request->getVar('penjualan'),
+            'retur_penjualan' => $this->request->getVar('retur_penjualan'),
+            'diskon_penjualan' => $this->request->getVar('diskon_penjualan'),
+            'laba_bulan' => $this->request->getVar('laba_bulan'),
+            'laba_tahun' => $this->request->getVar('laba_tahun'),
+            'laba_ditahan' => $this->request->getVar('laba_ditahan'),
+            'potongan_pembelian' => $this->request->getVar('potongan_pembelian'),
+            'ppn_masukan' => $this->request->getVar('ppn_masukan'),
+            'ppn_keluaran' => $this->request->getVar('ppn_keluaran'),
+            'potongan_penjualan' => $this->request->getVar('potongan_penjualan'),
+            'bank' => $this->request->getVar('bank'),
+        ];
+        $this->modelAntarmuka->update($id, $data);
+
+        return redirect()->to(site_url('setup/antarmuka'))->with('Sukses', 'Data Berhasil diupdate');
+    }
 
     /**
      * Delete the designated resource object from the model.

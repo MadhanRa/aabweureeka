@@ -80,10 +80,15 @@
   $(document).ready(function() {
     $('#myTable').DataTable({
       columnDefs: [{
-        targets: 4,
-        orderable: false,
-        searchable: false
-      }],
+          targets: 4,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
     });
   });
 </script>

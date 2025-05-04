@@ -83,6 +83,37 @@ $routes->group('setup_persediaan', ['namespace' => 'App\Controllers\setup_persed
     $routes->resource('harga');
 });
 
+$routes->group('transaksi', static function ($routes) {
+    $routes->group('pembelian', ['namespace' => 'App\Controllers\transaksi\pembelian'], static function ($routes) {
+        //routes untuk pembelian
+        $routes->get('pembelian/new', 'Pembelian::new');
+        $routes->get('pembelian/lookup-stock', 'Pembelian::lookupStock');
+        $routes->resource('pembelian');
+        $routes->post('pembelian', 'Pembelian::create');
+        $routes->post('pembelian/(:any)', 'Pembelian::delete/$1');
+        $routes->get('pembelian', 'Pembelian::index');
+        $routes->get('pembelian/printPDF/(:num)', 'Pembelian::printPDF/$1');
+        $routes->get('Pembelian/printPDF/(:num)', 'Pembelian::printPDF/$1');
+        $routes->get('pembelian/printPDF', 'Pembelian::printPDF');
+        $routes->get('Pembelian/printPDF', 'Pembelian::printPDF');
+        $routes->put('pembelian/(:segment)', 'Pembelian::update/$1', ['filter' => 'role:admin']);
+        $routes->put('pembelian/(:segment)/edit', 'Pembelian::edit/$1', ['filter' => 'role:admin']);
+
+        //routes untuk returpembelian
+        $routes->get('returpembelian/new', 'ReturPembelian::new');
+        $routes->resource('returpembelian');
+        $routes->post('returpembelian', 'ReturPembelian::create');
+        $routes->post('returpembelian/(:any)', 'ReturPembelian::delete/$1');
+        $routes->get('returpembelian', 'ReturPembelian::index');
+        $routes->get('returpembelian/printPDF/(:num)', 'ReturPembelian::printPDF/$1');
+        $routes->get('ReturPembelian/printPDF/(:num)', 'ReturPembelian::printPDF/$1');
+        $routes->get('returpembelian/printPDF', 'ReturPembelian::printPDF');
+        $routes->get('ReturPembelian/printPDF', 'ReturPembelian::printPDF');
+        $routes->put('returpembelian/(:segment)', 'ReturPembelian::update/$1', ['filter' => 'role:admin']);
+        $routes->put('/returpembelian/(:segment)/edit', 'ReturPembelian::edit/$1', ['filter' => 'role:admin']);
+    });
+});
+
 
 //routes pindahlokasi
 $routes->get('/pindahlokasi/new', 'PindahLokasi::new');
@@ -280,32 +311,6 @@ $routes->get('accounting/closeBook', 'Accounting::index');
 
 // Route untuk menjalankan proses penutupan periode
 $routes->post('accounting/closeBook/closePeriod', 'Accounting::closePeriod');
-
-//routes untuk pembelian
-$routes->get('/pembelian/new', 'Pembelian::new');
-$routes->resource('pembelian');
-$routes->post('/pembelian', 'Pembelian::create');
-$routes->post('/pembelian/(:any)', 'Pembelian::delete/$1');
-$routes->get('pembelian', 'Pembelian::index');
-$routes->get('pembelian/printPDF/(:num)', 'Pembelian::printPDF/$1');
-$routes->get('Pembelian/printPDF/(:num)', 'Pembelian::printPDF/$1');
-$routes->get('pembelian/printPDF', 'Pembelian::printPDF');
-$routes->get('Pembelian/printPDF', 'Pembelian::printPDF');
-$routes->put('/pembelian/(:segment)', 'Pembelian::update/$1', ['filter' => 'role:admin']);
-$routes->put('/pembelian/(:segment)/edit', 'Pembelian::edit/$1', ['filter' => 'role:admin']);
-
-//routes untuk returpembelian
-$routes->get('/returpembelian/new', 'ReturPembelian::new');
-$routes->resource('returpembelian');
-$routes->post('/returpembelian', 'ReturPembelian::create');
-$routes->post('/returpembelian/(:any)', 'ReturPembelian::delete/$1');
-$routes->get('returpembelian', 'ReturPembelian::index');
-$routes->get('returpembelian/printPDF/(:num)', 'ReturPembelian::printPDF/$1');
-$routes->get('ReturPembelian/printPDF/(:num)', 'ReturPembelian::printPDF/$1');
-$routes->get('returpembelian/printPDF', 'ReturPembelian::printPDF');
-$routes->get('ReturPembelian/printPDF', 'ReturPembelian::printPDF');
-$routes->put('/returpembelian/(:segment)', 'ReturPembelian::update/$1', ['filter' => 'role:admin']);
-$routes->put('/returpembelian/(:segment)/edit', 'ReturPembelian::edit/$1', ['filter' => 'role:admin']);
 
 //routes untuk penjualan
 $routes->get('/penjualan/new', 'Penjualan::new');

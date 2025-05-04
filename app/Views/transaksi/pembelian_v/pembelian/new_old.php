@@ -3,34 +3,34 @@
 <?= $this->section("content") ?>
 
 <section class="section">
-    <div class="section-header">
-        <!-- <h1>APA INI</h1> -->
-        <a href="<?= site_url('pembelian') ?>" class="btn btn-primary">
+  <div class="section-header">
+    <h1>Pembelian</h1>
+    <!-- <a href="<?= site_url('pembelian') ?>" class="btn btn-primary">
             <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
-    
-    <div class="section-body">
-        <!-- HALAMAN DINAMIS -->
-        <div class="card">
-            <div class="card-header">
-                <h4>Transaksi Pembelian</h4>
-            </div>
-            <div class="card-body">
-                <form method="post" action="<?= site_url('pembelian') ?>">
-                    <?= csrf_field() ?>
-                    
-        <div class="form-group">
+        </a> -->
+  </div>
+
+  <div class="section-body">
+    <!-- HALAMAN DINAMIS -->
+    <div class="card">
+      <div class="card-header">
+        <h4>Transaksi Pembelian</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" action="<?= site_url('pembelian') ?>">
+          <?= csrf_field() ?>
+
+          <div class="form-group">
             <label>Tanggal</label>
             <input type="date" class="form-control" name="tanggal" value="<?= old('tanggal') ?>" required>
-        </div>
-                    
-        <div class="form-group">
+          </div>
+
+          <div class="form-group">
             <label>Nota</label>
             <input type="text" class="form-control" name="nota" value="<?= old('nota') ?>" required>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Supplier</label>
             <select class="form-control" name="id_setupsupplier" required>
               <option value="" hidden>-- Pilih Supplier --</option>
@@ -38,29 +38,29 @@
                 <option value="<?= esc($value->id_setupsupplier) ?>" <?= old('id_setupsupplier') == $value->id_setupsupplier ? 'selected' : '' ?>>
                   <?= esc($value->nama) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div class="form-group">
             <label>TOP</label>
             <input type="text" class="form-control" name="TOP" value="<?= old('TOP') ?>" required>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Tanggal Jatuh Tempo</label>
             <input type="date" class="form-control" name="tgl_jatuhtempo" value="<?= old('tgl_jatuhtempo') ?>" required>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Tanggal Invoice</label>
             <input type="date" class="form-control" name="tgl_invoice" value="<?= old('tgl_invoice') ?>" required>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>No Invoice</label>
             <input type="number" class="form-control" name="no_invoice" value="<?= old('no_invoice') ?>" required>
-        </div>
+          </div>
 
           <div class="form-group">
             <label>Lokasi</label>
@@ -70,8 +70,8 @@
                 <option value="<?= esc($value->id_lokasi) ?>" <?= old('id_lokasi') == $value->id_lokasi ? 'selected' : '' ?>>
                   <?= esc($value->nama_lokasi) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div class="form-group">
@@ -88,110 +88,110 @@
                 <option value="<?= esc($value->id_satuan) ?>" <?= old('id_satuan') == $value->id_satuan ? 'selected' : '' ?>>
                   <?= esc($value->kode_satuan) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
           </div>
 
 
           <div class="form-group">
-              <label>Qty 1</label>
-              <input type="number" id="qty_1" class="form-control" name="qty_1" value="<?= old('qty_1') ?>" required>
+            <label>Qty 1</label>
+            <input type="number" id="qty_1" class="form-control" name="qty_1" value="<?= old('qty_1') ?>" required>
           </div>
 
           <div class="form-group">
-              <label>Qty 2</label>
-              <input type="number" id="qty_2" class="form-control" name="qty_2" value="<?= old('qty_2') ?>">
+            <label>Qty 2</label>
+            <input type="number" id="qty_2" class="form-control" name="qty_2" value="<?= old('qty_2') ?>">
           </div>
 
           <div class="form-group">
-              <label>Harga Satuan</label>
-              <input type="number" id="harga_satuan" class="form-control" name="harga_satuan" value="<?= old('harga_satuan') ?>" required>
+            <label>Harga Satuan</label>
+            <input type="number" id="harga_satuan" class="form-control" name="harga_satuan" value="<?= old('harga_satuan') ?>" required>
           </div>
 
           <div class="form-group">
-              <label>Jumlah Harga</label>
-              <input type="text" id="jml_harga" class="form-control" name="jml_harga" value="<?= number_format(old('jml_harga') ?: 0, 0, ',', '.') ?>" readonly>
+            <label>Jumlah Harga</label>
+            <input type="text" id="jml_harga" class="form-control" name="jml_harga" value="<?= number_format(old('jml_harga') ?: 0, 0, ',', '.') ?>" readonly>
           </div>
 
           <div class="form-group">
-              <label>Disc 1 (%)</label>
-              <input type="number" id="disc_1" class="form-control" name="disc_1" value="<?= old('disc_1') ?>">
+            <label>Disc 1 (%)</label>
+            <input type="number" id="disc_1" class="form-control" name="disc_1" value="<?= old('disc_1') ?>">
           </div>
 
           <div class="form-group">
-              <label>Disc 2 (%)</label>
-              <input type="number" id="disc_2" class="form-control" name="disc_2" value="<?= old('disc_2') ?>">
+            <label>Disc 2 (%)</label>
+            <input type="number" id="disc_2" class="form-control" name="disc_2" value="<?= old('disc_2') ?>">
           </div>
 
           <div class="form-group">
-              <label>Total</label>
-              <input type="text" id="total" class="form-control" name="total" value="<?= number_format(old('total') ?: 0, 0, ',', '.') ?>" readonly>
+            <label>Total</label>
+            <input type="text" id="total" class="form-control" name="total" value="<?= number_format(old('total') ?: 0, 0, ',', '.') ?>" readonly>
           </div>
 
           <div class="form-group">
             <label>Rekening</label>
-            <select class="form-control" name="id_setupbank" required>
+            <select class="form-control" name="id_setupbuku" required>
               <option value="" hidden>-- Pilih Rekening --</option>
-              <?php foreach ($dtsetupbank as $key => $value) : ?>
-                <option value="<?= esc($value->id_setupbank) ?>" <?= old('id_setupbank') == $value->id_setupbank ? 'selected' : '' ?>>
-                  <?= esc($value->nama_setupbank) ?>
+              <?php foreach ($dtsetupbuku as $key => $value) : ?>
+                <option value="<?= esc($value->id_setupbuku) ?>" <?= old('id_setupbuku') == $value->id_setupbuku ? 'selected' : '' ?>>
+                  <?= esc($value->nama_setupbuku) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
           </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label for="tipe">Tipe</label>
             <select class="form-control" name="tipe" id="tipe" required>
-                <option value="" disabled selected>Pilih Tipe</option>
-                <option value="exclude" <?= old('tipe') == 'exclude' ? 'selected' : '' ?>>Exclude</option>
-                <option value="include" <?= old('tipe') == 'include' ? 'selected' : '' ?>>Include</option>
-                <option value="non_ppn" <?= old('tipe') == 'non_ppn' ? 'selected' : '' ?>>Non PPN</option>
+              <option value="" disabled selected>Pilih Tipe</option>
+              <option value="exclude" <?= old('tipe') == 'exclude' ? 'selected' : '' ?>>Exclude</option>
+              <option value="include" <?= old('tipe') == 'include' ? 'selected' : '' ?>>Include</option>
+              <option value="non_ppn" <?= old('tipe') == 'non_ppn' ? 'selected' : '' ?>>Non PPN</option>
             </select>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Sub Total</label>
             <input type="text" id="sub_total" class="form-control" name="sub_total" value="<?= number_format(old('sub_total') ?: 0, 0, ',', '.') ?>" readonly>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Discount Cash</label>
             <input type="number" id="disc_cash" class="form-control" name="disc_cash" value="<?= old('disc_cash') ?>">
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>PPN (%)</label>
             <input type="number" id="ppn" class="form-control" name="ppn" value="<?= old('ppn') ?>">
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Grand Total</label>
             <input type="text" id="grand_total" class="form-control" name="grand_total" value="<?= number_format(old('grand_total') ?: 0, 0, ',', '.') ?>" readonly>
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>NPWP</label>
             <input type="text" id="npwp" class="form-control" name="npwp" value="<?= old('npwp') ?>">
-        </div>
+          </div>
 
-        <div class="form-group">
+          <div class="form-group">
             <label>Terbilang</label>
             <input type="text" id="terbilang" class="form-control" name="terbilang" value="<?= old('terbilang') ?>">
-        </div>
+          </div>
 
           <div class="form-group">
             <button type="submit" class="btn btn-success">Simpan Data</button>
             <button type="reset" class="btn btn-danger">Reset</button>
           </div>
-        </form>          
+        </form>
       </div>
     </div>
   </div>
 </section>
 
 <script>
-document.addEventListener("input", function() {
+  document.addEventListener("input", function() {
     const qty1 = parseFloat(document.getElementById("qty_1").value) || 0;
     const qty2 = parseFloat(document.getElementById("qty_2").value) || 0;
     const hargaSatuan = parseFloat(document.getElementById("harga_satuan").value) || 0;
@@ -219,14 +219,15 @@ document.addEventListener("input", function() {
     // Kalkulasi Grand Total setelah PPN
     const grandTotal = subTotal + (subTotal * ppn / 100); // Grand total dengan PPN
     document.getElementById("grand_total").value = formatRupiah(grandTotal);
-});
+  });
 
-// Fungsi untuk format angka ke Rupiah
-function formatRupiah(angka) {
-    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(angka);
-}
-
-
+  // Fungsi untuk format angka ke Rupiah
+  function formatRupiah(angka) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR"
+    }).format(angka);
+  }
 </script>
 
 

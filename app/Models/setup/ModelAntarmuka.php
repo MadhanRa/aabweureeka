@@ -12,7 +12,7 @@ class ModelAntarmuka extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kas_interface', 'biaya', 'hutang', 'hpp',    'terima_mundur', 'kl_laba_ditahan',    'hutang_lancar', 'neraca_laba', 'piutang_salesman', 'rekening_biaya', 'piutang_dagang', 'penjualan',    'retur_penjualan', 'diskon_penjualan', 'laba_bulan', 'laba_tahun', 'laba_ditahan', 'potongan_pembelian', 'ppn_masukan', 'ppn_keluaran', 'potongan_penjualan',    'bank'];
+    protected $allowedFields    = ['kas_setara', 'biaya', 'hutang', 'hpp',    'terima_mundur', 'kl_laba_ditahan',    'hutang_lancar', 'neraca_laba', 'piutang_salesman', 'rekening_biaya', 'piutang_dagang', 'penjualan',    'retur_penjualan', 'diskon_penjualan', 'laba_bulan', 'laba_tahun', 'laba_ditahan', 'potongan_pembelian', 'ppn_masukan', 'ppn_keluaran', 'potongan_penjualan',    'bank'];
 
 
     // protected bool $allowEmptyInserts = false;
@@ -44,4 +44,12 @@ class ModelAntarmuka extends Model
     // protected $afterFind      = [];
     // protected $beforeDelete   = [];
     // protected $afterDelete    = [];
+
+    public function getKodeKas()
+    {
+        // Mengambil kode kas dari tabel interface1
+        $kode = $this->findAll()[0]->kas_setara;
+
+        return $kode ? $kode : null;
+    }
 }

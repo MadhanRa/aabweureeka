@@ -3,7 +3,6 @@
 namespace App\Controllers\setup_persediaan;
 
 use App\Models\setup_persediaan\ModelGroup;
-use App\Models\ModelAntarmuka;
 use App\Models\setup\ModelSetupBuku;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -11,14 +10,12 @@ use CodeIgniter\RESTful\ResourceController;
 class Group extends ResourceController
 {
     protected $objGroup;
-    protected $objAntarmuka;
     protected $objSetupBuku;
     protected $db;
     function __construct()
     {
         $this->objGroup = new ModelGroup();
         $this->objSetupBuku = new ModelSetupBuku();
-        $this->objAntarmuka = new ModelAntarmuka();
         $this->db = \Config\Database::connect();
     }
 

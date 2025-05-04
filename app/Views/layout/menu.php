@@ -34,25 +34,25 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown" data-toggle="dropdown"><i class="fas fa-columns"></i> <span>Transaksi</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="<?= site_url('pembelian') ?>">Pembelian</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('returpembelian') ?>">Retur Pembelian</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('penjualan') ?>">Penjualan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('returpenjualan') ?>">Retur Penjualan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('penyesuaianstock') ?>">Penyesuaian Stock</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('pindahlokasi') ?>">Pindah Lokasi</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('bahansablon') ?>">Bahan Di Sablon</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('hasilsablon') ?>">Hasil Sablon</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('pemakaianbahan') ?>">Pemakaian Bahan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('hasilproduksi') ?>">Hasil Produksi</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('tutangusaha') ?>">Pelunasan Piutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('lunassalesman') ?>">Pelunasan Piutang Sales</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('pelunasanhutang') ?>">Pelunasan Hutang</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('mutasikasbank') ?>">Mutasi Kas dan Bank</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('jurnalumum') ?>">Jurnal Umum</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('kaskecil') ?>">Pengeluaran Kas Kecil</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pembelian/pembelian') ?>">Pembelian</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pembelian/returpembelian') ?>">Retur Pembelian</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penjualan/penjualan') ?>">Penjualan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/returpenjualan') ?>">Retur Penjualan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penyesuaianstock') ?>">Penyesuaian Stock</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pindahlokasi') ?>">Pindah Lokasi</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/bahansablon') ?>">Bahan Di Sablon</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/hasilsablon') ?>">Hasil Sablon</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pemakaianbahan') ?>">Pemakaian Bahan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/hasilproduksi') ?>">Hasil Produksi</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/tutangusaha') ?>">Pelunasan Piutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/lunassalesman') ?>">Pelunasan Piutang Sales</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pelunasanhutang') ?>">Pelunasan Hutang</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/mutasikasbank') ?>">Mutasi Kas dan Bank</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/jurnalumum') ?>">Jurnal Umum</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/kaskecil') ?>">Pengeluaran Kas Kecil</a></li>
     <!-- <li><a class="nav-link text-dark" href="<?= site_url('transaksi/posting') ?>">Posting</a></li>  -->
-    <li><a class="nav-link text-dark" href="<?= site_url('close-period') ?>">Tutup Buku</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('stockopname') ?>">Stock Opname</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/close-period') ?>">Tutup Buku</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/stockopname') ?>">Stock Opname</a></li>
   </ul>
 </li>
 

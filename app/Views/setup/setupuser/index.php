@@ -55,14 +55,19 @@
                   <td><span class="badge badge-<?= ($value->nonaktif == 0) ? 'info' : 'warning' ?>"><?= ($value->nonaktif == 0) ? 'Aktif' : 'Nonaktif' ?></span></td>
 
                   <td class="text-center">
+                    <!-- Tombol Detail Data -->
+                    <a href="javascript:void(0)" onclick="lihat_data(<?= $value->id_user ?>)"
+                      id="btn-detail-<?= $value->id_user ?>"
+                      class="btn btn-info"><i class="fas fa-eye"></i> Detail</a>
+
                     <!-- Tombol Edit Data -->
-                    <a href="<?= site_url('setup/useropname/' . $value->id_user) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
+                    <a href=" <?= site_url('setup/useropname/' . $value->id_user) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
                     <input type="hidden" name="_method" value="PUT">
                     <!-- Tombol Hapus Data -->
                     <form action="<?= site_url('setup/useropname/' . $value->id_user) ?>" method="post" id="del-<?= $value->id_user ?>" class="d-inline">
                       <?= csrf_field() ?>
                       <input type="hidden" name="_method" value="DELETE">
-                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_user ?>)"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_user ?>)"><i class="fas fa-trash"></i> Hapus</button>
                     </form>
                   </td>
                 </tr>
@@ -72,7 +77,50 @@
         </div>
       </div>
     </div>
+    <div id="detail-content">
+
+    </div>
   </div>
 </section>
+
+<script>
+  function lihat_data(id) {
+    $.ajax({
+      url: "<?= site_url('setup/useropname/') ?>" + id,
+      type: "GET",
+      dataType: "json",
+      beforeSend: function() {
+        $('#btn-detail-' + id).addClass('disabled');
+        $('#btn-detail-' + id).addClass('btn-progress');
+      },
+      complete: function() {
+        $('#btn-detail-' + id).removeClass('disabled');
+        $('#btn-detail-' + id).removeClass('btn-progress');
+      },
+      success: function(response) {
+        if (response.success) {
+          $('#detail-content').html(response.data);
+        } else {
+          alert(response.error);
+        }
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+          targets: 4,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>

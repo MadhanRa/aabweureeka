@@ -83,7 +83,7 @@
     $(document).ready(function() {
         $('#myTable').DataTable({
             columnDefs: [{
-                targets: 6,
+                targets: 7,
                 orderable: false,
                 searchable: false
             }],

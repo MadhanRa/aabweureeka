@@ -78,10 +78,15 @@
   $(document).ready(function() {
     $('#myTable').DataTable({
       columnDefs: [{
-        targets: 3,
-        orderable: false,
-        searchable: false
-      }],
+          targets: 3,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
     });
   });
 </script>

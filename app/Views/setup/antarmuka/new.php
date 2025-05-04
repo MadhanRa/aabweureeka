@@ -21,7 +21,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Kas dan Setara Kas</label>
-                                <input type="text" class="form-control" name="kas_interface" required>
+                                <input type="text" class="form-control" name="kas_setara" required>
                             </div>
                             <div class="form-group">
                                 <label>Biaya</label>

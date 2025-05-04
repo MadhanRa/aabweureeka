@@ -46,7 +46,7 @@
                 <tr>
                   <td><strong>Kas</strong></td>
                   <td>:</td>
-                  <td><?= $dtantarmuka[0]->kas_interface ?></td>
+                  <td><?= $dtantarmuka[0]->kas_setara ?></td>
                 </tr>
                 <tr>
                   <td><strong>Biaya</strong></td>

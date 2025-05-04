@@ -7,8 +7,6 @@
             <th>Group</th>
             <th>Kelompok</th>
             <th>Satuan</th>
-            <th>Conv. Rate</th>
-            <th>Satuan2</th>
             <th>Supplier</th>
             <th>Minimum</th>
             <th>Action</th>
@@ -25,18 +23,18 @@
                 <td><?= $data->nama_barang ?></td>
                 <td><?= $data->nama_group ?></td>
                 <td><?= $data->nama_kelompok ?></td>
-                <td><?= $data->kode_satuan ?></td>
-                <td><?= $data->conv_factor ?></td>
-                <td><?= $data->kode_satuan2 ?></td>
+                <td><?= $data->kode_satuan . '/' . $data->kode_satuan2  ?></td>
                 <td><?= $data->nama_setupsupplier ?></td>
                 <td><?= $data->min_stock ?></td>
 
                 <td class="text-center">
+                    <!-- Tombol Detail Data -->
+                    <button type='button' class="btn btn-info btn-action mr-1" onclick="detail('<?= $data->id_stock ?>')"><i class="fas fa-eye"></i> Detail</button>
                     <!-- Tombol Edit Data -->
-                    <button type='button' class="btn btn-warning btn-action mr-1" onclick="edit('<?= $data->id_stock ?>')"><i class="fas fa-pencil-alt"></i></button>
+                    <button type='button' class="btn btn-warning btn-action mr-1" onclick="edit('<?= $data->id_stock ?>')"><i class="fas fa-pencil-alt"></i> Edit</button>
                     <!-- Tombol Hapus Data -->
                     <button type='button' class="btn btn-danger btn-action" onclick="hapus(<?= $data->id_stock ?>)">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"> Hapus</i>
                     </button>
                 </td>
             </tr>
@@ -48,12 +46,29 @@
     $(document).ready(function() {
         $('#myTable').DataTable({
             columnDefs: [{
-                targets: 10,
-                orderable: false,
-                searchable: false
-            }],
+                    targets: 8,
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    targets: 2,
+                    className: 'font-weight-bold',
+                }
+            ],
         });
     });
+
+    function detail(id) {
+        $.ajax({
+            url: "<?= site_url('setup_persediaan/stock') ?>/" + id,
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                $('#modalPlace').html(response.data).show();
+                $('#modalDetail').modal('show');
+            }
+        });
+    }
 
     function edit(id) {
         $.ajax({

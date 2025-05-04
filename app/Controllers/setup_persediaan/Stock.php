@@ -4,20 +4,24 @@ namespace App\Controllers\setup_persediaan;
 
 use App\Models\setup_persediaan\ModelGroup;
 use App\Models\setup_persediaan\ModelStock;
+use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup_persediaan\ModelKelompok;
-use App\Models\setup\ModelSetupsupplier;
 use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Stock extends ResourceController
 {
-    protected $objStock, $objLokasi, $db, $objKelompok, $objGroup, $objSetupsupplier, $objSatuan;
+    protected $objStock, $objLokasi, $db, $objKelompok, $objGroup, $objSetupsupplier, $objSatuan, $objStockGudang;
     //  INISIALISASI OBJECT DATA
     function __construct()
     {
         $this->objSatuan = new ModelSatuan();
         $this->objStock = new ModelStock();
+        $this->objLokasi = new ModelLokasi();
+        $this->objStockGudang = new ModelStockGudang();
         $this->objKelompok = new ModelKelompok();
         $this->objGroup = new ModelGroup();
         $this->objSetupsupplier = new ModelSetupsupplier();
@@ -57,7 +61,40 @@ class Stock extends ResourceController
      */
     public function show($id = null)
     {
-        //
+        if ($this->request->isAJAX()) {
+            $data['dtstock'] = $this->objStock->getStockWithRelationsById($id);
+            $dataStockGudang = $this->objStockGudang->where(['id_stock' => $id])->findAll();
+            $data['dtlokasi'] = $this->objLokasi->findAll();
+
+            // Buat array stok gudang terindeks berdasarkan id_lokasi
+            $stockGudangByLokasi = [];
+            if (!empty($dataStockGudang)) {
+                foreach ($dataStockGudang as $stockGudang) {
+                    $stockGudangByLokasi[$stockGudang->id_lokasi] = $stockGudang;
+                }
+            }
+
+            // Tambahkan data stok ke setiap lokasi
+            foreach ($data['dtlokasi'] as $lokasi) {
+                if (isset($stockGudangByLokasi[$lokasi->id_lokasi])) {
+                    $lokasi->qty1 = $stockGudangByLokasi[$lokasi->id_lokasi]->qty1;
+                    $lokasi->qty2 = $stockGudangByLokasi[$lokasi->id_lokasi]->qty2;
+                    $lokasi->jml_harga = $stockGudangByLokasi[$lokasi->id_lokasi]->jml_harga;
+                } else {
+                    $lokasi->qty1 = 0;
+                    $lokasi->qty2 = 0;
+                    $lokasi->jml_harga = 0;
+                }
+            }
+
+            $msg = [
+                'data' => view('setup_persediaan/stock/detail', $data)
+            ];
+
+            return $this->response->setJSON($msg);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Halaman Tidak Ditemukan']);
+        }
     }
 
     /**

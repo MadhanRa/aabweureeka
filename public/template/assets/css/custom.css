@@ -27,3 +27,28 @@ table thead>tr>th.sorting_desc::after {
     max-width: 600px;
     margin: 0 auto;
 }
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 9999 !important;
+}
+
+.ui-menu-item {
+    padding: 3px 0;
+}
+
+.ui-menu-item div {
+    padding: 5px 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ui-menu-item:last-child div {
+    border-bottom: none;
+}
+
+div.table-wrapper {
+    max-height: 250px;
+    overflow: auto;
+}

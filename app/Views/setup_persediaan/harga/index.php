@@ -103,10 +103,15 @@
   $(document).ready(function() {
     $('#myTable').DataTable({
       columnDefs: [{
-        targets: 5,
-        orderable: false,
-        searchable: false
-      }],
+          targets: 5,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 1,
+          className: 'font-weight-bold',
+        }
+      ],
     });
   });
 </script>
