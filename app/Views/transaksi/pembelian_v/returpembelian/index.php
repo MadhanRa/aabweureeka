@@ -8,21 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('returpembelian/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
-  </div>
-
-  <!-- Tombol Print All -->
-  <div class="section-body">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <a href="<?= base_url('ReturPembelian/printPDF') ?>" class="btn btn-success" target="_blank">
-            <i class="fas fa-print"></i> Cetak PDF
-          </a>
-        </div>
-      </div>
-    </div>
+    <h1>Dashboard Return Pembelian</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -43,26 +29,26 @@
     <div class="card">
       <div class="card-header">
         <h4>Transaksi Retur Pembelian</h4>
+        <div class="card-header-action">
+          <a href="<?= base_url('ReturPembelian/printPDF') ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-print"></i> Cetak PDF
+          </a>
+          <a href="<?= site_url('transaksi/pembelian/returpembelian/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+        </div>
       </div>
       <div class="section-body">
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
+            <table class="table table-striped table-md eureeka-table" id="myTable">
               <thead>
                 <tr class="eureeka-table-header">
                   <th>No</th>
                   <th>Tanggal</th>
-                  <th>Nota</th>
+                  <th>Nota Retur</th>
+                  <th>Nota Pembelian</th>
+                  <th>Tgl. Pembelian</th>
                   <th>Supplier</th>
-                  <th>Nama Stock</th>
-                  <th>Satuan</th>
-                  <th>Qty 1</th>
-                  <th>Qty 2</th>
-                  <th>Harga Satuan</th>
-                  <th>Jumlah Harga</th>
-                  <th>Disc. 1</th>
-                  <th>Disc. 2</th>
-                  <th>Total</th>
+                  <th>Lokasi Asal</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -73,16 +59,10 @@
                     <td><?= $key + 1 ?></td>
                     <td><?= $value->tanggal ?></td>
                     <td><?= $value->nota ?></td>
+                    <td><?= $value->nota_pembelian ?></td>
+                    <td><?= $value->tgl_pembelian ?></td>
                     <td><?= $value->nama_supplier ?></td>
-                    <td><?= $value->nama_stock ?></td>
-                    <td><?= $value->kode_satuan ?></td>
-                    <td><?= $value->qty_1 ?></td>
-                    <td><?= $value->qty_2 ?></td>
-                    <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
-                    <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
-                    <td><?= $value->disc_1 ?></td>
-                    <td><?= $value->disc_2 ?></td>
-                    <td><?= "Rp " . number_format($value->total, 0, ',', '.') ?></td>
+                    <td><?= $value->lokasi_asal ?></td>
 
                     <td class="text-center">
                       <?php if ($is_closed === 'TRUE'): ?>
@@ -120,8 +100,25 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
+
+
+<script>
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+          targets: 7,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>

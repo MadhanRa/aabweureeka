@@ -349,6 +349,7 @@
   <script src="<?= base_url('template/assets/js/custom.js') ?>"></script>
 
   <!-- Page Specific JS File -->
+  <?= $this->renderSection("pageScript") ?>
 
 </body>
 

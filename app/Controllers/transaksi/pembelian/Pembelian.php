@@ -42,6 +42,7 @@ class Pembelian extends ResourceController
         $this->db = \Config\Database::connect();
 
         $this->objRiwayatTransaksi = new ModelRiwayatTransaksi();
+        helper('terbilang');
     }
 
     /**
@@ -87,12 +88,13 @@ class Pembelian extends ResourceController
             if (empty($data['dtpembelian'])) {
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
+            $data['dtdetail'] = $this->objPembelianDetail->select('*')
+                ->where('id_pembelian', $id)
+                ->findAll();
+            $data['dtpembelian']->terbilang = terbilang($data['dtpembelian']->grand_total);
         }
 
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
-        $data['dtsetupbank'] = $this->objSetupbank->getAll();
+
         // Debugging: Tampilkan konten HTML sebelum PDF
         $html = view('transaksi/pembelian_v/pembelian/printPDF', $data);
         // echo $html;
@@ -116,7 +118,7 @@ class Pembelian extends ResourceController
 
         // Set tipe respons menjadi PDF
         $this->response->setContentType('application/pdf');
-        $pdf->Output('nota_pembelian.pdf', 'D');
+        $pdf->Output('nota_pembelian.pdf', 'I');
     }
 
     /**
@@ -128,7 +130,33 @@ class Pembelian extends ResourceController
      */
     public function show($id = null)
     {
-        //
+        if ($this->request->isAJAX()) {
+            $dtpembelian = $this->objPembelian->find($id);
+
+            if (!$dtpembelian) {
+                return $this->response->setJSON([
+                    'status' => 'false',
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+
+            $dtdetail = $this->objPembelianDetail->select('pembelian1_detail.*, stock1.conv_factor')
+                ->join('stock1', 'pembelian1_detail.id_stock = stock1.id_stock', 'left')
+                ->where('pembelian1_detail.id_pembelian', $id)
+                ->findAll();
+
+            $msg = [
+                'status' => 'success',
+                'data' => [
+                    'header' => $dtpembelian,
+                    'detail' => $dtdetail,
+                ]
+            ];
+
+            return $this->response->setJSON($msg);
+        } else {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
     }
 
     /**
@@ -181,7 +209,7 @@ class Pembelian extends ResourceController
             'no_invoice' => $this->request->getVar('no_invoice'),
             'id_lokasi' => $id_lokasi,
             'id_setupbuku' => $this->request->getVar('id_setupbuku'),
-            'disc_cash' => $this->request->getVar('disc_cash'),
+            'disc_cash' => $this->request->getVar('disc_cash') ?? 0,
             'dpp' => $this->request->getVar('dpp_raw') ?? 0,
             'ppn' => $this->request->getVar('ppn') ?? 0,
             'ppn_option' => $this->request->getVar('ppn_option'),

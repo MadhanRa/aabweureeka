@@ -9,7 +9,7 @@
 <section class="section">
   <div class="section-header">
     <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('penjualan/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <a href="<?= site_url('transaksi/penjualan/penjualan/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
   </div>
 
   <!-- Tombol Print All -->
@@ -126,8 +126,24 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
+
+<script>
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+          targets: 15,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>

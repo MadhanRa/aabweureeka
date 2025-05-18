@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi\penjualan;
 
 use CodeIgniter\Model;
 
@@ -18,7 +18,7 @@ class ModelPenjualan extends Model
         'id_pelanggan',
         'TOP',
         'tgl_jatuhtempo',
-        'id_setupsalesman',
+        'id_salesman',
         'id_lokasi',
         'no_fp',
         'nama_stock',
@@ -50,7 +50,7 @@ class ModelPenjualan extends Model
                 l1.nama_lokasi AS lokasi_asal, 
                 sp.nama_pelanggan AS nama_pelanggan, 
                 s.kode_satuan AS kode_satuan,
-                sm.nama_setupsalesman AS nama_setupsalesman
+                sm.nama_salesman AS nama_salesman
             ');
 
         // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi
@@ -63,7 +63,7 @@ class ModelPenjualan extends Model
         $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
         // Join dengan tabel 'setupsalesman1' untuk mendapatkan nama salesman
-        $builder->join('setupsalesman1 sm', 'p.id_setupsalesman = sm.id_setupsalesman', 'left');
+        $builder->join('setupsalesman1 sm', 'p.id_salesman = sm.id_salesman', 'left');
 
         return $builder->get()->getResult();
 
@@ -80,7 +80,7 @@ class ModelPenjualan extends Model
             l1.nama_lokasi AS lokasi_asal, 
             sp.nama_pelanggan AS nama_pelanggan, 
             s.kode_satuan AS kode_satuan,
-            sm.nama_setupsalesman AS nama_setupsalesman
+            sm.nama_salesman AS nama_salesman
         ');
 
         // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi
@@ -93,7 +93,7 @@ class ModelPenjualan extends Model
         $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
         // Join dengan tabel 'setupsalesman1' untuk mendapatkan nama salesman
-        $builder->join('setupsalesman1 sm', 'p.id_setupsalesman = sm.id_setupsalesman', 'left');
+        $builder->join('setupsalesman1 sm', 'p.id_salesman = sm.id_salesman', 'left');
         $builder->where('MONTH(p.tanggal)', $bulan);
         $builder->where('YEAR(p.tanggal)', $tahun);
         $data = $builder->get()->getResult();
@@ -122,7 +122,7 @@ class ModelPenjualan extends Model
                 l1.nama_lokasi AS lokasi_asal, 
                 sp.nama_pelanggan AS nama_pelanggan, 
                 s.kode_satuan AS kode_satuan,
-                sm.nama_setupsalesman AS nama_setupsalesman
+                sm.nama_salesman AS nama_salesman
             ');
 
         // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi
@@ -135,7 +135,7 @@ class ModelPenjualan extends Model
         $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
         // Join dengan tabel 'setupsalesman1' untuk mendapatkan nama salesman
-        $builder->join('setupsalesman1 sm', 'p.id_setupsalesman = sm.id_setupsalesman', 'left');
+        $builder->join('setupsalesman1 sm', 'p.id_salesman = sm.id_salesman', 'left');
 
         // Tambahkan kondisi where untuk id
         $builder->where('p.id_penjualan', $id);
@@ -151,14 +151,14 @@ class ModelPenjualan extends Model
         $builder->select('
             p.*, 
             l1.nama_lokasi AS lokasi_asal, 
-            sp.nama_setupsalesman AS nama_setupsalesman, 
+            sp.nama_salesman AS nama_salesman, 
             s.kode_satuan AS kode_satuan, 
             plg.nama_pelanggan AS nama_pelanggan
         ');
 
         // Join dengan tabel terkait
         $builder->join('lokasi1 l1', 'p.id_lokasi = l1.id_lokasi', 'left');
-        $builder->join('setupsalesman1 sp', 'p.id_setupsalesman = sp.id_setupsalesman', 'left');
+        $builder->join('setupsalesman1 sp', 'p.id_salesman = sp.id_salesman', 'left');
         $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
         $builder->join('setuppelanggan1 plg', 'p.id_pelanggan = plg.id_pelanggan', 'left');
 
@@ -172,7 +172,7 @@ class ModelPenjualan extends Model
 
         // Filter berdasarkan salesman jika diberikan
         if (!empty($salesman)) {
-            $builder->where('p.id_setupsalesman', $salesman);
+            $builder->where('p.id_salesman', $salesman);
         }
         // Filter berdasarkan lokasi jika diberikan
         if (!empty($lokasi)) {

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi\penjualan;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelPenjualan;
-use App\Models\ModelSatuan;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\penjualan\ModelPenjualan;
 use App\Models\setup\ModelSetuppelanggan;
 use App\Models\setup\ModelSetupsalesman;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -56,10 +56,10 @@ class Penjualan extends ResourceController
         $data['dtpenjualan'] = $this->objPenjualan->getAll();
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtpelanggan'] = $this->objSetuppelanggan->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->getAll();
+        $data['dtpelanggan'] = $this->objSetuppelanggan->findAll();
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
 
-        return view('penjualan/index', $data);
+        return view('transaksi/penjualan_v/penjualan/index', $data);
     }
 
     public function printPDF($id = null)
@@ -80,7 +80,7 @@ class Penjualan extends ResourceController
         $data['dtpelanggan'] = $this->objSetuppelanggan->getAll();
         $data['dtsalesman'] = $this->objSetupsalesman->getAll();
         // Debugging: Tampilkan konten HTML sebelum PDF
-        $html = view('penjualan/printPDF', $data);
+        $html = view('transaksi/penjualan_v/penjualan/printPDF', $data);
         // echo $html;
         // exit; // Jika perlu debugging
 
@@ -128,10 +128,10 @@ class Penjualan extends ResourceController
         $data['dtpenjualan'] = $this->objPenjualan->getAll();
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtpelanggan'] = $this->objSetuppelanggan->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->getAll();
+        $data['dtpelanggan'] = $this->objSetuppelanggan->findAll();
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
 
-        return view('penjualan/new', $data);
+        return view('transaksi/penjualan_v/penjualan/new', $data);
     }
 
     /**
@@ -170,7 +170,7 @@ class Penjualan extends ResourceController
             'id_pelanggan' => $this->request->getVar('id_pelanggan'),
             'TOP' => $this->request->getVar('TOP'),
             'tgl_jatuhtempo' => $this->request->getVar('tgl_jatuhtempo'),
-            'id_setupsalesman' => $this->request->getVar('id_setupsalesman'),
+            'id_salesman' => $this->request->getVar('id_salesman'),
             'id_lokasi' => $this->request->getVar('id_lokasi'),
             'no_fp' => $this->request->getVar('no_fp'),
             'nama_stock' => $this->request->getVar('nama_stock'),
@@ -193,7 +193,7 @@ class Penjualan extends ResourceController
         ];
         $this->db->table('penjualan1')->insert($data);
 
-        return redirect()->to(site_url('penjualan'))->with('Sukses', 'Data Berhasil Disimpan');
+        return redirect()->to(site_url('transaksi/penjualan_v/penjualan'))->with('Sukses', 'Data Berhasil Disimpan');
     }
 
     /**
@@ -225,7 +225,7 @@ class Penjualan extends ResourceController
         $data['dtsatuan'] = $this->objSatuan->getAll();
         $data['dtpelanggan'] = $this->objSetuppelanggan->getAll();
         $data['dtsalesman'] = $this->objSetupsalesman->getAll();
-        return view('penjualan/edit', $data);
+        return view('transaksi/penjualan_v/penjualan/edit', $data);
     }
 
     /**
@@ -245,7 +245,7 @@ class Penjualan extends ResourceController
         // Cek apakah data dengan ID yang diberikan ada di database
         $existingData = $this->objPenjualan->find($id);
         if (!$existingData) {
-            return redirect()->to(site_url('penjualan'))->with('error', 'Data tidak ditemukan');
+            return redirect()->to(site_url('transaksi/penjualan_v/penjualan'))->with('error', 'Data tidak ditemukan');
         }
 
         // Ambil nilai dari form dan pastikan menjadi angka
@@ -277,7 +277,7 @@ class Penjualan extends ResourceController
             'id_pelanggan' => $this->request->getVar('id_pelanggan'),
             'TOP' => $this->request->getVar('TOP'),
             'tgl_jatuhtempo' => $this->request->getVar('tgl_jatuhtempo'),
-            'id_setupsalesman' => $this->request->getVar('id_setupsalesman'),
+            'id_salesman' => $this->request->getVar('id_salesman'),
             'id_lokasi' => $this->request->getVar('id_lokasi'),
             'no_fp' => $this->request->getVar('no_fp'),
             'nama_stock' => $this->request->getVar('nama_stock'),
@@ -302,7 +302,7 @@ class Penjualan extends ResourceController
         // Update data berdasarkan ID
         $this->objPenjualan->update($id, $data);
 
-        return redirect()->to(site_url('penjualan'))->with('success', 'Data berhasil diupdate.');
+        return redirect()->to(site_url('transaksi/penjualan_v/penjualan'))->with('success', 'Data berhasil diupdate.');
     }
 
     /**
@@ -315,6 +315,6 @@ class Penjualan extends ResourceController
     public function delete($id = null)
     {
         $this->db->table('penjualan1')->where(['id_penjualan' => $id])->delete();
-        return redirect()->to(site_url('penjualan'))->with('Sukses', 'Data Berhasil Dihapus');
+        return redirect()->to(site_url('transaksi/penjualan_v/penjualan'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

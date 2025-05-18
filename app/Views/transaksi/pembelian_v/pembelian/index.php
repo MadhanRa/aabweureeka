@@ -30,9 +30,9 @@
       <div class="card-header">
         <h4>Transaksi Pembelian</h4>
         <div class="card-header-action">
-          <a href="<?= base_url('Pembelian/printPDF') ?>" class="btn btn-success" target="_blank">
+          <!-- <a href="<?= base_url('transaksi/pembelian/pembelian/printPDF') ?>" class="btn btn-success" target="_blank">
             <i class="fas fa-print"></i> Cetak PDF
-          </a>
+          </a> -->
           <a href="<?= site_url('transaksi/pembelian/pembelian/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
         </div>
       </div>
@@ -78,17 +78,17 @@
                         <a href="<?= site_url('transaksi/pembelian/pembelian/' . $value->id_pembelian) .  '/edit' ?>" class="btn btn-warning btn-small"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
                         <input type="hidden" name="_method" value="PUT">
                         <!-- Tombol Hapus Data -->
-                        <form action="<?= site_url('transaksi/pembelian/pembelian/' . $value->id_pembelian) ?>" method="post" id="del-<?= $value->id_pembelian ?>" class="d-inline">
+                        <!-- <form action="<?= site_url('transaksi/pembelian/pembelian/' . $value->id_pembelian) ?>" method="post" id="del-<?= $value->id_pembelian ?>" class="d-inline">
                           <?= csrf_field() ?>
                           <input type="hidden" name="_method" value="DELETE">
                           <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_pembelian ?>)">
                             <i class="fas fa-trash"></i>
                           </button>
-                        </form>
+                        </form> -->
                       <?php endif ?>
 
                       <!-- Tombol Print Data -->
-                      <a href="<?= base_url('Pembelian/printPDF/' . $value->id_pembelian) ?>" class="btn btn-success btn-small" target="_blank">
+                      <a href="<?= base_url('transaksi/pembelian/pembelian/printPDF/' . $value->id_pembelian) ?>" class="btn btn-success btn-small" target="_blank">
                         <i class="fas fa-print"></i>
                       </a>
                     </td>

@@ -85,53 +85,51 @@ class ModelPembelian extends Model
             ->findAll(); // Mengambil semua data dari tabel pembelian1
     }
 
+    function getAllNota()
+    {
+        return $this->select(
+            'id_pembelian, nota'
+        )
+            ->orderBy('tanggal', 'DESC')
+            ->findAll(); // Mengambil semua data dari tabel pembelian1
+    }
+
 
     function getById($id)
     {
-
-        $builder = $this->db->table('pembelian1 p');
-
-        // Pilih kolom dari tabel utama dan tabel terkait
-        $builder->select('
-            p.*, 
-            l1.nama_lokasi AS lokasi_asal, 
-            sp.nama AS nama_supplier, 
-            s.kode_satuan AS kode_satuan,
-            b.nama_setupbank AS nama_setupbank
-        ');
-
-        // Join dengan tabel 'lokasi1' untuk lokasi asal
-        $builder->join('lokasi1 l1', 'p.id_lokasi = l1.id_lokasi', 'left');
-
-        // Join dengan tabel 'setupsupplier1' untuk nama supplier
-        $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-
-        // Join dengan tabel 'satuan1' untuk kode satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
-
-        // Join dengan tabel 'setupbank1' untuk nama bank
-        $builder->join('setupbank1 b', 'p.id_setupbank = b.id_setupbank', 'left');
-
-        // Tambahkan kondisi where untuk id
-        $builder->where('p.id_pembelian', $id);
-
-        return $builder->get()->getRow();
+        return $this->select('pembelian1.*, setupsupplier1.nama AS nama_supplier, setupsupplier1.npwp AS npwp, lokasi1.nama_lokasi AS nama_lokasi, setupbuku1.nama_setupbuku AS nama_setupbuku')
+            ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left')
+            ->join('lokasi1', 'pembelian1.id_lokasi = lokasi1.id_lokasi', 'left')
+            ->join('setupbuku1', 'pembelian1.id_setupbuku = setupbuku1.id_setupbuku', 'left')
+            ->where('id_pembelian', $id)
+            ->first(); // Mengambil data berdasarkan id_pembelian
     }
 
     public function get_laporan($tglawal, $tglakhir, $supplier = null)
     {
         $builder = $this->db->table('pembelian1 p');
         $builder->select('
-            p.*, 
-            sp.nama AS nama_supplier, 
-            s.kode_satuan AS kode_satuan
-        ');
+        p.*,
+        pd.id as detail_id,
+        pd.kode,
+        pd.nama_barang,
+        pd.satuan,
+        pd.qty1,
+        pd.qty2,
+        pd.harga_satuan, 
+        pd.jml_harga, 
+        pd.disc_1_perc, 
+        pd.disc_2_perc,
+        pd.total AS sub_total,
+        sp.nama AS nama_supplier,
+        sp.kode AS kode_supplier
+    ');
+
+        // Join dengan tabel detail
+        $builder->join('pembelian1_detail pd', 'p.id_pembelian = pd.id_pembelian', 'left');
 
         // Join dengan tabel supplier
         $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-
-        // Join dengan tabel satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
         // Filter tanggal
         if (!empty($tglawal)) {
@@ -145,6 +143,9 @@ class ModelPembelian extends Model
         if (!empty($supplier)) {
             $builder->where('p.id_setupsupplier', $supplier);
         }
+
+        // Urutkan berdasarkan id_pembelian
+        $builder->orderBy('p.id_pembelian, pd.id');
 
         return $builder->get()->getResult();
     }

@@ -3,17 +3,17 @@
 namespace App\Controllers;
 
 use TCPDF;
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelPembelian;
-use App\Models\ModelSetupbank;
-use App\Models\ModelSetupsupplier;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\pembelian\ModelPembelian;
+use App\Models\setup\ModelSetupbank;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class LaporanPembelian extends ResourceController
 {
-    
+
     protected $db, $objLokasi, $objSatuan, $objPembelian, $objSetupbank, $objSetupsupplier;
     function __construct()
     {
@@ -32,35 +32,51 @@ class LaporanPembelian extends ResourceController
     public function index()
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir')? $this->request->getVar('tglakhir') : '';
-        $supplier = $this->request->getVar('supplier')? $this->request->getVar('supplier') : '';
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $supplier = $this->request->getVar('supplier') ? $this->request->getVar('supplier') : '';
 
         // Panggil model untuk mendapatkan data laporan
         $dtpembelian = $this->objPembelian->get_laporan($tglawal, $tglakhir, $supplier);
-        
 
-        // Ambil data tambahan untuk dropdown filter
-        $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
-
-        
-         // Hitung subtotal dan total
-        $subtotal = 0;
-        $grandtotal = 0;
+        $sum_subtotal = 0;
+        $sum_grandtotal = 0;
+        $sum_dpp = 0;
+        $sum_disc_cash = 0;
+        $sum_ppn = 0;
         foreach ($dtpembelian as $row) {
-        $subtotal += $row->sub_total;
-        $grandtotal += $row->grand_total;
-    }
-    
+            $disc_cash = floatval($row->disc_cash);
+            $sub_total = floatval($row->sub_total);
+            $disc = $sub_total * ($disc_cash / 100);
+            $dpp = $sub_total - $disc;
+            if ($row->ppn_option == 'exclude') {
+                $ppn = $dpp * (floatval($row->ppn) / 100);
+            } else {
+                $ppn = 0;
+            }
+            $total = $dpp + $ppn;
+
+            $row->row_disc_cash = $disc;
+            $row->row_dpp = $dpp;
+            $row->row_ppn = $ppn;
+            $row->row_grand_total =  $total;
+
+            $sum_dpp += $dpp;
+            $sum_subtotal += $sub_total;
+            $sum_grandtotal += $total;
+            $sum_disc_cash += $disc;
+            $sum_ppn += $ppn;
+        }
+
 
         // $data['dtpembelian'] = $rowdata;
         $data = [
             'dtpembelian'    => $dtpembelian,
-            'subtotal'       => $subtotal,
-            'grandtotal'     => $grandtotal,
-            'dtlokasi'       => $this->objLokasi->getAll(),
-            'dtsatuan'       => $this->objSatuan->getAll(),
-            'dtsetupsupplier'=> $this->objSetupsupplier->getAll(),
-            'dtsetupbank'    => $this->objSetupbank->getAll(),
+            'dtsupplier'    => $this->objSetupsupplier->getAll(),
+            'subtotal'       => $sum_subtotal,
+            'disccash'       => $sum_disc_cash,
+            'dpp'       => $sum_dpp,
+            'ppn'       => $sum_ppn,
+            'grandtotal'     => $sum_grandtotal,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
             'supplier'       => $supplier,
@@ -79,38 +95,38 @@ class LaporanPembelian extends ResourceController
         $dtpembelian = $this->objPembelian->get_laporan($tglawal, $tglakhir, $supplier);
 
         // Ambil nama supplier jika filter supplier diterapkan
-    $supplierName = 'Semua Supplier';
-    if (!empty($supplierId)) {
-        $supplierData = $this->db->table('setupsupplier1')
-            ->select('nama')
-            ->where('id_setupsupplier', $supplierId)
-            ->get()
-            ->getRow();
-        $supplierName = $supplierData ? $supplierData->nama : 'Supplier Tidak Ditemukan';
-    }
-        
+        $supplierName = 'Semua Supplier';
+        if (!empty($supplierId)) {
+            $supplierData = $this->db->table('setupsupplier1')
+                ->select('nama')
+                ->where('id_setupsupplier', $supplierId)
+                ->get()
+                ->getRow();
+            $supplierName = $supplierData ? $supplierData->nama : 'Supplier Tidak Ditemukan';
+        }
+
         // Hitung subtotal dan grand total
         $subtotal = 0;
         $grandtotal = 0;
         if ($dtpembelian) {
-        foreach ($dtpembelian as $row) {
-            $subtotal += $row->jml_harga; // Total jumlah harga
-            $grandtotal += $row->total;  // Total setelah diskon
+            foreach ($dtpembelian as $row) {
+                $subtotal += $row->jml_harga; // Total jumlah harga
+                $grandtotal += $row->total;  // Total setelah diskon
+            }
         }
-    }
 
-    $data = [
-        'dtpembelian' => $dtpembelian,
-        'dtlokasi'    => $this->objLokasi->getAll(),
-        'dtsatuan'    => $this->objSatuan->getAll(),
-        'dtsetupsupplier' => $this->objSetupsupplier->getAll(),
-        'dtsetupbank' => $this->objSetupbank->getAll(),
-        'tglawal'     => $tglawal,
-        'tglakhir'    => $tglakhir,
-        'supplier'    => $supplierName,
-        'subtotal'    => $subtotal,
-        'grandtotal'  => $grandtotal,
-    ];
+        $data = [
+            'dtpembelian' => $dtpembelian,
+            'dtlokasi'    => $this->objLokasi->getAll(),
+            'dtsatuan'    => $this->objSatuan->getAll(),
+            'dtsetupsupplier' => $this->objSetupsupplier->getAll(),
+            'dtsetupbank' => $this->objSetupbank->getAll(),
+            'tglawal'     => $tglawal,
+            'tglakhir'    => $tglakhir,
+            'supplier'    => $supplierName,
+            'subtotal'    => $subtotal,
+            'grandtotal'  => $grandtotal,
+        ];
         // Debugging: Tampilkan konten HTML sebelum PDF
         $html = view('laporanpembelian/printPDF', $data);
         // echo $html;

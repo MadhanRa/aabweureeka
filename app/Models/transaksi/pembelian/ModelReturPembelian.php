@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi\pembelian;
 
 use CodeIgniter\Model;
 
@@ -17,57 +17,29 @@ class ModelReturPembelian extends Model
         'nota',
         'id_setupsupplier',
         'id_lokasi',
-        'nama_stock',
-        'id_satuan',
-        'qty_1',
-        'qty_2',
-        'harga_satuan',
-        'jml_harga',
-        'disc_1',
-        'disc_2',
-        'total',
         'id_pembelian',
-        'tgl_pembelian',
-        'pembayaran',
-        'tipe',
+        'opsi_return',
         'sub_total',
         'disc_cash',
+        'dpp',
+        'ppn_option',
         'ppn',
         'grand_total',
-        'npwp',
-        'terbilang'
     ];
 
     function getAll()
     {
-        $builder = $this->db->table('returpembelian1 p');
-
-        // Pilih kolom dari tabel utama dan tabel terkait
-        $builder->select('
-                p.*, 
+        return $this->select('
+                returpembelian1.*, 
                 l1.nama_lokasi AS lokasi_asal, 
-                sp.nama AS nama_supplier, 
-                s.kode_satuan AS kode_satuan,
-                pb_tgl.tanggal AS tgl_pembelian, 
-                pb_nota.nota AS nota_pembelian
-            ');
-
-        // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi asal
-        $builder->join('lokasi1 l1', 'p.id_lokasi = l1.id_lokasi', 'left');
-
-        // Join dengan tabel 'setupsupplier1' untuk mendapatkan nama supplier
-        $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-
-        // Join dengan tabel 'satuan1' untuk mendapatkan kode satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
-
-        // Join dengan tabel 'pembelian1' untuk mendapatkan tanggal dan nota pembelian
-        $builder->join('pembelian1 pb_tgl', 'p.id_pembelian_tgl = pb_tgl.id_pembelian', 'left');
-        $builder->join('pembelian1 pb_nota', 'p.id_pembelian_nota = pb_nota.id_pembelian', 'left');
-
-        return $builder->get()->getResult();
-
-        return $this->findAll();
+                sp.nama AS nama_supplier,
+                pb.tanggal AS tgl_pembelian,
+                pb.nota AS nota_pembelian
+            ')
+            ->join('lokasi1 l1', 'returpembelian1.id_lokasi = l1.id_lokasi', 'left')
+            ->join('setupsupplier1 sp', 'returpembelian1.id_setupsupplier = sp.id_setupsupplier', 'left')
+            ->join('pembelian1 pb', 'returpembelian1.id_pembelian = pb.id_pembelian', 'left')
+            ->findAll();
     }
 
     public function getByMonthAndYear($bulan, $tahun)
@@ -179,7 +151,7 @@ class ModelReturPembelian extends Model
     }
 
 
-    
+
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

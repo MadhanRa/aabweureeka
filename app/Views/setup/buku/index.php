@@ -1,6 +1,6 @@
 <?= $this->extend("/layout/backend") ?>;
 
-<?= $this->section("content") ?>
+<?= $this->section("title") ?>
 <title>Setup Buku - Akuntansi Eureeka</title>
 <?= $this->endSection(); ?>
 
