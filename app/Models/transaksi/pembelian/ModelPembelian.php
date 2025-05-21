@@ -12,7 +12,7 @@ class ModelPembelian extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'nota', 'id_setupsupplier', 'TOP', 'tgl_jatuhtempo', 'tgl_invoice', 'no_invoice', 'id_lokasi', 'id_setupbuku', 'sub_total', 'disc_cash', 'dpp', 'ppn_option', 'ppn', 'tunai', 'hutang', 'grand_total'];
+    protected $allowedFields    = ['tanggal', 'nota', 'id_setupsupplier', 'TOP', 'tgl_jatuhtempo', 'tgl_invoice', 'no_invoice', 'id_lokasi', 'id_setupbuku', 'sub_total', 'disc_cash', 'disc_cash_rp', 'dpp', 'ppn_option', 'ppn', 'tunai', 'hutang', 'grand_total'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

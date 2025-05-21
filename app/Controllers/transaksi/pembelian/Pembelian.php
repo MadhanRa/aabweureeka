@@ -210,6 +210,7 @@ class Pembelian extends ResourceController
             'id_lokasi' => $id_lokasi,
             'id_setupbuku' => $this->request->getVar('id_setupbuku'),
             'disc_cash' => $this->request->getVar('disc_cash') ?? 0,
+            'disc_cash_rp' => $this->request->getVar('disc_cash_rp_raw') ?? 0,
             'dpp' => $this->request->getVar('dpp_raw') ?? 0,
             'ppn' => $this->request->getVar('ppn') ?? 0,
             'ppn_option' => $this->request->getVar('ppn_option'),
@@ -323,7 +324,8 @@ class Pembelian extends ResourceController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Data berhasil disimpan!'
+                'message' => 'Data berhasil disimpan!',
+                'redirect_url' => site_url('transaksi/pembelian/pembelian')
             ]);
         } catch (\Exception $e) {
             $this->db->transRollback();

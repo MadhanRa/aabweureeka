@@ -118,9 +118,10 @@
             <tr>
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
+                <th>Satuan</th>
+                <th style="width: 60px;">Qty1.</th>
+                <th style="width: 60px;">Qty2.</th>
                 <th>Hrg. Satuan</th>
-                <th>Qty1.</th>
-                <th>Qty2.</th>
                 <th>Total</th>
                 <th>Discount 1</th>
                 <th>Discount 2</th>
@@ -132,12 +133,13 @@
                     <tr>
                         <td class="text-left"><?= htmlspecialchars(isset($item->kode) ? $item->kode : '-') ?></td>
                         <td class="text-left"><?= htmlspecialchars(isset($item->nama_barang) ? $item->nama_barang : '-') ?></td>
-                        <td>Rp <?= number_format(isset($item->harga_satuan) ? $item->harga_satuan : 0, 0, ',', '.') ?></td>
+                        <td class="text-left"><?= htmlspecialchars(isset($item->satuan) ? $item->satuan : '-') ?></td>
                         <td><?= htmlspecialchars(isset($item->qty1) ? $item->qty1 : 0) ?></td>
                         <td><?= htmlspecialchars(isset($item->qty2) ? $item->qty2 : 0) ?></td>
+                        <td>Rp <?= number_format(isset($item->harga_satuan) ? $item->harga_satuan : 0, 0, ',', '.') ?></td>
                         <td>Rp <?= number_format(isset($item->total) ? $item->total : 0, 0, ',', '.') ?></td>
-                        <td><?= htmlspecialchars(isset($item->disc_1_perc) ? $item->disc_1_perc : 0) ?>%</td>
-                        <td><?= htmlspecialchars(isset($item->disc_2_perc) ? $item->disc_2_perc : 0) ?>%</td>
+                        <td><?= htmlspecialchars(($item->disc_1_perc == 0) ? $item->disc_1_rp : $item->disc_1_perc . '%') ?></td>
+                        <td><?= htmlspecialchars($item->disc_2_perc == 0 ? $item->disc_2_rp : $item->disc_2_perc . '%') ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php endif; ?>

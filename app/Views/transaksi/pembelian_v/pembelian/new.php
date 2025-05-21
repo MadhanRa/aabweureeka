@@ -127,8 +127,8 @@
                     <td><input name="detail[0][jml_harga]" class="form-control form-control-sm" readonly></td>
                     <td><input name="detail[0][disc_1_perc]" class="form-control form-control-sm"></td>
                     <td><input name="detail[0][disc_1_rp]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_2_perc]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_2_rp]" class="form-control form-control-sm"></td>
+                    <td><input name="detail[0][disc_2_perc]" class="form-control form-control-sm" readonly></td>
+                    <td><input name="detail[0][disc_2_rp]" class="form-control form-control-sm" readonly></td>
                     <td><input name="detail[0][total]" class="form-control form-control-sm" readonly></td>
                     <td><button type="button" class="btn btn-danger btnRemove">X</button></td>
                   </tr>
@@ -158,10 +158,12 @@
               </div>
               <div class="form-row">
                 <div class="form-group col-lg-6">
-                  <input type="number" id="disc_cash" class="form-control form-control-sm " name="disc_cash" placeholder="Discount cash %" value="<?= old('disc_cash') ?>">
+                  <label>Disc Cash %</label>
+                  <input type="number" id="disc_cash" class="form-control form-control-sm " name="disc_cash" value="<?= old('disc_cash') ?>">
                 </div>
                 <div class="form-group col-lg-6">
-                  <input type="text" class="form-control form-control-sm" id="disc_cash_amount" name="disc_cash_amount" value="<?= number_format(old('disc_cash_amount') ?: 0, 0, ',', '.') ?>">
+                  <label>Disc Cash Rp</label>
+                  <input type="text" class="form-control form-control-sm" id="disc_cash_rp" name="disc_cash_rp" value="<?= number_format(old('disc_cash_rp') ?: 0, 0, ',', '.') ?>">
                 </div>
               </div>
               <div class="form-group">
@@ -213,8 +215,8 @@
   </div>
 </section>
 
-<?= $this->section('pageScript') ?>
-<script src="<?= base_url('assets/js/views/transaksi/pembelian/pembelian.js') ?>"></script>
 <?= $this->endSection(); ?>
 
+<?= $this->section('pageScript') ?>
+<script src="<?= base_url('assets/js/views/transaksi/pembelian/pembelian.js') ?>"></script>
 <?= $this->endSection(); ?>

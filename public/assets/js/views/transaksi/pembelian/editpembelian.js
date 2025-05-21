@@ -1,6 +1,7 @@
 $(document).ready(function () {
     // Initialize form components
     initFormHandlers();
+    initializeFormData();
     activateAutocomplete();
     initializeDateHandling();
     initPpnOptionHandling();
@@ -83,7 +84,7 @@ function formatDate(date) {
  */
 function initFormHandlers() {
     // Row counter for dynamic rows
-    let rowCounter = 1;
+    let rowCounter = $('#tabelDetail tbody tr').length; // Start from the last row index
     $('#btnAddRow').click(() => addNewRow(rowCounter++));
 
     // Remove row button handler (using event delegation)
@@ -189,6 +190,7 @@ function calculateRowTotal(row) {
 }
 
 function computeDiscount(row, num, base) {
+    // Calculate discount 2
     const perc = parseFloat(row.find(`input[name$="[disc_${num}_perc]"]`).val()) || 0;
     const rpField = row.find(`input[name$="[disc_${num}_rp]"]`);
     const rp = parseCurrencyValue(rpField.val() || 0);
@@ -256,6 +258,11 @@ function updateTotals() {
 
     // Calculate cash discount
     const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
+    if (discCashPerc == 0) {
+        $('#disc_cash').val(0);
+    } else {
+        $('#disc_cash').val(discCashPerc);
+    }
     const discCashAmount = (discCashPerc / 100) * subTotal;
     // Get cash discount in rupiah
     const discCashRp = parseCurrencyValue($('#disc_cash_rp').val() || 0);
@@ -473,4 +480,84 @@ function fillAutoCompleteFields(row, item) {
     // Clear quantity fields
     row.find('input[name$="[qty1]"]').val(0);
     row.find('input[name$="[qty2]"]').val(0);
+}
+
+/**
+ * Initialize form data when page loads
+ */
+function initializeFormData() {
+    // Format currency fields in header section
+    formatHeaderFields();
+
+    // Format and calculate row totals for existing rows
+    $('#tabelDetail tbody tr').each(function () {
+        formatRowData($(this));
+    });
+
+    // Calculate overall totals
+    updateTotals();
+}
+
+/**
+ * Format header currency fields
+ */
+function formatHeaderFields() {
+    const currencyFields = [
+        '#sub_total',
+        '#disc_cash_amount',
+        'input[name="dpp"]',
+        '#grand_total',
+        '#tunai',
+        '#hutang'
+    ];
+
+    currencyFields.forEach(selector => {
+        const field = $(selector);
+        const rawValue = parseFloat(field.val().replace(/[^\d,-]/g, '')) || 0;
+
+        // Store raw value for calculations
+        field.attr('data-raw-value', rawValue);
+
+        // Format display value
+        field.val(formatCurrency(rawValue));
+    });
+
+    // Initialize disc_cash_amount based on subtotal and disc_cash percent
+    const subTotal = parseFloat($('#sub_total').attr('data-raw-value')) || 0;
+    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
+    const discCashAmount = (discCashPerc / 100) * subTotal;
+    $('input[name="disc_cash_amount"]').val(formatCurrency(discCashAmount));
+}
+
+/**
+ * Format numeric data in a row and set data attributes
+ */
+function formatRowData(row) {
+    // Set raw values for price and amounts
+    const hargaSatuanField = row.find('input[name$="[harga_satuan]"]');
+    const rawHargaSatuan = parseFloat(hargaSatuanField.val().replace(/[^\d,-]/g, '')) || 0;
+    hargaSatuanField.attr('data-raw-value', rawHargaSatuan);
+
+    // Format currency fields in the row
+    const currencyFields = [
+        'input[name$="[harga_satuan]"]',
+        'input[name$="[jml_harga]"]',
+        'input[name$="[disc_1_rp]"]',
+        'input[name$="[disc_2_rp]"]',
+        'input[name$="[total]"]'
+    ];
+
+    currencyFields.forEach(selector => {
+        const field = row.find(selector);
+        const rawValue = parseFloat(field.val().replace(/[^\d,-]/g, '')) || 0;
+
+        // Store raw value for calculations
+        field.attr('data-raw-value', rawValue);
+
+        // Format display value
+        field.val(formatCurrency(rawValue));
+    });
+
+    // Recalculate row total based on current values
+    calculateRowTotal(row);
 }
