@@ -11,8 +11,9 @@ class ModelRiwayatTransaksi extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'jenis_transaksi', 'id_rekening', 'nama_rekening', 'debit', 'kredit', 'saldo', 'keterangan'];
+    protected $allowedFields    = ['tanggal', 'jenis_transaksi', 'id_transaksi', 'nota', 'id_rekening', 'deskripsi', 'debit', 'kredit', 'saldo_setelah'];
 
     protected $useTimestamps    = true;
-    protected $createdField     = 'waktu_input';
+    protected $createdField     = 'created_at';
+    protected $updatedField     = 'updated_at';
 }

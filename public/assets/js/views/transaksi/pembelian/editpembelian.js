@@ -293,9 +293,16 @@ function updateTotals() {
  * Handle exclusivity between percentage and rupiah discount inputs
  */
 function handleDiscountExclusivity() {
-    console.log('Handling discount exclusivity');
-    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
-    const discCashRp = ($('#disc_cash_rp').val().includes('Rp')) ? parseCurrencyValue($('#disc_cash_rp').val() || 0) : parseFloat($('#disc_cash_rp').val() || 0);
+    const discCashPercInput = $('#disc_cash').val();
+    const discCashRpInput = $('#disc_cash_rp').val();
+
+    // Parse nilai persentase diskon
+    const discCashPerc = parseFloat(discCashPercInput) || 0;
+
+    let discCashRp = 0;
+    if (discCashRpInput) {
+        discCashRp = $discCashRpInput.includes('Rp') ? parseCurrencyValue($discCashRpInput) : parseFloat(discCashRpInput) || 0;
+    }
 
     if (discCashPerc > 0) {
         $('#disc_cash_rp').prop('readonly', true).val(0);

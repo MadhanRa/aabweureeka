@@ -24,7 +24,7 @@ class SetupBuku extends ResourceController
      */
     public function index()
     {
-        $data['dtsetupbuku'] = $this->objSetupBuku->findAll();
+        $data['dtsetupbuku'] = $this->objSetupBuku->getAll();
         return view('setup/buku/index', $data);
     }
 

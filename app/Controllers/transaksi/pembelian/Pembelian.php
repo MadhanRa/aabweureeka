@@ -13,14 +13,16 @@ use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupbank;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
+use App\Models\setup\ModelHutangPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use PhpParser\Node\Stmt\TryCatch;
+use Config\Database;
 use TCPDF;
 
 class Pembelian extends ResourceController
 {
-    protected $objLokasi, $objSatuan, $objSetupbank, $objPembelian, $objSetupsupplier, $objStock, $db, $objAntarmuka, $objSetupBuku, $objPembelianDetail, $objStockGudang, $objRiwayatTransaksi;
+    protected $objLokasi, $objSatuan, $objSetupbank, $objPembelian, $objSetupsupplier, $objStock, $db, $objAntarmuka, $objSetupBuku, $objPembelianDetail, $objStockGudang, $objRiwayatTransaksi, $objHutangPiutang;
 
     function __construct()
     {
@@ -35,11 +37,12 @@ class Pembelian extends ResourceController
         $this->objSatuan = new ModelSatuan();
         $this->objStock = new ModelStock();
         $this->objStockGudang = new ModelStockGudang();
+        $this->objHutangPiutang = new ModelHutangPiutang();
 
         // Transaksi Pembelian
         $this->objPembelian = new ModelPembelian();
         $this->objPembelianDetail = new ModelPembelianDetail();
-        $this->db = \Config\Database::connect();
+        $this->db = Database::connect();
 
         $this->objRiwayatTransaksi = new ModelRiwayatTransaksi();
         helper('terbilang');
@@ -197,24 +200,31 @@ class Pembelian extends ResourceController
     {
 
         $id_lokasi = $this->request->getVar('id_lokasi');
+        $id_setupbuku = $this->request->getVar('id_setupbuku');
+        $tunai = $this->request->getVar('tunai_raw') ?? 0;
+        $hutang = $this->request->getVar('hutang_raw') ?? 0;
+        $id_supplier = $this->request->getVar('id_setupsupplier');
+        $tanggal = $this->request->getVar('tanggal');
+        $tgl_jatuhtempo = $this->request->getVar('tgl_jatuhtempo');
+        $nota = $this->request->getVar('nota');
 
         // Mengambil data header
         $headerData = [
-            'tanggal' => $this->request->getVar('tanggal'),
-            'nota' => $this->request->getVar('nota'),
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+            'tanggal' => $tanggal,
+            'nota' => $nota,
+            'id_setupsupplier' => $id_supplier,
             'TOP' => $this->request->getVar('TOP'),
-            'tgl_jatuhtempo' => $this->request->getVar('tgl_jatuhtempo'),
+            'tgl_jatuhtempo' => $tgl_jatuhtempo,
             'tgl_invoice' => $this->request->getVar('tgl_invoice'),
             'no_invoice' => $this->request->getVar('no_invoice'),
             'id_lokasi' => $id_lokasi,
-            'id_setupbuku' => $this->request->getVar('id_setupbuku'),
+            'id_setupbuku' => $id_setupbuku,
             'disc_cash' => $this->request->getVar('disc_cash') ?? 0,
             'disc_cash_rp' => $this->request->getVar('disc_cash_rp_raw') ?? 0,
             'dpp' => $this->request->getVar('dpp_raw') ?? 0,
             'ppn' => $this->request->getVar('ppn') ?? 0,
             'ppn_option' => $this->request->getVar('ppn_option'),
-            'tunai' => $this->request->getVar('tunai_raw') ?? 0,
+            'tunai' => $tunai,
             'sub_total' => $this->request->getVar('sub_total_raw') ?? 0,
             'grand_total' => $this->request->getVar('grand_total_raw') ?? 0,
             'hutang' => $this->request->getVar('hutang_raw') ?? 0,
@@ -318,6 +328,64 @@ class Pembelian extends ResourceController
                         $this->objStockGudang->insert($stockData);
                     }
                 }
+
+                $tunai = floatval($tunai);
+                $hutang = floatval($hutang);
+
+                if ($tunai > 0) {
+                    // Melakukan perubahan saldo rekening
+                    $dt_rekening = $this->objSetupBuku->find($id_setupbuku);
+                    $old_saldo = $dt_rekening->saldo_berjalan;
+                    $new_saldo = $old_saldo - $tunai;
+                    $this->objSetupBuku->update($id_setupbuku, [
+                        'saldo_berjalan' => $new_saldo
+                    ]);
+
+                    $this->objRiwayatTransaksi->insert([
+                        'tanggal' => $tanggal,
+                        'jenis_transaksi' => 'pembelian',
+                        'id_transaksi' => $idPembelian,
+                        'nota' => $nota,
+                        'id_rekening' => $id_setupbuku,
+                        'deskripsi' => 'Kas Keluar',
+                        'debit' => '0',
+                        'kredit' => $tunai,
+                        'saldo_setelah' => $new_saldo
+                    ]);
+                }
+
+                if ($hutang > 0) {
+                    // Melakukan perubahan saldo rekening hutang usaha supplier
+                    $data = [
+                        'tanggal' => $tanggal,
+                        'id_transaksi' => $idPembelian,
+                        'nota' => $nota,
+                        'tanggal_jt' => $tgl_jatuhtempo,
+                        'saldo' => $hutang,
+                        'relasi_id' => $id_supplier,
+                        'relasi_tipe' => 'supplier',
+                        'jenis' => 'hutang'
+                    ];
+
+                    $this->objHutangPiutang->insert($data);
+                    $dt_supplier = $this->objSetupsupplier->find($this->request->getVar('id_setupsupplier'));
+                    $old_saldo = $dt_supplier->saldo;
+                    $new_saldo = $old_saldo + $hutang;
+                    $this->objSetupsupplier->update($this->request->getVar('id_setupsupplier'), [
+                        'saldo' => $new_saldo
+                    ]);
+
+                    // $this->objRiwayatTransaksi->insert([
+                    //     'tanggal' => $this->request->getVar('tanggal'),
+                    //     'jenis_transaksi' => 'Pembelian',
+                    //     'id_transaksi' => $idPembelian,
+                    //     'id_rekening' => $id_supplier,
+                    //     'deskripsi' => 'Hutang ke Supplier',
+                    //     'debit' => '0',
+                    //     'kredit' => $hutang,
+                    //     'saldo_setelah' => $new_saldo
+                    // ]);
+                }
             }
             // Commit transaction if all went well
             $this->db->transCommit();
@@ -409,26 +477,33 @@ class Pembelian extends ResourceController
 
 
         $id_lokasi = $this->request->getVar('id_lokasi');
+        $id_setupbuku = $this->request->getVar('id_setupbuku');
+        $tunai = $this->request->getVar('tunai_raw') ?? 0;
+        $hutang = $this->request->getVar('hutang_raw') ?? 0;
+        $id_supplier = $this->request->getVar('id_setupsupplier');
+        $tanggal = $this->request->getVar('tanggal');
+        $tgl_jatuhtempo = $this->request->getVar('tgl_jatuhtempo');
+        $nota = $this->request->getVar('nota');
 
         // Mengambil data header
         $headerData = [
-            'tanggal' => $this->request->getVar('tanggal'),
-            'nota' => $this->request->getVar('nota'),
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+            'tanggal' => $tanggal,
+            'nota' => $nota,
+            'id_setupsupplier' => $id_supplier,
             'TOP' => $this->request->getVar('TOP'),
-            'tgl_jatuhtempo' => $this->request->getVar('tgl_jatuhtempo'),
+            'tgl_jatuhtempo' => $tgl_jatuhtempo,
             'tgl_invoice' => $this->request->getVar('tgl_invoice'),
             'no_invoice' => $this->request->getVar('no_invoice'),
             'id_lokasi' => $id_lokasi,
-            'id_setupbuku' => $this->request->getVar('id_setupbuku'),
+            'id_setupbuku' => $id_setupbuku,
             'disc_cash' => $this->request->getVar('disc_cash'),
             'dpp' => $this->request->getVar('dpp_raw') ?? 0,
             'ppn' => $this->request->getVar('ppn') ?? 0,
             'ppn_option' => $this->request->getVar('ppn_option'),
-            'tunai' => $this->request->getVar('tunai_raw') ?? 0,
+            'tunai' => $tunai,
             'sub_total' => $this->request->getVar('sub_total_raw') ?? 0,
             'grand_total' => $this->request->getVar('grand_total_raw') ?? 0,
-            'hutang' => $this->request->getVar('hutang_raw') ?? 0,
+            'hutang' => $hutang,
         ];
 
         // Memulai transaksi
@@ -586,6 +661,92 @@ class Pembelian extends ResourceController
                         ];
                         $this->objStockGudang->insert($stockData);
                     }
+                }
+
+                $tunai = floatval($tunai);
+                $hutang = floatval($hutang);
+                $kas_keluar = $this->objRiwayatTransaksi
+                    ->where('id_transaksi', $id)
+                    ->like('deskripsi', 'Kas Keluar')
+                    ->first(); // Ambil hanya satu baris
+
+                // Melakukan perubahan saldo rekening
+                if ($tunai > 0) {
+                    if ($kas_keluar) {
+                        $id_riwayat = $kas_keluar->id;
+                        $kredit_kas_keluar_lama = floatval($kas_keluar->kredit);
+                    }
+                    $dt_rekening = $this->objSetupBuku->find($id_setupbuku);
+                    $old_saldo = $dt_rekening->saldo_berjalan;
+                    $current_saldo = $old_saldo + $kredit_kas_keluar_lama;
+                    $new_saldo = $current_saldo - $tunai;
+                    $this->objSetupBuku->update($id_setupbuku, [
+                        'saldo_berjalan' => $new_saldo
+                    ]);
+
+                    $this->objRiwayatTransaksi->update($id_riwayat, [
+                        'tanggal' => $tanggal,
+                        'jenis_transaksi' => 'pembelian',
+                        'id_transaksi' => $id,
+                        'nota' => $nota,
+                        'id_rekening' => $id_setupbuku,
+                        'deskripsi' => 'Kas Keluar',
+                        'debit' => '0',
+                        'kredit' => $tunai,
+                        'saldo_setelah' => $new_saldo
+                    ]);
+                }
+
+                if ($hutang > 0) {
+                    // Melakukan perubahan saldo rekening hutang usaha supplier
+                    $dt_hutang_lama = $this->objHutangPiutang
+                        ->where([
+                            'id_transaksi' => $id,
+                            'relasi_id' => $id_supplier,
+                            'relasi_tipe' => 'supplier',
+                            'jenis' => 'hutang'
+                        ])
+                        ->first(); // Ambil hanya satu baris
+
+                    $hutang_masuk_lama = floatval($dt_hutang_lama->saldo);
+                    $data = [
+                        'tanggal' => $tanggal,
+                        'id_transaksi' => $id,
+                        'nota' => $nota,
+                        'tanggal_jt' => $tgl_jatuhtempo,
+                        'saldo' => $hutang,
+                        'relasi_id' => $id_supplier,
+                        'relasi_tipe' => 'supplier',
+                        'jenis' => 'hutang'
+                    ];
+                    $this->objHutangPiutang->update($dt_hutang_lama->id, $data);
+
+                    $dt_supplier = $this->objSetupsupplier->find($this->request->getVar('id_setupsupplier'));
+                    $old_saldo = floatval($dt_supplier->saldo);
+                    $current_saldo = $old_saldo - $hutang_masuk_lama;
+                    $new_saldo = $old_saldo + $hutang;
+                    $this->objSetupsupplier->update($this->request->getVar('id_setupsupplier'), [
+                        'saldo' => $new_saldo
+                    ]);
+
+                    // // Update riwayat transaksi hutang
+                    // $riwayat_hutang_masuk = $this->objRiwayatTransaksi
+                    //     ->where([
+                    //         'id_transaksi' => $id,
+                    //         'deskripsi' => 'Hutang ke Supplier'
+                    //     ])
+                    //     ->first(); // Ambil hanya satu baris
+
+                    // $this->objRiwayatTransaksi->update($riwayat_hutang_masuk->id, [
+                    //     'tanggal' => $tanggal,
+                    //     'jenis_transaksi' => 'Pembelian',
+                    //     'id_transaksi' => $id,
+                    //     'id_rekening' => $id_supplier,
+                    //     'deskripsi' => 'Hutang ke Supplier',
+                    //     'debit' => 0,
+                    //     'kredit' => $hutang,
+                    //     'saldo_setelah' => $new_saldo
+                    // ]);
                 }
             }
             // Commit transaction if all went well
