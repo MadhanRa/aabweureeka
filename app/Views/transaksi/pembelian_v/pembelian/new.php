@@ -32,7 +32,7 @@
               <div class="form-group">
                 <!-- Supplier -->
                 <label>Supplier</label>
-                <select class="form-control form-control-sm" name="id_setupsupplier" required>
+                <select class="form-control form-control-sm" name="id_setupsupplier" id="id_setupsupplier" required>
                   <option value="" hidden>-- Pilih Supplier --</option>
                   <?php foreach ($dtsetupsupplier as $key => $value) : ?>
                     <option value="<?= esc($value->id_setupsupplier) ?>" <?= old('id_setupsupplier') == $value->id_setupsupplier ? 'selected' : '' ?>>

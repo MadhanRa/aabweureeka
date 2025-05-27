@@ -12,6 +12,7 @@ const SELECTORS = {
     form: '#formPembelian',
     tabelDetail: '#tabelDetail tbody',
     tunai: '#tunai',
+    supplierDropdown: '#id_setupsupplier'
 }
 
 /**
@@ -97,6 +98,30 @@ function initFormHandlers() {
         e.preventDefault();
         submitForm($(this));
     });
+
+    $(SELECTORS.supplierDropdown).on('change', function () {
+        const supplierSelected = $(this).val() ? true : false;
+        toggleKodeInputs(supplierSelected);
+
+        // If supplier changed and was previously selected, clear all product rows
+        if (supplierSelected && $(this).data('previous-value') &&
+            $(this).data('previous-value') !== $(this).val()) {
+            // Ask for confirmation before clearing
+            if ($(SELECTORS.tabelDetail + ' tr').length > 0) {
+                if (confirm('Mengubah supplier akan menghapus semua barang yang sudah dipilih. Lanjutkan?')) {
+                    $(SELECTORS.tabelDetail).empty();
+                    updateTotals();
+                } else {
+                    // Restore previous selection
+                    $(this).val($(this).data('previous-value')).trigger('change');
+                    return;
+                }
+            }
+        }
+
+        // Store current value for next comparison
+        $(this).data('previous-value', $(this).val());
+    }).trigger('change'); // Trigger on load
 
     attachCalculationEvents();
     setupTunaiInput();
@@ -320,7 +345,7 @@ function addNewRow(rowIndex) {
     const tr = `<tr>
             <td>
                 <input name="detail[${rowIndex}][id_stock]" hidden>
-                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm">
+                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm" ${$(SELECTORS.supplierDropdown).val() ? '' : 'disabled placeholder="Pilih supplier"'}>
                 <input name="detail[${rowIndex}][conv_factor]" hidden>
             </td>
             <td><input name="detail[${rowIndex}][nama_barang]" class="form-control form-control-sm" readonly></td>
@@ -418,17 +443,43 @@ function handleAjaxResponse(response, form) {
 }
 
 /**
+ * Enable or disable all kode inputs based on supplier selection
+ * @param {boolean} enable - Whether to enable the inputs
+ */
+function toggleKodeInputs(enable) {
+    $(SELECTORS.kodeInput).each(function () {
+        $(this).prop('disabled', !enable);
+
+        if (!enable) {
+            $(this).attr('placeholder', 'Pilih supplier');
+        } else {
+            $(this).attr('placeholder', 'Masukkan kode');
+        }
+    });
+
+    // Also disable add row button if no supplier selected
+    $('#btnAddRow').prop('disabled', !enable);
+}
+
+/**
  * Activate autocomplete on stock code inputs
  */
 function activateAutocomplete() {
     const url = $(SELECTORS.form).data('stock-url');
+    const supplierSelected = $(SELECTORS.supplierDropdown).val() ? true : false;
+
+    // Disable or enable all kode inputs based on supplier selection
+    toggleKodeInputs(supplierSelected);
 
     $(SELECTORS.kodeInput).each(function () {
         if ($(this).hasClass('ui-autocomplete-input')) return;
 
         $(this).autocomplete({
             source: function (req, res) {
-                $.get(url, { term: req.term }, data => {
+                $.get(url, {
+                    term: req.term,
+                    supplier: $(SELECTORS.supplierDropdown).val()
+                }, data => {
                     if (!data || !data.length) return res([]);
 
                     // Transform the data for display

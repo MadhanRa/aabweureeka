@@ -9,7 +9,7 @@ class ModelHutangPiutang extends Model
     protected $table            = 'setup_hutang_piutang';
     protected $primaryKey       = 'id_hutang_piutang';
     protected $returnType       = 'object';
-    protected $allowedFields    = ['tanggal', 'nota', 'tanggal_jt', 'saldo', 'relasi_id', 'relasi_tipe', 'jenis'];
+    protected $allowedFields    = ['tanggal', 'id_transaksi', 'nota', 'tanggal_jt', 'saldo', 'relasi_id', 'relasi_tipe', 'jenis'];
 
 
     public function getHutangPiutang($id, $relasi_tipe)
