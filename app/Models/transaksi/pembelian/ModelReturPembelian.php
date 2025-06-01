@@ -17,10 +17,11 @@ class ModelReturPembelian extends Model
         'nota',
         'id_setupsupplier',
         'id_lokasi',
-        'id_pembelian',
         'opsi_return',
+        'id_pembelian',
         'sub_total',
         'disc_cash',
+        'disc_cash_rp',
         'dpp',
         'ppn_option',
         'ppn',
@@ -119,33 +120,42 @@ class ModelReturPembelian extends Model
         return $builder->get()->getRow();
     }
 
-    public function get_laporan($tglawal, $tglakhir, $supplier = null)
+    public function get_laporan($tglawal, $tglakhir)
     {
-        $builder = $this->db->table('returpembelian1 p');
+        $builder = $this->db->table('returpembelian1 rp');
         $builder->select('
-            p.*, 
-            sp.nama AS nama_supplier, 
-            s.kode_satuan AS kode_satuan
-        ');
+        rp.*,
+        rpd.id as detail_id,
+        rpd.kode,
+        rpd.nama_barang,
+        rpd.satuan,
+        rpd.qty1,
+        rpd.qty2,
+        rpd.harga_satuan, 
+        rpd.jml_harga, 
+        rpd.disc_1_perc, 
+        rpd.disc_2_perc,
+        rpd.total AS sub_total,
+        sp.nama AS nama_supplier,
+        sp.kode AS kode_supplier
+    ');
+
+        // Join dengan tabel detail
+        $builder->join('returpembelian1_detail rpd', 'rp.id_returpembelian = rpd.id_returpembelian', 'left');
 
         // Join dengan tabel supplier
-        $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-
-        // Join dengan tabel satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
+        $builder->join('setupsupplier1 sp', 'rp.id_setupsupplier = sp.id_setupsupplier', 'left');
 
         // Filter tanggal
         if (!empty($tglawal)) {
-            $builder->where('p.tanggal >=', $tglawal);
+            $builder->where('rp.tanggal >=', $tglawal);
         }
         if (!empty($tglakhir)) {
-            $builder->where('p.tanggal <=', $tglakhir);
+            $builder->where('rp.tanggal <=', $tglakhir);
         }
 
-        // Filter supplier (jika ada)
-        if (!empty($supplier)) {
-            $builder->where('p.id_setupsupplier', $supplier);
-        }
+        // Urutkan berdasarkan id_pembelian
+        $builder->orderBy('rp.id_pembelian, rpd.id');
 
         return $builder->get()->getResult();
     }

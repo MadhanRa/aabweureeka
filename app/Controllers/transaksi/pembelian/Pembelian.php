@@ -308,6 +308,11 @@ class Pembelian extends ResourceController
      */
     public function update($id = null)
     {
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
+
         return $this->saveData($id); // Redirect to saveData method for processing
     }
 

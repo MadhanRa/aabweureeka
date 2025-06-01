@@ -2,7 +2,7 @@
 
 namespace App\ValueObjects;
 
-class DetailItemPembelian
+class DetailItem
 {
     public float $qty1;
     public float $qty2;
@@ -14,10 +14,16 @@ class DetailItemPembelian
     public float $total;
     public float $jmlHarga;
     public string $idStock;
+    public string $kode;
+    public string $nama_barang;
+    public string $satuan;
 
     public function __construct(array $item)
     {
         $this->idStock = $item['id_stock'];
+        $this->kode = $item['kode'] ?? '';
+        $this->nama_barang = $item['nama_barang'] ?? '';
+        $this->satuan = $item['satuan'] ?? '';
         $this->qty1 = floatval($item['qty1']);
         $this->qty2 = floatval($item['qty2']);
         $this->hargaSatuan = isset($item['harga_satuan_raw'])
@@ -41,6 +47,9 @@ class DetailItemPembelian
     {
         return [
             'id_stock' => $this->idStock,
+            'kode' => $this->kode,
+            'nama_barang' => $this->nama_barang,
+            'satuan' => $this->satuan,
             'qty1' => $this->qty1,
             'qty2' => $this->qty2,
             'harga_satuan' => $this->hargaSatuan,

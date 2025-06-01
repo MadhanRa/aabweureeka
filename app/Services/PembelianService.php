@@ -9,7 +9,7 @@ use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
 use App\Models\setup\ModelHutangPiutang;
-use App\ValueObjects\DetailItemPembelian;
+use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
 
@@ -110,15 +110,12 @@ class PembelianService
             // Skip empty rows (where there's no stock ID)
             if (empty($detail['id_stock'])) continue;
 
-            $detailPembelian = new DetailItemPembelian($detail);
+            $detailPembelian = new DetailItem($detail);
 
             // Create detail record
             $detailRecord = $detailPembelian->getRecords();
             $detailRecord = array_merge($detailRecord, [
                 'id_pembelian' => $idPembelian,
-                'kode' => $detail['kode'],
-                'nama_barang' => $detail['nama_barang'],
-                'satuan' => $detail['satuan'],
             ]);
 
             if (isset($detail['id_detail']) && in_array($detail['id_detail'], $existingIds)) {

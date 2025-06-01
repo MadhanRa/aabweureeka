@@ -21,53 +21,23 @@ class ModelPenjualan extends Model
         'id_salesman',
         'id_lokasi',
         'no_fp',
-        'nama_stock',
-        'id_satuan',
-        'qty_1',
-        'qty_2',
-        'harga_satuan',
-        'jml_harga',
-        'disc_1',
-        'disc_2',
-        'total',
-        'pembayaran',
-        'tipe',
+        'opsi_pembayaran',
+        'ppn_option',
         'sub_total',
         'disc_cash',
+        'netto',
         'ppn',
         'grand_total',
-        'npwp',
-        'terbilang'
     ];
 
     function getAll()
     {
-        $builder = $this->db->table('penjualan1 p');
-
-        // Pilih kolom dari tabel utama dan tabel terkait
-        $builder->select('
-                p.*, 
-                l1.nama_lokasi AS lokasi_asal, 
-                sp.nama_pelanggan AS nama_pelanggan, 
-                s.kode_satuan AS kode_satuan,
-                sm.nama_salesman AS nama_salesman
-            ');
-
-        // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi
-        $builder->join('lokasi1 l1', 'p.id_lokasi = l1.id_lokasi', 'left');
-
-        // Join dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
-        $builder->join('setuppelanggan1 sp', 'p.id_pelanggan = sp.id_pelanggan', 'left');
-
-        // Join dengan tabel 'satuan1' untuk mendapatkan kode satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
-
-        // Join dengan tabel 'setupsalesman1' untuk mendapatkan nama salesman
-        $builder->join('setupsalesman1 sm', 'p.id_salesman = sm.id_salesman', 'left');
-
-        return $builder->get()->getResult();
-
-        return $this->findAll();
+        return $this->select('penjualan1.*, setupsalesman1.nama_salesman AS nama_salesman,, setuppelanggan1.nama_pelanggan AS nama_pelanggan, lokasi1.nama_lokasi AS lokasi_asal')
+            ->join('setupsalesman1', 'penjualan1.id_salesman = setupsalesman1.id_salesman', 'left')
+            ->join('setuppelanggan1', 'penjualan1.id_pelanggan = setuppelanggan1.id_pelanggan', 'left')
+            ->join('lokasi1', 'penjualan1.id_lokasi = lokasi1.id_lokasi', 'left')
+            ->orderBy('penjualan1.tanggal', 'DESC')
+            ->findAll(); // Mengambil semua data dari tabel penjualan1
     }
 
     public function getByMonthAndYear($bulan, $tahun)

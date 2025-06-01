@@ -511,7 +511,7 @@ function initializeFormData() {
 function formatHeaderFields() {
     const currencyFields = [
         '#sub_total',
-        '#disc_cash_amount',
+        '#disc_cash_rp',
         'input[name="dpp"]',
         '#grand_total',
         '#tunai',
@@ -530,10 +530,10 @@ function formatHeaderFields() {
     });
 
     // Initialize disc_cash_amount based on subtotal and disc_cash percent
-    const subTotal = parseFloat($('#sub_total').attr('data-raw-value')) || 0;
-    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
-    const discCashAmount = (discCashPerc / 100) * subTotal;
-    $('input[name="disc_cash_amount"]').val(formatCurrency(discCashAmount));
+    // const subTotal = parseFloat($('#sub_total').attr('data-raw-value')) || 0;
+    // const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
+    // const discCashAmount = (discCashPerc / 100) * subTotal;
+    // $('input[name="disc_cash_amount"]').val(formatCurrency(discCashAmount));
 }
 
 /**

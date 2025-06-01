@@ -17,7 +17,7 @@
         <h4>Return Pembelian</h4>
       </div>
       <div class="card-body">
-        <form id="formPembelian">
+        <form id="formReturPembelian" action="<?= site_url('transaksi/pembelian/returpembelian') ?>" data-stock-url="<?= site_url('transaksi/pembelian/pembelian/lookup-stock') ?>">
           <?= csrf_field() ?>
           <input type="hidden" name="id_pembelian">
           <div class="row">
@@ -109,12 +109,6 @@
           </div>
           <div class="row mt-5 justify-content-between">
             <div class="col-md-4">
-              <!-- Tombol Print Data -->
-              <div class="form-group">
-                <a href="<?= base_url('ReturPembelian/printPDF/') ?>" class="btn btn-success btn-small" target="_blank">
-                  <i class="fas fa-print"></i> Print Nota
-                </a>
-              </div>
               <div class="form-group p-3 w-50 border">
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="radio" name="opsi_return" id="inlineRadio1" value="kredit">
@@ -149,10 +143,12 @@
               </div>
               <div class="form-row">
                 <div class="form-group col-lg-6">
-                  <input type="number" id="disc_cash" class="form-control form-control-sm " name="disc_cash" placeholder="Discount cash %" value="<?= old('disc_cash') ?>">
+                  <label>Disc Cash %</label>
+                  <input type="number" id="disc_cash" class="form-control form-control-sm " name="disc_cash" value="<?= old('disc_cash') ?>">
                 </div>
                 <div class="form-group col-lg-6">
-                  <input type="text" class="form-control form-control-sm" id="disc_cash_amount" name="disc_cash_amount" value="<?= number_format(old('disc_cash_amount') ?: 0, 0, ',', '.') ?>">
+                  <label>Disc Cash Rp</label>
+                  <input type="text" class="form-control form-control-sm" id="disc_cash_rp" name="disc_cash_rp" value="<?= number_format(old('disc_cash_rp') ?: 0, 0, ',', '.') ?>">
                 </div>
               </div>
               <div class="form-group">
@@ -194,7 +190,7 @@
 
 </section>
 <!-- Tempat modal -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modalNotaPembelian">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalNotaPembelian" data-nota-url="<?= site_url('transaksi/pembelian/pembelian/') ?>">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">

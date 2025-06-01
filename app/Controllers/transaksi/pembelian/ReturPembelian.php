@@ -15,6 +15,9 @@ use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupbank;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
+
+use App\ValueObjects\DetailItem;
+
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use TCPDF;
@@ -22,6 +25,8 @@ use TCPDF;
 class ReturPembelian extends ResourceController
 {
     protected $objLokasi, $objSatuan, $objSetupbank, $objPembelian, $objSetupsupplier, $objStock, $db, $objAntarmuka, $objSetupBuku, $objPembelianDetail, $objStockGudang, $objRiwayatTransaksi, $objReturPembelian, $objReturPembelianDetail;
+
+    protected $detailItemPembelian;
 
     function __construct()
     {
@@ -147,6 +152,162 @@ class ReturPembelian extends ResourceController
         return view('transaksi/pembelian_v/returpembelian/new', $data);
     }
 
+    protected function getHeaderDataFromRequest(): array
+    {
+        return [
+            'tanggal' => $this->request->getVar('tanggal'),
+            'nota' => $this->request->getVar('nota'),
+            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+            'id_lokasi' => $this->request->getVar('id_lokasi'),
+            'id_pembelian' => $this->request->getVar('id_pembelian'),
+            'opsi_return' => $this->request->getVar('opsi_return'),
+            'disc_cash' => $this->request->getVar('disc_cash') ?? 0,
+            'disc_cash_rp' => $this->request->getVar('disc_cash_rp_raw') ?? 0,
+            'dpp' => $this->request->getVar('dpp_raw') ?? 0,
+            'ppn' => $this->request->getVar('ppn') ?? 0,
+            'ppn_option' => $this->request->getVar('ppn_option'),
+            'sub_total' => $this->request->getVar('sub_total_raw') ?? 0,
+            'grand_total' => $this->request->getVar('grand_total_raw') ?? 0,
+        ];
+    }
+
+    /**
+     * Sinkronisasi data stok dengan perubahan pada detail pembelian
+     * 
+     * @param array $headerData Data header pembelian
+     * @param array $detail Data detail pembelian
+     * @return void
+     */
+    protected function syncStockGudang(array $headerData, array $detail): void
+    {
+        // Skip jika tidak ada id stock
+        if (empty($detail['id_stock'])) {
+            return;
+        }
+
+        // 1. Ambil nilai lama dari detail pembelian jika ada
+        $oldDetailValues = $this->getExistingDetailValues($detail);
+        log_message('debug', 'Old Detail Values: ' . json_encode($oldDetailValues));
+
+        // 2. Ekstrak nilai baru dari detail
+        $newValues = $this->extractDetailValues($detail);
+        log_message('debug', 'New Detail Values: ' . json_encode($newValues));
+
+        // 3. Hitung perubahan dalam kuantitas normal dan harga
+        $changes = $this->calculateChanges($oldDetailValues, $newValues);
+        log_message('debug', 'Changes: ' . json_encode($changes));
+
+        // 4. Dapatkan atau buat record stok
+        $this->updateOrCreateStock($headerData['id_lokasi'], $detail['id_stock'], $changes, $newValues);
+    }
+
+    /**
+     * Ambil nilai lama dari detail pembelian yang sudah ada
+     */
+    private function getExistingDetailValues(array $detail): array
+    {
+        $result = [
+            'qty1' => 0,
+            'qty2' => 0,
+            'jml_harga' => 0
+        ];
+
+        if (isset($detail['id_detail']) && !empty($detail['id_detail'])) {
+            $existingDetail = $this->objReturPembelianDetail->find($detail['id_detail']);
+            if ($existingDetail) {
+                $result = [
+                    'qty1' => floatval($existingDetail->qty1),
+                    'qty2' => floatval($existingDetail->qty2),
+                    'jml_harga' => floatval($existingDetail->jml_harga)
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Ekstrak dan konversi nilai dari detail pembelian baru
+     */
+    private function extractDetailValues(array $detail): array
+    {
+        $conv_factor = floatval($detail['conv_factor']);
+        $qty1 = floatval($detail['qty1']);
+        $qty2 = floatval($detail['qty2']);
+
+        // Tangani berbagai format input jml_harga
+        $jmlHarga = isset($detail['jml_harga_raw'])
+            ? floatval($detail['jml_harga_raw'])
+            : floatval(preg_replace('/[^\d]/', '', $detail['jml_harga']));
+
+        return [
+            'conv_factor' => $conv_factor,
+            'qty1' => $qty1,
+            'qty2' => $qty2,
+            'jml_harga' => $jmlHarga,
+            'normal_qty' => $qty1 * $conv_factor + $qty2
+        ];
+    }
+
+    /**
+     * Hitung perubahan antara nilai lama dan baru
+     */
+    private function calculateChanges(array $old, array $new): array
+    {
+        $old_normal_qty = isset($old['qty1']) && isset($new['conv_factor'])
+            ? $old['qty1'] * $new['conv_factor'] + $old['qty2']
+            : 0;
+
+        return [
+            'qty_diff' => $new['normal_qty'] - $old_normal_qty,
+            'price_diff' => $new['jml_harga'] - $old['jml_harga']
+        ];
+    }
+
+    /**
+     * Update stok yang ada atau buat record baru
+     */
+    private function updateOrCreateStock(int $locationId, int $stockId, array $changes, array $newValues): void
+    {
+        // Cari stok yang sudah ada
+        $existingStock = $this->objStockGudang->where([
+            'id_lokasi' => $locationId,
+            'id_stock' => $stockId
+        ])->first();
+
+        if ($existingStock) {
+            // Update stok yang sudah ada
+            $old_qty1 = floatval($existingStock->qty1);
+            $old_qty2 = floatval($existingStock->qty2);
+            $old_jmlHarga = floatval($existingStock->jml_harga);
+
+            // Konversi ke kuantitas normal, tambahkan perbedaan, lalu konversi kembali
+            $normal_old_qty = $old_qty1 * $newValues['conv_factor'] + $old_qty2;
+            $new_normal_qty = $normal_old_qty + $changes['qty_diff'];
+
+            $new_qty1 = floor($new_normal_qty / $newValues['conv_factor']);
+            $new_qty2 = $new_normal_qty % $newValues['conv_factor'];
+            $new_jmlHarga = $old_jmlHarga + $changes['price_diff'];
+
+            $this->objStockGudang->update($existingStock->id, [
+                'qty1' => $new_qty1,
+                'qty2' => $new_qty2,
+                'jml_harga' => $new_jmlHarga,
+            ]);
+        } else {
+            // Buat record stok baru
+            $stockData = [
+                'id_lokasi' => $locationId,
+                'id_stock' => $stockId,
+                'qty1' => $newValues['qty1'],
+                'qty2' => $newValues['qty2'],
+                'jml_harga' => $newValues['jml_harga'],
+            ];
+
+            $this->objStockGudang->insert($stockData);
+        }
+    }
+
     /**
      * Create a new resource object, from "posted" parameters.
      *
@@ -154,23 +315,7 @@ class ReturPembelian extends ResourceController
      */
     public function create()
     {
-        $id_lokasi = $this->request->getVar('id_lokasi');
-
-        // Mengambil data header
-        $headerData = [
-            'tanggal' => $this->request->getVar('tanggal'),
-            'nota' => $this->request->getVar('nota'),
-            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-            'id_lokasi' => $id_lokasi,
-            'id_pembelian' => $this->request->getVar('id_pembelian'),
-            'opsi_return' => $this->request->getVar('opsi_return'),
-            'disc_cash' => $this->request->getVar('disc_cash'),
-            'dpp' => $this->request->getVar('dpp_raw') ?? 0,
-            'ppn' => $this->request->getVar('ppn') ?? 0,
-            'ppn_option' => $this->request->getVar('ppn_option'),
-            'sub_total' => $this->request->getVar('sub_total_raw') ?? 0,
-            'grand_total' => $this->request->getVar('grand_total_raw') ?? 0,
-        ];
+        $headerData = $this->getHeaderDataFromRequest();
 
         // Memulai transaksi
         $this->db->transBegin();
@@ -189,87 +334,43 @@ class ReturPembelian extends ResourceController
                         continue;
                     }
 
-                    $id_stock = $item['id_stock'];
-
-                    // Convert formatted values to raw numbers if needed
-                    $qty1 = floatval($item['qty1']);
-                    $qty2 = floatval($item['qty2']);
-                    $hargaSatuan = isset($item['harga_satuan_raw']) ?
-                        floatval($item['harga_satuan_raw']) :
-                        floatval(preg_replace('/[^\d]/', '', $item['harga_satuan']));
-                    $disc1Perc = isset($item['disc_1_perc']) ?
-                        floatval($item['disc_1_perc']) : 0;
-                    $disc1Rp = floatval($item['disc_1_rp_raw']);
-                    $disc2Perc = isset($item['disc_2_perc']) ? floatval($item['disc_2_perc']) : 0;
-                    $disc2Rp = floatval($item['disc_2_rp_raw']);
-
-                    // Get raw values if available, otherwise parse the formatted values
-                    $jmlHarga = isset($item['jml_harga_raw']) ?
-                        floatval($item['jml_harga_raw']) :
-                        floatval(preg_replace('/[^\d]/', '', $item['jml_harga']));
-
-                    $total = isset($item['total_raw']) ?
-                        floatval($item['total_raw']) :
-                        floatval(preg_replace('/[^\d]/', '', $item['total']));
-
-                    // Create detail record
-                    $detailRecord = [
+                    $detailRetur = new DetailItem($item);
+                    $detailRecord = $detailRetur->getRecords();
+                    $detailRecord = array_merge($detailRecord, [
                         'id_returpembelian' => $idReturPembelian,
-                        'id_stock' => $id_stock,
-                        'kode' => $item['kode'],
-                        'nama_barang' => $item['nama_barang'],
-                        'satuan' => $item['satuan'],
-                        'qty1' => $qty1,
-                        'qty2' => $qty2,
-                        'harga_satuan' => $hargaSatuan,
-                        'jml_harga' => $jmlHarga,
-                        'disc_1_perc' => $disc1Perc,
-                        'disc_1_rp' => $disc1Rp,
-                        'disc_2_perc' => $disc2Perc,
-                        'disc_2_rp' => $disc2Rp,
-                        'total' => $total
-                    ];
+                    ]);
+
+                    // Sinkronisasi stok gudang
+                    $this->syncStockGudang($headerData, $item);
 
                     // Insert detail
                     $this->objReturPembelianDetail->insert($detailRecord);
+                }
 
-                    // Update stock in stock1_gudang table
-                    $stockData = [
-                        'id_lokasi' => $id_lokasi,
-                        'id_stock' => $id_stock,
-                        'qty1' => $qty1,
-                        'qty2' => $qty2,
-                        'jml_harga' => $jmlHarga,
-                    ];
+                if ($headerData['opsi_return'] == 'tunai') {
+                    // Ambil data rekening dan update saldo
+                    $dt_rekening = $this->objSetupBuku->find($headerData['id_setupbuku']);
+                    $old_saldo = floatval($dt_rekening->saldo_berjalan);
 
-                    // Check if stock already exists in stock1_gudang
-                    $existingStock = $this->objStockGudang->where(['id_lokasi' => $id_lokasi, 'id_stock' => $id_stock])->first();
+                    $returValue = $headerData['grand_total'];
+                    $new_saldo = $old_saldo + $returValue;
 
-                    if ($existingStock) {
-                        // Update existing stock
-                        $old_qty1 = floatval($existingStock->qty1);
-                        $old_qty2 = floatval($existingStock->qty2);
-                        $conv_factor = floatval($item['conv_factor']);
-
-                        $normal_old_qty = $old_qty1 * $conv_factor + $old_qty2; // Normalized old quantity
-                        $normal_new_qty = $qty1 * $conv_factor + $qty2; // Normalized new quantity
-
-                        $new_qty = $normal_old_qty - $normal_new_qty; // Calculate new quantity
-                        $new_qty1 = floor($new_qty / $conv_factor); // Calculate new qty1
-                        $new_qty2 = $new_qty % $conv_factor; // Calculate new qty2
-
-                        $old_jmlHarga = floatval($existingStock->jml_harga);
-                        $new_jmlHarga = $old_jmlHarga - $jmlHarga; // Update total harga
-
-                        $this->objStockGudang->update($existingStock->id, [
-                            'qty1' => $new_qty1,
-                            'qty2' => $new_qty2,
-                            'jml_harga' => $new_jmlHarga,
-                        ]);
-                    } else {
-                        // Insert new stock record
-                        $this->objStockGudang->insert($stockData);
-                    }
+                    // Update saldo rekening
+                    $this->objSetupBuku->update($headerData['id_setupbuku'], [
+                        'saldo_berjalan' => $new_saldo,
+                    ]);
+                    // Simpan riwayat transaksi
+                    $this->objRiwayatTransaksi->insert([
+                        'tanggal' => $headerData['tanggal'],
+                        'jenis_transaksi' => 'retur pembelian',
+                        'id_transaksi' => $idReturPembelian,
+                        'nota' => $headerData['nota'],
+                        'id_rekening' => $headerData['id_setupbuku'],
+                        'deskripsi' => 'Retur Pembelian Tunai',
+                        'debit' => $returValue,
+                        'kredit' => 0,
+                        'saldo_setelah' => $new_saldo,
+                    ]);
                 }
             }
             // Commit transaction if all went well
@@ -277,7 +378,8 @@ class ReturPembelian extends ResourceController
 
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Data berhasil disimpan!'
+                'message' => 'Data berhasil disimpan!',
+                'redirect_url' => site_url('transaksi/pembelian/returpembelian')
             ]);
         } catch (\Exception $e) {
             $this->db->transRollback();

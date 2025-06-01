@@ -103,17 +103,12 @@ $routes->group('transaksi', static function ($routes) {
 
     $routes->group('penjualan', ['namespace' => 'App\Controllers\transaksi\penjualan'], static function ($routes) {
 
-        //routes untuk penjualan
-        // $routes->get('/penjualan/new', 'Penjualan::new');
-        // $routes->post('/penjualan', 'Penjualan::create');
-        // $routes->post('/penjualan/(:any)', 'Penjualan::delete/$1');
-        // $routes->get('penjualan', 'Penjualan::index');
+        $routes->get('penjualan/lookup-stock', 'Penjualan::lookupStock');
         $routes->get('penjualan/printPDF/(:num)', 'Penjualan::printPDF/$1');
         $routes->get('penjualan/printPDF', 'Penjualan::printPDF');
         $routes->put('/penjualan/(:segment)', 'Penjualan::update/$1', ['filter' => 'role:admin']);
         $routes->put('/penjualan/(:segment)/edit', 'Penjualan::edit/$1', ['filter' => 'role:admin']);
         $routes->resource('penjualan');
-
 
         //routes untuk returpenjualan
         $routes->get('/returpenjualan/new', 'ReturPenjualan::new');

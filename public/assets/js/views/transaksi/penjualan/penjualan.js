@@ -9,10 +9,8 @@ $(document).ready(function () {
 const SELECTORS = {
     ppnOption: 'input[name="ppn_option"]',
     kodeInput: 'input[name$="[kode]"]',
-    form: '#formPembelian',
+    form: '#formPenjualan',
     tabelDetail: '#tabelDetail tbody',
-    tunai: '#tunai',
-    supplierDropdown: '#id_setupsupplier'
 };
 
 /**
@@ -27,19 +25,42 @@ function initPpnOptionHandling() {
 }
 
 function handlePPNInputToggle() {
+
     const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
     const ppnInput = $('#ppn');
 
     if (ppnOption === 'non_ppn') {
         // Disable and clear PPN input when "Non PPN" is selected
-        ppnInput.prop('disabled', true).val(0);
+        ppnInput.prop('readonly', true).val(0);
     } else {
         // Enable PPN input for "Include" or "Exclude" options
-        ppnInput.prop('disabled', false);
-
-        if (!ppnInput.val()) ppnInput.val(11);
+        ppnInput.prop('readonly', false);
     }
+    updateProductPrices(ppnOption);
+
     updateTotals();
+}
+
+function updateProductPrices(ppnOption) {
+    $(SELECTORS.tabelDetail + ' tr').each(function () {
+        const row = $(this);
+        let newPrice;
+
+        // Get the appropriate price based on the option
+        if (ppnOption === 'exclude' || ppnOption === 'non_ppn') {
+            newPrice = parseFloat(row.find('input[name$="[harga_satuan_exclude]"]').val()) || 0;
+        } else {
+            newPrice = parseFloat(row.find('input[name$="[harga_satuan_include]"]').val()) || 0;
+        }
+
+        // Update the visible price field
+        row.find('input[name$="[harga_satuan]"]')
+            .val(formatCurrency(newPrice))
+            .attr('data-raw-value', newPrice);
+
+        // Recalculate row total with the new price
+        calculateRowTotal(row);
+    });
 }
 
 /**
@@ -99,32 +120,7 @@ function initFormHandlers() {
         submitForm($(this));
     });
 
-    $(SELECTORS.supplierDropdown).on('change', function () {
-        const supplierSelected = $(this).val() ? true : false;
-        toggleKodeInputs(supplierSelected);
-
-        // If supplier changed and was previously selected, clear all product rows
-        if (supplierSelected && $(this).data('previous-value') &&
-            $(this).data('previous-value') !== $(this).val()) {
-            // Ask for confirmation before clearing
-            if ($(SELECTORS.tabelDetail + ' tr').length > 0) {
-                if (confirm('Mengubah supplier akan menghapus semua barang yang sudah dipilih. Lanjutkan?')) {
-                    $(SELECTORS.tabelDetail).empty();
-                    updateTotals();
-                } else {
-                    // Restore previous selection
-                    $(this).val($(this).data('previous-value')).trigger('change');
-                    return;
-                }
-            }
-        }
-
-        // Store current value for next comparison
-        $(this).data('previous-value', $(this).val());
-    }).trigger('change'); // Trigger on load
-
     attachCalculationEvents();
-    setupTunaiInput();
 }
 
 /**
@@ -140,33 +136,11 @@ function attachCalculationEvents() {
         'input[name$="[disc_2_rp]"]',
     ];
 
-    const discCashFields = [
-        '#disc_cash',
-        '#disc_cash_rp'
-    ]
-
     // Use event delegation for all calculation fields
     $(document).on('blur', calculationFields.join(', '), function () {
         const row = $(this).closest('tr');
         calculateRowTotal(row);
         updateTotals();
-    });
-
-    $(document).on('blur', discCashFields.join(', '), () => updateTotals());
-}
-
-function setupTunaiInput() {
-    // Handle tunai input changes
-    $(SELECTORS.tunai).on('blur', function () {
-        // Only format when leaving the field (on blur) or when change is complete
-        const input = $(this).val().trim();
-        const tunaiValue = parseCurrencyValue(input);
-        $(this).attr('data-raw-value', tunaiValue).val(formatCurrency(tunaiValue));
-        hitung_hutang();
-    }).on('focus', function () {
-        // When focusing on the field, show the raw number for easier editing
-        const raw = parseCurrencyValue($(this).val());
-        $(this).val(raw);
     });
 }
 
@@ -282,65 +256,37 @@ function updateTotals() {
     // Calculate cash discount
     const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
     const discCashAmount = (discCashPerc / 100) * subTotal;
-    // Get cash discount in rupiah
-    const discCashRp = parseCurrencyValue($('#disc_cash_rp').val() || 0);
+    $('#disc_cash_rp').val(formatCurrency(discCashAmount)).attr('data-raw-value', discCashAmount);
 
     handleDiscountExclusivity();
 
-    // Use either percentage or direct amount discount
-    const totalCashDiscount = discCashPerc > 0 ? discCashAmount : discCashRp;
-
-    // Calculate DPP (base for tax)
-    const dpp = subTotal - totalCashDiscount;
-    $('input[name="dpp"]').attr('data-raw-value', dpp).val(formatCurrency(dpp));
+    // Calculate Netto (base for tax)
+    const netto = subTotal - discCashAmount;
+    $('input[name="netto"]').attr('data-raw-value', netto).val(formatCurrency(netto));
 
     // Calculate PPN based on selected option
     const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
     let ppnRate = $('#ppn').val() || 0;
-    let grandTotal = dpp;
+    let grandTotal = netto;
 
-    if (ppnOption === 'exclude') grandTotal += (ppnRate / 100) * dpp;
+    if (ppnOption === 'exclude') grandTotal += (ppnRate / 100) * netto;
 
     // Update grand total
     $('#grand_total').attr('data-raw-value', grandTotal).val(formatCurrency(grandTotal));
 
-    hitung_hutang(); // Calculate remaining debt
 }
 
 /**
  * Handle exclusivity between percentage and rupiah discount inputs
  */
 function handleDiscountExclusivity() {
-    console.log('Handling discount exclusivity');
     const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
     const discCashRp = ($('#disc_cash_rp').val().includes('Rp')) ? parseCurrencyValue($('#disc_cash_rp').val() || 0) : parseFloat($('#disc_cash_rp').val() || 0);
 
     if (discCashPerc == 0 && discCashRp == 0) {
-        $('#disc_cash').prop('readonly', false).val(0);
-        $('#disc_cash_rp').prop('readonly', false).val(0);
+        $('#disc_cash').val(0);
+        $('#disc_cash_rp').val(0).attr('data-raw-value', 0);
     }
-
-    if (discCashPerc > 0) {
-        $('#disc_cash_rp').prop('readonly', true).val(0);
-    } else {
-        $('#disc_cash_rp').prop('readonly', false);
-    }
-
-    if (discCashRp > 0) {
-        $('#disc_cash').prop('readonly', true).val(0);
-        // Format the rupiah value for consistency
-        $('#disc_cash_rp')
-            .attr('data-raw-value', discCashRp)
-            .val(formatCurrency(discCashRp));
-    } else {
-        $('#disc_cash').prop('readonly', false);
-    }
-}
-
-function hitung_hutang() {
-    const total = $('#grand_total').attr('data-raw-value') || 0;
-    const tunai = $(SELECTORS.tunai).attr('data-raw-value') || 0;
-    $('#hutang').attr('data-raw-value', total - tunai).val(formatCurrency(total - tunai));
 }
 
 /**
@@ -350,14 +296,18 @@ function addNewRow(rowIndex) {
     const tr = `<tr>
             <td>
                 <input name="detail[${rowIndex}][id_stock]" hidden>
-                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm" ${$(SELECTORS.supplierDropdown).val() ? '' : 'disabled placeholder="Pilih supplier"'}>
+                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm">
                 <input name="detail[${rowIndex}][conv_factor]" hidden>
             </td>
             <td><input name="detail[${rowIndex}][nama_barang]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][satuan]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][qty1]" class="form-control form-control-sm"></td>
             <td><input name="detail[${rowIndex}][qty2]" class="form-control form-control-sm"></td>
-            <td><input name="detail[${rowIndex}][harga_satuan]" class="form-control form-control-sm" readonly></td>
+            <td>
+            <input name="detail[${rowIndex}][harga_satuan]" class="form-control form-control-sm" readonly>
+                <input name="detail[${rowIndex}][harga_satuan_include]" type="hidden">
+                <input name="detail[${rowIndex}][harga_satuan_exclude]" type="hidden">
+            </td>
             <td><input name="detail[${rowIndex}][jml_harga]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][disc_1_perc]" class="form-control form-control-sm"></td>
             <td><input name="detail[${rowIndex}][disc_1_rp]" class="form-control form-control-sm"></td>
@@ -447,34 +397,12 @@ function handleAjaxResponse(response, form) {
     }
 }
 
-/**
- * Enable or disable all kode inputs based on supplier selection
- * @param {boolean} enable - Whether to enable the inputs
- */
-function toggleKodeInputs(enable) {
-    $(SELECTORS.kodeInput).each(function () {
-        $(this).prop('disabled', !enable);
-
-        if (!enable) {
-            $(this).attr('placeholder', 'Pilih supplier');
-        } else {
-            $(this).attr('placeholder', 'Masukkan kode');
-        }
-    });
-
-    // Also disable add row button if no supplier selected
-    $('#btnAddRow').prop('disabled', !enable);
-}
 
 /**
  * Activate autocomplete on stock code inputs
  */
 function activateAutocomplete() {
     const url = $(SELECTORS.form).data('stock-url');
-    const supplierSelected = $(SELECTORS.supplierDropdown).val() ? true : false;
-
-    // Disable or enable all kode inputs based on supplier selection
-    toggleKodeInputs(supplierSelected);
 
     $(SELECTORS.kodeInput).each(function () {
         if ($(this).hasClass('ui-autocomplete-input')) return;
@@ -483,7 +411,6 @@ function activateAutocomplete() {
             source: function (req, res) {
                 $.get(url, {
                     term: req.term,
-                    supplier: $(SELECTORS.supplierDropdown).val()
                 }, data => {
                     if (!data || !data.length) return res([]);
 
@@ -498,30 +425,46 @@ function activateAutocomplete() {
             minLength: 2,
             select: function (event, ui) {
                 if (!ui.item) return false;
-
+                const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
                 // Fill the form fields with the selected item's data
                 const row = $(this).closest('tr');
-                fillAutoCompleteFields(row, ui.item.item);
+                fillAutoCompleteFields(row, ui.item.item, ppnOption);
                 calculateRowTotal(row);
                 updateTotals();
                 return false; // Prevent default behavior
             }
-        }).autocomplete("instance")._renderItem = (ul, item) => $("<li>")
-            .append(`
+        }).autocomplete("instance")._renderItem = (ul, item) => {
+            const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
+            let hargaJual = item.item.harga_jualexc
+            if (ppnOption === 'include') {
+                hargaJual = item.item.harga_jualinc;
+            }
+
+            return $("<li>")
+                .append(`
                 <div><strong>${item.item.kode}</strong> - ${item.item.nama_barang} <br>
                 <small>Satuan: ${item.item.satuan_1}${item.item.satuan_2 ? '/' + item.item.satuan_2 : ''},
-                Harga: ${formatCurrency(item.item.harga_beli)}</small></div>`)
-            .appendTo(ul);
+                Harga: ${formatCurrency(hargaJual)}</small></div>`)
+                .appendTo(ul);
+        }
     });
 }
 
-function fillAutoCompleteFields(row, item) {
+function fillAutoCompleteFields(row, item, ppnOption) {
+    row.find('input[name$="[harga_satuan_include]"]').val(item.harga_jualinc || 0);
+    row.find('input[name$="[harga_satuan_exclude]"]').val(item.harga_jualexc || 0);
+
+    let hargaJual = item.harga_jualexc
+    if (ppnOption === 'include') {
+        hargaJual = item.harga_jualinc;
+    }
+
     row.find('input[name$="[id_stock]"]').val(item.id_stock);
     row.find('input[name$="[kode]"]').val(item.kode);
     row.find('input[name$="[nama_barang]"]').val(item.nama_barang);
     row.find('input[name$="[conv_factor]"]').val(item.conv_factor || 1);
     row.find('input[name$="[satuan]"]').val(item.satuan_1 + (item.satuan_2 ? '/' + item.satuan_2 : ''));
-    row.find('input[name$="[harga_satuan]"]').val(formatCurrency(item.harga_beli)).attr('data-raw-value', item.harga_beli);
+    row.find('input[name$="[harga_satuan]"]').val(formatCurrency(hargaJual)).attr('data-raw-value', hargaJual);
     row.find('input[name$="[disc_1_perc]"]').val(0).attr('data-raw-value', 0);
     row.find('input[name$="[disc_1_rp]"]').val(0).attr('data-raw-value', 0);
     row.find('input[name$="[disc_2_perc]"]').val(0).attr('data-raw-value', 0);

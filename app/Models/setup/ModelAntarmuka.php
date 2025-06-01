@@ -52,4 +52,10 @@ class ModelAntarmuka extends Model
 
         return $kode ? $kode : null;
     }
+
+    public function getKodeRekening($nama_kolom)
+    {
+        $kode = $this->findAll()[0]->$nama_kolom;
+        return $kode ? $kode : null;
+    }
 }

@@ -1,4 +1,3 @@
-// Document ready handler
 $(document).ready(function () {
     // Initialize form components
     initFormHandlers();
@@ -7,10 +6,19 @@ $(document).ready(function () {
     initPpnOptionHandling();
 });
 
+const SELECTORS = {
+    ppnOption: 'input[name="ppn_option"]',
+    kodeInput: 'input[name$="[kode]"]',
+    form: '#formReturPembelian',
+    tabelDetail: '#tabelDetail tbody',
+    supplierDropdown: '#id_setupsupplier'
+};
+
 function pilihNota(id) {
+    const url = $('#modalNotaPembelian').data('nota-url');
     // Fungsi untuk mencari nota pembelian dan autofill data
     $.ajax({
-        url: '<?= site_url('transaksi/ pembelian / pembelian / ') ?>' + id,
+        url: url + id,
         method: 'GET',
         dataType: 'json',
         success: function (data) {
@@ -39,7 +47,7 @@ function pilihNota(id) {
             console.error('Error fetching nota pembelian:', error);
         }
     });
-  }
+}
 
 function populateDetailRows(details) {
     // Clear existing rows except first template row
@@ -90,35 +98,27 @@ function populateRowWithData($row, data) {
  * Handle toggling of the PPN input field based on the selected PPN option
  */
 function initPpnOptionHandling() {
-    // Initial setup when page loads
-    togglePpnField();
-
+    handlePPNInputToggle();
     // Add event listener for radio button changes
-    $('input[name="ppn_option"]').on('change', function () {
-        togglePpnField();
-    });
+    $(SELECTORS.ppnOption).on('change', handlePPNInputToggle);
+    // Add event listener for PPN input changes
+    $('#ppn').on('blur', handlePPNInputToggle);
+}
 
-    function togglePpnField() {
-        const ppnOption = $('input[name="ppn_option"]:checked').val();
-        const ppnInput = $('#ppn');
+function handlePPNInputToggle() {
+    const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
+    const ppnInput = $('#ppn');
 
-        if (ppnOption === 'non_ppn') {
-            // Disable and clear PPN input when "Non PPN" is selected
-            ppnInput.prop('disabled', true);
-            ppnInput.val(0);
-        } else {
-            // Enable PPN input for "Include" or "Exclude" options
-            ppnInput.prop('disabled', false);
+    if (ppnOption === 'non_ppn') {
+        // Disable and clear PPN input when "Non PPN" is selected
+        ppnInput.prop('disabled', true).val(0);
+    } else {
+        // Enable PPN input for "Include" or "Exclude" options
+        ppnInput.prop('disabled', false);
 
-            // Set default PPN value (11%) if it's empty
-            if (!ppnInput.val()) {
-                ppnInput.val(11);
-            }
-        }
-
-        // Update totals when PPN option changes
-        updateTotals();
+        if (!ppnInput.val()) ppnInput.val(11);
     }
+    updateTotals();
 }
 
 /**
@@ -138,28 +138,24 @@ function initializeDateHandling() {
 
     function updateJatuhTempo() {
         if (!tanggalInput.value) return;
-
         try {
             // Parse the input date
             const tanggal = new Date(tanggalInput.value);
-
-            // Get TOP value (default to 0 if not a number)
             const topValue = parseInt(topInput.value) || 0;
-
-            // Add TOP days to the date
             tanggal.setDate(tanggal.getDate() + topValue);
-
-            // Format the date as YYYY-MM-DD for the input
-            const year = tanggal.getFullYear();
-            const month = String(tanggal.getMonth() + 1).padStart(2, '0');
-            const day = String(tanggal.getDate()).padStart(2, '0');
-
-            // Update the due date field
-            jatuhTempoInput.value = `${year}-${month}-${day}`;
+            jatuhTempoInput.value = formatDate(tanggal);
         } catch (error) {
             console.error('Error calculating due date:', error);
         }
     }
+}
+
+function formatDate(date) {
+    // Format the date as YYYY-MM-DD for the input
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 /**
@@ -168,72 +164,77 @@ function initializeDateHandling() {
 function initFormHandlers() {
     // Row counter for dynamic rows
     let rowCounter = 1;
-
-    // Add row button handler
-    $('#btnAddRow').click(function () {
-        addNewRow(rowCounter++);
-    });
+    $('#btnAddRow').click(() => addNewRow(rowCounter++));
 
     // Remove row button handler (using event delegation)
     $(document).on('click', '.btnRemove', function () {
         $(this).closest('tr').remove();
-        updateTotals(); // Recalculate totals when a row is removed
+        updateTotals();
     });
 
     // Form submission handler
-    $('#formPembelian').submit(function (e) {
+    $(SELECTORS.form).submit(function (e) {
         e.preventDefault();
         submitForm($(this));
     });
 
-    // Setup calculation handlers for qty, price and discount fields
-    setupCalculationHandlers();
+    $(SELECTORS.supplierDropdown).on('change', function () {
+        const supplierSelected = $(this).val() ? true : false;
+        toggleKodeInputs(supplierSelected);
+
+        // If supplier changed and was previously selected, clear all product rows
+        if (supplierSelected && $(this).data('previous-value') &&
+            $(this).data('previous-value') !== $(this).val()) {
+            // Ask for confirmation before clearing
+            if ($(SELECTORS.tabelDetail + ' tr').length > 0) {
+                if (confirm('Mengubah supplier akan menghapus semua barang yang sudah dipilih. Lanjutkan?')) {
+                    $(SELECTORS.tabelDetail).empty();
+                    updateTotals();
+                } else {
+                    // Restore previous selection
+                    $(this).val($(this).data('previous-value')).trigger('change');
+                    return;
+                }
+            }
+        }
+
+        // Store current value for next comparison
+        $(this).data('previous-value', $(this).val());
+    }).trigger('change'); // Trigger on load
+
+    attachCalculationEvents();
 }
 
 /**
  * Add calculation handlers for inputs that affect totals
  */
-function setupCalculationHandlers() {
+function attachCalculationEvents() {
     const calculationFields = [
         'input[name$="[qty1]"]',
         'input[name$="[qty2]"]',
-        'input[name$="[harga_satuan]"]',
         'input[name$="[disc_1_perc]"]',
         'input[name$="[disc_1_rp]"]',
         'input[name$="[disc_2_perc]"]',
         'input[name$="[disc_2_rp]"]',
     ];
 
+    const discCashFields = [
+        '#disc_cash',
+        '#disc_cash_rp'
+    ]
+
     // Use event delegation for all calculation fields
-    $(document).on('change keyup', calculationFields.join(', '), function () {
+    $(document).on('blur', calculationFields.join(', '), function () {
         const row = $(this).closest('tr');
         calculateRowTotal(row);
         updateTotals();
     });
 
-    $('#disc_cash').on('change blur', function () {
-        updateTotals();
-    });
-
-    // Handle tunai input changes
-    $('#tunai').on('change blur', function () {
-        // Only format when leaving the field (on blur) or when change is complete
-        const input = $(this).val().trim();
-        const tunaiValue = parseCurrencyValue(input);
-        $(this).attr('data-raw-value', tunaiValue); // Store raw value for calculations
-        $(this).val(formatCurrency(tunaiValue));
-        hitung_hutang(); // Recalculate remaining debt
-    }).on('focus', function () {
-        // When focusing on the field, show the raw number for easier editing
-        const rawValue = parseCurrencyValue($(this).val());
-        $(this).val(rawValue);
-    });
-
+    $(document).on('blur', discCashFields.join(', '), () => updateTotals());
 }
 
-// Helper function to parse currency formatted values
 function parseCurrencyValue(value) {
-    if (!value) return 0;
+    if (value == 0) return 0;
     // Remove currency symbol, thousands separators and handle decimal point
     return parseFloat(value.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(/,/g, '.')) || 0;
 }
@@ -250,28 +251,81 @@ function calculateRowTotal(row) {
     let jumlahHarga = qty1 * hargaSatuan;
     if (qty2 > 0) {
         const convFactor = parseFloat(row.find('input[name$="[conv_factor]"]').val()) || 1;
-        const hargaQty2 = hargaSatuan / convFactor;
-        jumlahHarga += qty2 * hargaQty2;
+        jumlahHarga += qty2 * (hargaSatuan / convFactor);
     }
 
     row.find('input[name$="[jml_harga]"]').val(jumlahHarga);
 
-    // Calculate discount 1
-    const disc1Perc = parseFloat(row.find('input[name$="[disc_1_perc]"]').val()) || 0;
-    const disc1Rp = (disc1Perc / 100) * jumlahHarga;
-    row.find('input[name$="[disc_1_rp]"]').val(disc1Rp);
+    // calculate discounts
+    const disc1 = computeDiscount(row, 1, jumlahHarga);
 
-    // Calculate discount 2
-    const disc2Perc = parseFloat(row.find('input[name$="[disc_2_perc]"]').val()) || 0;
-    const disc2Rp = (disc2Perc / 100) * (jumlahHarga - disc1Rp);
-    row.find('input[name$="[disc_2_rp]"]').val(disc2Rp);
+    if (disc1 > 0) {
+        row.find('input[name$="[disc_2_perc]"]').prop('readonly', false);
+        row.find('input[name$="[disc_2_rp]"]').prop('readonly', false);
+    } else {
+        row.find('input[name$="[disc_2_perc]"]').prop('readonly', true).val(0);
+        row.find('input[name$="[disc_2_rp]"]').prop('readonly', true).val(0);
+    }
+
+    const disc2 = computeDiscount(row, 2, jumlahHarga - disc1);
 
     // Calculate row total
-    const rowTotal = jumlahHarga - disc1Rp - disc2Rp;
+    const rowTotal = jumlahHarga - disc1 - disc2;
     row.find('input[name$="[total]"]').val(rowTotal);
 
-    // Format the displayed values
     formatNumericFields(row);
+}
+
+function computeDiscount(row, num, base) {
+    const perc = parseFloat(row.find(`input[name$="[disc_${num}_perc]"]`).val()) || 0;
+    const rpField = row.find(`input[name$="[disc_${num}_rp]"]`);
+    const rp = parseCurrencyValue(rpField.val() || 0);
+
+    if (num === 1) {
+        // Reset disabled status first
+        row.find(`input[name$="[disc_${num}_rp]"]`).prop('readonly', false);
+        row.find(`input[name$="[disc_${num}_perc]"]`).prop('readonly', false);
+    }
+
+    if (perc > 0) {
+        row.find(`input[name$="[disc_${num}_rp]"]`).prop('readonly', true);
+        return (perc / 100) * base;
+    } else if (rp > 0) {
+        row.find(`input[name$="[disc_${num}_perc]"]`).prop('readonly', true);
+        return rp;
+    }
+    return 0;
+}
+
+/**
+ * Format numeric fields in a row to display properly
+ */
+function formatNumericFields(row) {
+    // Format currency display fields but keep raw values for calculations
+    ['[jml_harga]', '[disc_1_rp]',
+        '[disc_2_rp]', '[total]'
+    ].forEach(suffix => {
+        const field = row.find(`input[name$="${suffix}"]`);
+        let val = 0;
+        if (field.val().includes('Rp')) {
+            val = parseCurrencyValue(field.val())
+        } else {
+            val = parseFloat(field.val()) || 0;
+        }
+        field.attr('data-raw-value', val).val(formatCurrency(val));
+    });
+}
+
+/**
+ * Format a number as Indonesian currency
+ */
+function formatCurrency(number) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(number);
 }
 
 /**
@@ -281,54 +335,61 @@ function updateTotals() {
     let subTotal = 0;
 
     // Sum all row totals
-    $('#tabelDetail tbody tr').each(function () {
-        const rowTotal = parseFloat($(this).find('input[name$="[total]"]').attr('data-raw-value')) || 0;
-        subTotal += rowTotal;
+    $(SELECTORS.tabelDetail + ' tr').each(function () {
+        subTotal += parseFloat($(this).find('input[name$="[total]"]').attr('data-raw-value')) || 0;
     });
 
     // Update subtotal display
-    $('#sub_total').attr('data-raw-value', subTotal);
-    $('#sub_total').val(formatCurrency(subTotal));
+    $('#sub_total').attr('data-raw-value', subTotal).val(formatCurrency(subTotal));
 
     // Calculate cash discount
     const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
     const discCashAmount = (discCashPerc / 100) * subTotal;
-    $('input[name="disc_cash_amount"]').val(formatCurrency(discCashAmount));
+    // Get cash discount in rupiah
+    const discCashRp = parseCurrencyValue($('#disc_cash_rp').val() || 0);
+
+    handleDiscountExclusivity();
+
+    // Use either percentage or direct amount discount
+    const totalCashDiscount = discCashPerc > 0 ? discCashAmount : discCashRp;
 
     // Calculate DPP (base for tax)
-    const dpp = subTotal - discCashAmount;
-    $('input[name="dpp"]').attr('data-raw-value', dpp);
-    $('input[name="dpp"]').val(formatCurrency(dpp));
+    const dpp = subTotal - totalCashDiscount;
+    $('input[name="dpp"]').attr('data-raw-value', dpp).val(formatCurrency(dpp));
 
     // Calculate PPN based on selected option
-    const ppnOption = $('input[name="ppn_option"]:checked').val();
-    let ppnRate = 0;
+    const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
+    let ppnRate = $('#ppn').val() || 0;
     let grandTotal = dpp;
 
-    if (ppnOption === 'exclude') {
-        ppnRate = 11; // Assuming 11% VAT
-        const ppnAmount = (ppnRate / 100) * dpp;
-        grandTotal = dpp + ppnAmount;
-    } else if (ppnOption === 'include') {
-        ppnRate = 11; // Assuming 11% VAT
-        // PPN already included in the price
-    }
-
-    // Update PPN rate display
-    $('#ppn').val(ppnRate);
+    if (ppnOption === 'exclude') grandTotal += (ppnRate / 100) * dpp;
 
     // Update grand total
-    $('#grand_total').attr('data-raw-value', grandTotal);
-    $('#grand_total').val(formatCurrency(grandTotal));
-
-    hitung_hutang(); // Calculate remaining debt
+    $('#grand_total').attr('data-raw-value', grandTotal).val(formatCurrency(grandTotal));
 }
 
-function hitung_hutang() {
-    const grandTotal = $('#grand_total').attr('data-raw-value') || 0;
-    const tunai = $('#tunai').attr('data-raw-value') || 0;
-    const hutang = grandTotal - tunai;
-    $('#hutang').val(formatCurrency(hutang));
+/**
+ * Handle exclusivity between percentage and rupiah discount inputs
+ */
+function handleDiscountExclusivity() {
+    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
+    const discCashRp = ($('#disc_cash_rp').val().includes('Rp')) ? parseCurrencyValue($('#disc_cash_rp').val() || 0) : parseFloat($('#disc_cash_rp').val() || 0);
+
+    if (discCashPerc > 0) {
+        $('#disc_cash_rp').prop('readonly', true).val(0);
+    } else {
+        $('#disc_cash_rp').prop('readonly', false);
+    }
+
+    if (discCashRp > 0) {
+        $('#disc_cash').prop('readonly', true).val(0);
+        // Format the rupiah value for consistency
+        $('#disc_cash_rp')
+            .attr('data-raw-value', discCashRp)
+            .val(formatCurrency(discCashRp));
+    } else {
+        $('#disc_cash').prop('readonly', false);
+    }
 }
 
 /**
@@ -349,12 +410,12 @@ function addNewRow(rowIndex) {
             <td><input name="detail[${rowIndex}][jml_harga]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][disc_1_perc]" class="form-control form-control-sm"></td>
             <td><input name="detail[${rowIndex}][disc_1_rp]" class="form-control form-control-sm"></td>
-            <td><input name="detail[${rowIndex}][disc_2_perc]" class="form-control form-control-sm"></td>
-            <td><input name="detail[${rowIndex}][disc_2_rp]" class="form-control form-control-sm"></td>
+            <td><input name="detail[${rowIndex}][disc_2_perc]" class="form-control form-control-sm" readonly></td>
+            <td><input name="detail[${rowIndex}][disc_2_rp]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][total]" class="form-control form-control-sm" readonly></td>
             <td><button type="button" class="btn btn-danger btnRemove">X</button></td>
         </tr>`;
-    $('#tabelDetail tbody').append(tr);
+    $(SELECTORS.tabelDetail).append(tr);
     activateAutocomplete();
 }
 
@@ -395,7 +456,7 @@ function submitForm(form) {
     });
 
     $.ajax({
-        url: '<?= site_url('transaksi/ pembelian / returpembelian') ?>',
+        url: form.attr('action'),
         method: 'POST',
         data: form.serialize(),
         dataType: 'json',
@@ -403,136 +464,96 @@ function submitForm(form) {
             // Disable submit button to prevent double submission
             form.find('button[type="submit"]').prop('disabled', true);
         },
-        success: function (response) {
-            if (response.success) {
-                iziToast.success({
-                    title: 'Sukses',
-                    message: response.message,
-                    position: 'topCenter',
-                    titleSize: '20',
-                    messageSize: '20',
-                    layout: 2,
-                });
-                window.location.href = '<?= site_url('transaksi / pembelian / returpembelian') ?>';
-            } else {
-                iziToast.error({
-                    title: 'Error',
-                    message: response.message,
-                    position: 'topCenter',
-                    titleSize: '20',
-                    messageSize: '20',
-                    layout: 2,
-                });
-                form.find('button[type="submit"]').prop('disabled', false);
-            }
-        },
+        success: res => handleAjaxResponse(res, form),
         error: function (xhr, status, error) {
             alert('Error: ' + error);
             form.find('button[type="submit"]').prop('disabled', false);
         }
     });
-  }
+}
+
+function handleAjaxResponse(response, form) {
+    if (response.success) {
+        iziToast.success({
+            title: 'Sukses',
+            message: response.message,
+            position: 'topCenter',
+            titleSize: '20',
+            messageSize: '20',
+            layout: 2,
+        });
+        window.location.href = response.redirect_url;
+    } else {
+        iziToast.error({
+            title: 'Error',
+            message: response.message,
+            position: 'topCenter',
+            titleSize: '20',
+            messageSize: '20',
+            layout: 2,
+        });
+        form.find('button[type="submit"]').prop('disabled', false);
+    }
+}
+
 
 /**
  * Activate autocomplete on stock code inputs
  */
 function activateAutocomplete() {
-    $('input[name$="[kode]"]').each(function () {
-        if (!$(this).hasClass('ui-autocomplete-input')) {
-            const rowIndex = $(this).attr('name').match(/\d+/)[0];
+    const url = $(SELECTORS.form).data('stock-url');
 
-            $(this).autocomplete({
-                source: function (request, response) {
-                    $.get('<?= site_url('transaksi / pembelian / pembelian / lookup - stock') ?>', {
-                        term: request.term
-                    }, function (data) {
-                        if (!data || !data.length) {
-                            return response([]);
-                        }
+    $(SELECTORS.kodeInput).each(function () {
+        if ($(this).hasClass('ui-autocomplete-input')) return;
 
-                        // Transform the data for display
-                        const items = data.map(item => ({
-                            label: `${item.kode} - ${item.nama_barang}`,
-                            value: item.kode,
-                            item: item
-                        }));
-                        response(items);
-                    }).fail(function () {
-                        response([]);
-                    });
-                },
-                minLength: 2,
-                select: function (event, ui) {
-                    if (!ui.item) return false;
+        $(this).autocomplete({
+            source: function (req, res) {
+                $.get(url, {
+                    term: req.term,
+                    supplier: $(SELECTORS.supplierDropdown).val()
+                }, data => {
+                    if (!data || !data.length) return res([]);
 
-                    // Fill the form fields with the selected item's data
-                    const row = $(this).closest('tr');
-                    row.find('input[name$="[id_stock]"]').val(ui.item.item.id_stock);
-                    row.find('input[name$="[kode]"]').val(ui.item.item.kode);
-                    row.find('input[name$="[nama_barang]"]').val(ui.item.item.nama_barang);
+                    // Transform the data for display
+                    res(data.map(item => ({
+                        label: `${item.kode} - ${item.nama_barang}`,
+                        value: item.kode,
+                        item: item
+                    })));
+                }).fail(() => res([]));
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                if (!ui.item) return false;
 
-                    // Set conversion factor value
-                    const convFactor = ui.item.item.conv_factor || 1;
-                    row.find('input[name$="[conv_factor]"]').val(convFactor);
-
-                    const satuanDisplay = ui.item.item.satuan_1 +
-                        (ui.item.item.satuan_2 ? '/' + ui.item.item.satuan_2 : '');
-                    row.find('input[name$="[satuan]"]').val(satuanDisplay);
-
-                    const harga_satuan_field = row.find('input[name$="[harga_satuan]"]');
-                    harga_satuan_field.val(formatCurrency(ui.item.item.harga_beli));
-                    harga_satuan_field.attr('data-raw-value', ui.item.item.harga_beli); // Store raw value
-
-
-                    // Calculate row amounts
-                    calculateRowTotal(row);
-                    updateTotals();
-
-                    return false; // Prevent default behavior
-                }
-            }).autocomplete("instance")._renderItem = function (ul, item) {
-                const formattedPrice = formatCurrency(item.item.harga_beli);
-
-                // Custom rendering of dropdown items
-                return $("<li>")
-                    .append(`<div><strong>${item.item.kode}</strong> - ${item.item.nama_barang} <br>
-                             <small>Satuan: ${item.item.satuan_1}${item.item.satuan_2 ? '/' + item.item.satuan_2 : ''}, 
-                             Harga: ${formattedPrice}</small></div>`)
-                    .appendTo(ul);
-            };
-        }
+                // Fill the form fields with the selected item's data
+                const row = $(this).closest('tr');
+                fillAutoCompleteFields(row, ui.item.item);
+                calculateRowTotal(row);
+                updateTotals();
+                return false; // Prevent default behavior
+            }
+        }).autocomplete("instance")._renderItem = (ul, item) => $("<li>")
+            .append(`
+                <div><strong>${item.item.kode}</strong> - ${item.item.nama_barang} <br>
+                <small>Satuan: ${item.item.satuan_1}${item.item.satuan_2 ? '/' + item.item.satuan_2 : ''},
+                Harga: ${formatCurrency(item.item.harga_beli)}</small></div>`)
+            .appendTo(ul);
     });
 }
 
-/**
- * Format a number as Indonesian currency
- */
-function formatCurrency(number) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(number);
-}
-
-/**
- * Format numeric fields in a row to display properly
- */
-function formatNumericFields(row) {
-    // Format currency display fields but keep raw values for calculations
-    const currencyFields = ['input[name$="[jml_harga]"]', 'input[name$="[disc_1_rp]"]',
-        'input[name$="[disc_2_rp]"]', 'input[name$="[total]"]'
-    ];
-
-    currencyFields.forEach(selector => {
-        const field = row.find(selector);
-        const rawValue = field.val() || 0;
-        if (rawValue) {
-            // Store the raw value as a data attribute
-            field.attr('data-raw-value', rawValue);
-            // Display formatted value
-            field.val(formatCurrency(rawValue));
-        }
-    });
+function fillAutoCompleteFields(row, item) {
+    row.find('input[name$="[id_stock]"]').val(item.id_stock);
+    row.find('input[name$="[kode]"]').val(item.kode);
+    row.find('input[name$="[nama_barang]"]').val(item.nama_barang);
+    row.find('input[name$="[conv_factor]"]').val(item.conv_factor || 1);
+    row.find('input[name$="[satuan]"]').val(item.satuan_1 + (item.satuan_2 ? '/' + item.satuan_2 : ''));
+    row.find('input[name$="[harga_satuan]"]').val(formatCurrency(item.harga_beli)).attr('data-raw-value', item.harga_beli);
+    row.find('input[name$="[disc_1_perc]"]').val(0).attr('data-raw-value', 0);
+    row.find('input[name$="[disc_1_rp]"]').val(0).attr('data-raw-value', 0);
+    row.find('input[name$="[disc_2_perc]"]').val(0).attr('data-raw-value', 0);
+    row.find('input[name$="[disc_2_rp]"]').val(0).attr('data-raw-value', 0);
+    // Clear quantity fields
+    row.find('input[name$="[qty1]"]').val(0);
+    row.find('input[name$="[qty2]"]').val(0);
 }

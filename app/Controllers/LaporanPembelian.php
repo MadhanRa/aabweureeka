@@ -44,9 +44,12 @@ class LaporanPembelian extends ResourceController
         $sum_disc_cash = 0;
         $sum_ppn = 0;
         foreach ($dtpembelian as $row) {
-            $disc_cash = floatval($row->disc_cash);
             $sub_total = floatval($row->sub_total);
-            $disc = $sub_total * ($disc_cash / 100);
+            if ($row->disc_cash > 0) {
+                $disc = $sub_total * (floatval($row->disc_cash) / 100);
+            } else {
+                $disc = floatval($row->disc_cash_rp);
+            }
             $dpp = $sub_total - $disc;
             if ($row->ppn_option == 'exclude') {
                 $ppn = $dpp * (floatval($row->ppn) / 100);
