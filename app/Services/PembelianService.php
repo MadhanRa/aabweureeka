@@ -157,15 +157,12 @@ class PembelianService
 
         // 1. Ambil nilai lama dari detail pembelian jika ada
         $oldDetailValues = $this->getExistingDetailValues($detail);
-        log_message('debug', 'Old Detail Values: ' . json_encode($oldDetailValues));
 
         // 2. Ekstrak nilai baru dari detail
         $newValues = $this->extractDetailValues($detail);
-        log_message('debug', 'New Detail Values: ' . json_encode($newValues));
 
         // 3. Hitung perubahan dalam kuantitas normal dan harga
         $changes = $this->calculateChanges($oldDetailValues, $newValues);
-        log_message('debug', 'Changes: ' . json_encode($changes));
 
         // 4. Dapatkan atau buat record stok
         $this->updateOrCreateStock($headerData['id_lokasi'], $detail['id_stock'], $changes, $newValues);

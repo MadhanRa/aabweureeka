@@ -9,9 +9,90 @@ $(document).ready(function () {
 const SELECTORS = {
     ppnOption: 'input[name="ppn_option"]',
     kodeInput: 'input[name$="[kode]"]',
-    form: '#formPenjualan',
+    form: '#formReturPenjualan',
     tabelDetail: '#tabelDetail tbody',
 };
+
+function pilihNota(id) {
+    const url = $('#modalNotaPenjualan').data('nota-url');
+    // Fungsi untuk mencari nota penjualan dan autofill data
+    $.ajax({
+        url: url + id,
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.status) {
+                const header = data.data['header'];
+                const detail = data.data['detail'];
+                // Autofill dataheader
+                $('input[name="id_penjualan"]').val(header.id_penjualan);
+                $('input[name="tgl_penjualan"]').val(header.tanggal);
+                $('input[name="nota_penjualan"]').val(header.nota);
+                $('select[name="id_salesman"]').val(header.id_salesman);
+                $('select[name="id_pelanggan"]').val(header.id_pelanggan);
+                $('select[name="id_lokasi"]').val(header.id_lokasi);
+                $('input[name="disc_cash"]').val(header.disc_cash);
+                $('input[name="ppn"]').val(header.ppn);
+                $('input[name="ppn_option"][value="' + header.ppn_option + '"]').prop('checked', true);
+
+                populateDetailRows(detail);
+
+                $('#btnAddRow').prop('disabled', true); // disable button
+
+                // Close modal
+                $('#modalNotaPenjualan').modal('hide');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching nota penjualan:', error);
+        }
+    });
+}
+
+function populateDetailRows(details) {
+    // Clear existing rows except first template row
+    const $tbody = $('#tabelDetail tbody');
+    if ($tbody.children().length > 1) {
+        $tbody.children().slice(1).remove();
+    }
+
+    // Reset rowCounter
+    rowCounter = 1;
+
+    // Populate first row
+    if (details.length > 0) {
+        populateRowWithData($tbody.children().first(), details[0]);
+    }
+
+    // Add additional rows
+    for (let i = 1; i < details.length; i++) {
+        addNewRow(rowCounter++);
+        populateRowWithData($tbody.children().last(), details[i]);
+    }
+    // Update calculations
+    updateTotals();
+}
+
+function populateRowWithData($row, data) {
+    // Set values in the row
+    $row.find('input[name$="[id_stock]"]').val(data.id_stock);
+    $row.find('input[name$="[kode]"]').val(data.kode);
+    $row.find('input[name$="[conv_factor]"]').val(data.conv_factor);
+    $row.find('input[name$="[nama_barang]"]').val(data.nama_barang);
+    $row.find('input[name$="[satuan]"]').val(data.satuan);
+    $row.find('input[name$="[qty1]"]').val(data.qty1);
+    $row.find('input[name$="[qty2]"]').val(data.qty2);
+    $row.find('input[name$="[harga_satuan]"]').val(data.harga_satuan).attr('data-raw-value', data.harga_satuan);
+    $row.find('input[name$="[harga_satuan_exclude]"]').val(data.harga_jualexc);
+    $row.find('input[name$="[harga_satuan_include]"]').val(data.harga_jualinc);
+    $row.find('input[name$="[disc_1_perc]"]').val(data.disc_1_perc);
+    $row.find('input[name$="[disc_1_rp]"]').val(data.disc_1_rp).attr('data-raw-value', data.disc_1_rp);
+    $row.find('input[name$="[disc_2_perc]"]').val(data.disc_2_perc);
+    $row.find('input[name$="[disc_2_rp]"]').val(data.disc_2_rp).attr('data-raw-value', data.disc_2_rp);
+
+    // Calculate row total
+    calculateRowTotal($row);
+}
 
 /**
  * Handle toggling of the PPN input field based on the selected PPN option
@@ -105,7 +186,7 @@ function formatDate(date) {
  */
 function initFormHandlers() {
     // Row counter for dynamic rows
-    let rowCounter = 1;
+    let rowCounter = $('#tabelDetail tbody tr').length; // Start from the last row index
     $('#btnAddRow').click(() => addNewRow(rowCounter++));
 
     // Remove row button handler (using event delegation)
@@ -367,7 +448,10 @@ function submitForm(form) {
             // Disable submit button to prevent double submission
             form.find('button[type="submit"]').prop('disabled', true);
         },
-        success: res => handleAjaxResponse(res, form),
+        success: res => {
+            console.log(res);
+            handleAjaxResponse(res, form)
+        },
         error: function (xhr, status, error) {
             alert('Error: ' + error);
             form.find('button[type="submit"]').prop('disabled', false);
@@ -399,7 +483,6 @@ function handleAjaxResponse(response, form) {
     }
 }
 
-
 /**
  * Activate autocomplete on stock code inputs
  */
@@ -411,9 +494,7 @@ function activateAutocomplete() {
 
         $(this).autocomplete({
             source: function (req, res) {
-                $.get(url, {
-                    term: req.term,
-                }, data => {
+                $.get(url, { term: req.term }, data => {
                     if (!data || !data.length) return res([]);
 
                     // Transform the data for display
@@ -474,4 +555,83 @@ function fillAutoCompleteFields(row, item, ppnOption) {
     // Clear quantity fields
     row.find('input[name$="[qty1]"]').val(0);
     row.find('input[name$="[qty2]"]').val(0);
+}
+
+/**
+ * Initialize form data when page loads
+ */
+function initializeFormData() {
+    // Format currency fields in header section
+    formatHeaderFields();
+
+    // Format and calculate row totals for existing rows
+    $('#tabelDetail tbody tr').each(function () {
+        formatRowData($(this));
+    });
+
+    // Calculate overall totals
+    updateTotals();
+}
+
+/**
+ * Format header currency fields
+ */
+function formatHeaderFields() {
+    const currencyFields = [
+        '#sub_total',
+        '#disc_cash_rp',
+        'input[name="netto"]',
+        '#grand_total',
+
+    ];
+
+    currencyFields.forEach(selector => {
+        const field = $(selector);
+        const rawValue = parseFloat(field.val().replace(/[^\d,-]/g, '')) || 0;
+
+        // Store raw value for calculations
+        field.attr('data-raw-value', rawValue);
+
+        // Format display value
+        field.val(formatCurrency(rawValue));
+    });
+
+    // Initialize disc_cash_amount based on subtotal and disc_cash percent
+    const subTotal = parseFloat($('#sub_total').attr('data-raw-value')) || 0;
+    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
+    const discCashAmount = (discCashPerc / 100) * subTotal;
+    $('input[name="disc_cash_rp"]').val(formatCurrency(discCashAmount));
+}
+
+/**
+ * Format numeric data in a row and set data attributes
+ */
+function formatRowData(row) {
+    // Set raw values for price and amounts
+    const hargaSatuanField = row.find('input[name$="[harga_satuan]"]');
+    const rawHargaSatuan = parseFloat(hargaSatuanField.val().replace(/[^\d,-]/g, '')) || 0;
+    hargaSatuanField.attr('data-raw-value', rawHargaSatuan);
+
+    // Format currency fields in the row
+    const currencyFields = [
+        'input[name$="[harga_satuan]"]',
+        'input[name$="[jml_harga]"]',
+        'input[name$="[disc_1_rp]"]',
+        'input[name$="[disc_2_rp]"]',
+        'input[name$="[total]"]'
+    ];
+
+    currencyFields.forEach(selector => {
+        const field = row.find(selector);
+        const rawValue = parseFloat(field.val().replace(/[^\d,-]/g, '')) || 0;
+
+        // Store raw value for calculations
+        field.attr('data-raw-value', rawValue);
+
+        // Format display value
+        field.val(formatCurrency(rawValue));
+    });
+
+    // Recalculate row total based on current values
+    calculateRowTotal(row);
 }

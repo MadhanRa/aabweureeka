@@ -37,7 +37,7 @@
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pembelian/pembelian') ?>">Pembelian</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pembelian/returpembelian') ?>">Retur Pembelian</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penjualan/penjualan') ?>">Penjualan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/returpenjualan') ?>">Retur Penjualan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penjualan/returpenjualan') ?>">Retur Penjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penyesuaianstock') ?>">Penyesuaian Stock</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pindahlokasi') ?>">Pindah Lokasi</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/bahansablon') ?>">Bahan Di Sablon</a></li>

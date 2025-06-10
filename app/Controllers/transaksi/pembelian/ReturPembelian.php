@@ -145,7 +145,6 @@ class ReturPembelian extends ResourceController
 
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
         $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
         $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
         $data['dtpembelian'] = $this->objPembelian->getAll();
 

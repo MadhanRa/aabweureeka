@@ -9,9 +9,90 @@ $(document).ready(function () {
 const SELECTORS = {
     ppnOption: 'input[name="ppn_option"]',
     kodeInput: 'input[name$="[kode]"]',
-    form: '#formPenjualan',
+    form: '#formReturPenjualan',
     tabelDetail: '#tabelDetail tbody',
 };
+
+function pilihNota(id) {
+    const url = $('#modalNotaPenjualan').data('nota-url');
+    // Fungsi untuk mencari nota penjualan dan autofill data
+    $.ajax({
+        url: url + id,
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.status) {
+                const header = data.data['header'];
+                const detail = data.data['detail'];
+                // Autofill dataheader
+                $('input[name="id_penjualan"]').val(header.id_penjualan);
+                $('input[name="tgl_penjualan"]').val(header.tanggal);
+                $('input[name="nota_penjualan"]').val(header.nota);
+                $('select[name="id_salesman"]').val(header.id_salesman);
+                $('select[name="id_pelanggan"]').val(header.id_pelanggan);
+                $('select[name="id_lokasi"]').val(header.id_lokasi);
+                $('input[name="disc_cash"]').val(header.disc_cash);
+                $('input[name="ppn"]').val(header.ppn);
+                $('input[name="ppn_option"][value="' + header.ppn_option + '"]').prop('checked', true);
+
+                populateDetailRows(detail);
+
+                $('#btnAddRow').prop('disabled', true); // disable button
+
+                // Close modal
+                $('#modalNotaPenjualan').modal('hide');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching nota penjualan:', error);
+        }
+    });
+}
+
+function populateDetailRows(details) {
+    // Clear existing rows except first template row
+    const $tbody = $('#tabelDetail tbody');
+    if ($tbody.children().length > 1) {
+        $tbody.children().slice(1).remove();
+    }
+
+    // Reset rowCounter
+    rowCounter = 1;
+
+    // Populate first row
+    if (details.length > 0) {
+        populateRowWithData($tbody.children().first(), details[0]);
+    }
+
+    // Add additional rows
+    for (let i = 1; i < details.length; i++) {
+        addNewRow(rowCounter++);
+        populateRowWithData($tbody.children().last(), details[i]);
+    }
+    // Update calculations
+    updateTotals();
+}
+
+function populateRowWithData($row, data) {
+    // Set values in the row
+    $row.find('input[name$="[id_stock]"]').val(data.id_stock);
+    $row.find('input[name$="[kode]"]').val(data.kode);
+    $row.find('input[name$="[conv_factor]"]').val(data.conv_factor);
+    $row.find('input[name$="[nama_barang]"]').val(data.nama_barang);
+    $row.find('input[name$="[satuan]"]').val(data.satuan);
+    $row.find('input[name$="[qty1]"]').val(data.qty1);
+    $row.find('input[name$="[qty2]"]').val(data.qty2);
+    $row.find('input[name$="[harga_satuan]"]').val(data.harga_satuan).attr('data-raw-value', data.harga_satuan);
+    $row.find('input[name$="[harga_satuan_exclude]"]').val(data.harga_jualexc);
+    $row.find('input[name$="[harga_satuan_include]"]').val(data.harga_jualinc);
+    $row.find('input[name$="[disc_1_perc]"]').val(data.disc_1_perc);
+    $row.find('input[name$="[disc_1_rp]"]').val(data.disc_1_rp).attr('data-raw-value', data.disc_1_rp);
+    $row.find('input[name$="[disc_2_perc]"]').val(data.disc_2_perc);
+    $row.find('input[name$="[disc_2_rp]"]').val(data.disc_2_rp).attr('data-raw-value', data.disc_2_rp);
+
+    // Calculate row total
+    calculateRowTotal($row);
+}
 
 /**
  * Handle toggling of the PPN input field based on the selected PPN option
@@ -399,7 +480,6 @@ function handleAjaxResponse(response, form) {
     }
 }
 
-
 /**
  * Activate autocomplete on stock code inputs
  */
@@ -411,9 +491,7 @@ function activateAutocomplete() {
 
         $(this).autocomplete({
             source: function (req, res) {
-                $.get(url, {
-                    term: req.term,
-                }, data => {
+                $.get(url, { term: req.term }, data => {
                     if (!data || !data.length) return res([]);
 
                     // Transform the data for display

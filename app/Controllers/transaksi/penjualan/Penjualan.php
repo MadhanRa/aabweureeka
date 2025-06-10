@@ -39,6 +39,7 @@ class Penjualan extends ResourceController
         $this->objStock = new ModelStock();
         $this->db = \Config\Database::connect();
 
+
         // Inisialisasi service
         $this->penjualanService = new PenjualanService(
             $this->objPenjualan,
@@ -52,6 +53,7 @@ class Penjualan extends ResourceController
             $this->objSetupsalesman,
             $this->db
         );
+        helper('terbilang');
     }
 
     protected function getCommonData()
@@ -103,6 +105,11 @@ class Penjualan extends ResourceController
             if (empty($data['dtpenjualan'])) {
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
+            log_message("info", "Data penjualan dengan ID {$id} memiliki data: " . json_encode($data['dtpenjualan']));
+            $data['dtdetail'] = $this->objPenjualanDetail->select('*')
+                ->where('id_penjualan', $id)
+                ->findAll();
+            $data['dtpenjualan']->terbilang = terbilang($data['dtpenjualan']->grand_total);
         }
 
         // Debugging: Tampilkan konten HTML sebelum PDF
@@ -117,18 +124,21 @@ class Penjualan extends ResourceController
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
 
-        // Set font
-        $pdf->SetFont('helvetica', '', 12);
+        // Set margin
+        $pdf->SetMargins(5, 5, 5);
 
+        // Set font
+        $pdf->SetFont('Helvetica', '', 12);
         // Tambah halaman baru
         $pdf->AddPage();
+
 
         // Cetak konten menggunakan WriteHTML
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Set tipe respons menjadi PDF
         $this->response->setContentType('application/pdf');
-        $pdf->Output('nota_penjualan.pdf', 'D');
+        $pdf->Output('nota_penjualan.pdf', 'I');
     }
 
     /**
@@ -140,7 +150,33 @@ class Penjualan extends ResourceController
      */
     public function show($id = null)
     {
-        //
+        if ($this->request->isAJAX()) {
+            $dtpenjualan = $this->objPenjualan->find($id);
+
+            if (!$dtpenjualan) {
+                return $this->response->setJSON([
+                    'status' => 'false',
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+
+            $dtdetail = $this->objPenjualanDetail->select('penjualan1_detail.*, stock1.conv_factor')
+                ->join('stock1', 'penjualan1_detail.id_stock = stock1.id_stock', 'left')
+                ->where('penjualan1_detail.id_penjualan', $id)
+                ->findAll();
+
+            $msg = [
+                'status' => 'success',
+                'data' => [
+                    'header' => $dtpenjualan,
+                    'detail' => $dtdetail,
+                ]
+            ];
+
+            return $this->response->setJSON($msg);
+        } else {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
     }
 
     /**

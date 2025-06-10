@@ -111,15 +111,11 @@ $routes->group('transaksi', static function ($routes) {
         $routes->resource('penjualan');
 
         //routes untuk returpenjualan
-        $routes->get('/returpenjualan/new', 'ReturPenjualan::new');
-        $routes->resource('returpenjualan');
-        $routes->post('/returpenjualan', 'ReturPenjualan::create');
-        $routes->post('/returpenjualan/(:any)', 'ReturPenjualan::delete/$1');
-        $routes->get('returpenjualan', 'ReturPenjualan::index');
         $routes->get('returpenjualan/printPDF/(:num)', 'ReturPenjualan::printPDF/$1');
         $routes->get('returpenjualan/printPDF', 'ReturPenjualan::printPDF');
         $routes->put('/returpenjualan/(:segment)', 'ReturPenjualan::update/$1', ['filter' => 'role:admin']);
         $routes->put('/returpenjualan/(:segment)/edit', 'ReturPenjualan::edit/$1', ['filter' => 'role:admin']);
+        $routes->resource('returpenjualan');
     });
 });
 

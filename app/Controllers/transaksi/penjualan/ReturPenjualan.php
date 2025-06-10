@@ -1,29 +1,53 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi\penjualan;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelPenjualan;
-use App\Models\ModelSetupsalesman;
-use App\Models\ModelReturPenjualan;
-use App\Models\ModelSetuppelanggan;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelStock;
+use App\Models\setup_persediaan\ModelStockGudang;
+use App\Models\transaksi\penjualan\ModelPenjualan;
+use App\Models\transaksi\penjualan\ModelReturPenjualan;
+use App\Models\transaksi\penjualan\ModelReturPenjualanDetail;
+use App\Models\transaksi\penjualan\ModelPenjualanDetail;
+use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\setup\ModelSetuppelanggan;
+use App\Models\setup\ModelSetupsalesman;
+use App\Models\setup\ModelSetupBuku;
+use App\Models\setup\ModelHutangPiutang;
+use App\Models\setup\ModelAntarmuka;
+use App\Services\ReturPenjualanService;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use TCPDF;
 
 class ReturPenjualan extends ResourceController
 {
-    protected $objLokasi, $objSatuan, $objSetupsalesman, $objPenjualan, $objReturPenjualan,$objPelanggan, $db;
+    protected $objLokasi, $objSatuan, $objSetupsalesman, $objPenjualan, $objReturPenjualan, $objReturPenjualanDetail, $objPelanggan, $objStock, $db;
+    protected $returPenjualanService;
+
     function __construct()
     {
         $this->objLokasi = new ModelLokasi();
-        $this->objSatuan = new ModelSatuan();
         $this->objSetupsalesman = new ModelSetupsalesman();
         $this->objPelanggan = new ModelSetuppelanggan();
         $this->objPenjualan = new ModelPenjualan();
         $this->objReturPenjualan = new ModelReturPenjualan();
+        $this->objReturPenjualanDetail = new ModelReturPenjualanDetail();
+        $this->objStock = new ModelStock();
         $this->db = \Config\Database::connect();
+
+        $this->returPenjualanService = new ReturPenjualanService(
+            $this->objReturPenjualan,
+            $this->objReturPenjualanDetail,
+            new ModelStockGudang(),
+            new ModelSetupBuku(),
+            new ModelRiwayatTransaksi(),
+            new ModelHutangPiutang(),
+            new ModelAntarmuka(),
+            $this->objPelanggan,
+            $this->objSetupsalesman,
+            $this->db
+        );
     }
     /**
      * Return an array of resource objects, themselves in array format.
@@ -45,18 +69,23 @@ class ReturPenjualan extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
-         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-         $data['dtreturpenjualan'] = $this->objReturPenjualan->getAll();
-         $data['dtpelanggan'] = $this->objPelanggan->getAll();
-         $data['dtlokasi'] = $this->objLokasi->getAll();
-         $data['dtsatuan'] = $this->objSatuan->getAll();
-         $data['dtsalesman'] = $this->objSetupsalesman->getAll();
-         $data['dtpenjualan'] = $this->objPenjualan->getAll();
- 
-         return view('returpenjualan/index', $data);
+        // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
+        $data['dtreturpenjualan'] = $this->objReturPenjualan->getAll();
+
+        return view('transaksi/penjualan_v/returpenjualan/index', $data);
+    }
+
+    protected function getCommonData()
+    {
+        // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
+        $data['dtlokasi'] = $this->objLokasi->getAll();
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
+        $data['dtpelanggan'] = $this->objPelanggan->findAll();
+
+        return $data;
     }
 
     public function printPDF($id = null)
@@ -71,33 +100,31 @@ class ReturPenjualan extends ResourceController
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
         }
-        
+
+        $data = $this->getCommonData();
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->getAll();
-        $data['dtpenjualan'] = $this->objPenjualan->getAll();
-        $data['dtpelanggan'] = $this->objPelanggan->getAll();
         // Debugging: Tampilkan konten HTML sebelum PDF
-        $html = view('returpenjualan/printPDF', $data);
+        $html = view('transaksi/penjualan_v/returpenjualan/printPDF', $data);
         // echo $html;
         // exit; // Jika perlu debugging
-    
+
         // Buat PDF baru
         $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
-    
+
         // Hapus header/footer default
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
-    
+
         // Set font
         $pdf->SetFont('helvetica', '', 12);
-    
+
         // Tambah halaman baru
         $pdf->AddPage();
-    
+
         // Cetak konten menggunakan WriteHTML
         $pdf->writeHTML($html, true, false, true, false, '');
-    
+
         // Set tipe respons menjadi PDF
         $this->response->setContentType('application/pdf');
         $pdf->Output('retur_penjualan.pdf', 'D');
@@ -123,14 +150,58 @@ class ReturPenjualan extends ResourceController
     public function new()
     {
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-        $data['dtreturpenjualan'] = $this->objReturPenjualan->getAll();
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtpelanggan'] = $this->objPelanggan->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->getAll();
+        $data = $this->getCommonData();
         $data['dtpenjualan'] = $this->objPenjualan->getAll();
 
-        return view('returpenjualan/new', $data);
+        return view('transaksi/penjualan_v/returpenjualan/new', $data);
+    }
+
+    protected function getHeaderDataFromRequest(): array
+    {
+        return [
+            'tanggal' => $this->request->getVar('tanggal'),
+            'nota' => $this->request->getVar('nota'),
+            'id_pelanggan' => $this->request->getVar('id_pelanggan'),
+            'id_salesman' => $this->request->getVar('id_salesman'),
+            'id_lokasi' => $this->request->getVar('id_lokasi'),
+            'id_penjualan' => $this->request->getVar('id_penjualan'),
+            'opsi_return' => $this->request->getVar('opsi_return'),
+            'disc_cash' => $this->request->getVar('disc_cash') ?? 0,
+            'netto' => $this->request->getVar('netto_raw') ?? 0,
+            'ppn' => $this->request->getVar('ppn') ?? 0,
+            'ppn_option' => $this->request->getVar('ppn_option'),
+            'sub_total' => floatval($this->request->getVar('sub_total_raw')) ?? 0,
+            'grand_total' => floatval($this->request->getVar('grand_total_raw')) ?? 0,
+        ];
+    }
+
+    protected function saveData($id = null)
+    {
+        $headerData = $this->getHeaderDataFromRequest();
+        $detailData = $this->request->getVar('detail');
+
+        try {
+
+            $returpenjualan_id = $this->returPenjualanService->save(
+                $headerData,
+                $detailData,
+                $id
+            );
+
+            if ($returpenjualan_id) {
+                $message = $id ? 'Data berhasil diubah!' : 'Data berhasil disimpan!';
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => $message,
+                    'redirect_url' => site_url('transaksi/penjualan/returpenjualan')
+                ]);
+            }
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 'false',
+                'message' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -140,58 +211,7 @@ class ReturPenjualan extends ResourceController
      */
     public function create()
     {
-        // Ambil nilai dari form dan pastikan menjadi angka
-        $qty_1 = floatval($this->request->getVar('qty_1'));
-        $qty_2 = floatval($this->request->getVar('qty_2'));  // Ambil qty_2
-        $harga_satuan = floatval($this->request->getVar('harga_satuan'));
-        $disc_1 = floatval($this->request->getVar('disc_1'));
-        $disc_2 = floatval($this->request->getVar('disc_2'));
-        $disc_cash = floatval($this->request->getVar('disc_cash'));
-        $ppn = floatval($this->request->getVar('ppn'));
-
-        // Hitung jml_harga
-        $jml_harga = (($qty_1 + $qty_2) * $harga_satuan);  // Menghitung harga total berdasarkan qty_1, qty_2, dan harga_satuan
-
-        // Hitung diskon bertingkat
-        $totalAfterDisc1 = $jml_harga - (($jml_harga * $disc_1) / 100);  // Diskon pertama
-        $totalAfterDisc2 = $totalAfterDisc1 - (($totalAfterDisc1 * $disc_2) / 100);  // Diskon kedua
-
-        // Menghitung sub_total setelah diskon cash
-        $sub_total = $totalAfterDisc2 - (($totalAfterDisc2 * $disc_cash) / 100);
-
-        // Menghitung grand total setelah PPN
-        $grand_total = $sub_total + (($sub_total * $ppn) / 100);
-
-        // Simpan data ke database
-        $data = [
-            'tanggal'           => $this->request->getPost('tanggal'),
-            'nota'              => $this->request->getPost('nota'),
-            'id_pelanggan'      => $this->request->getPost('id_pelanggan'),
-            'id_setupsalesman'  => $this->request->getPost('id_setupsalesman'),
-            'id_lokasi'         => $this->request->getPost('id_lokasi'),
-            'nama_stock'        => $this->request->getPost('nama_stock'),
-            'id_satuan'         => $this->request->getPost('id_satuan'),
-            'qty_1' => $qty_1,
-            'qty_2' => $qty_2,
-            'harga_satuan' => $harga_satuan,
-            'jml_harga' => $jml_harga,
-            'disc_1' => $disc_1,
-            'disc_2' => $disc_2,
-            'total' => $totalAfterDisc2,
-            'id_penjualan_tgl'  => $this->request->getPost('id_penjualan_tgl'),
-            'id_penjualan_nota' => $this->request->getPost('id_penjualan_nota'),
-            'pembayaran'        => $this->request->getPost('pembayaran'),
-            'tipe'              => $this->request->getPost('tipe'),
-            'sub_total' => $sub_total,
-            'disc_cash' => $disc_cash,
-            'ppn' => $ppn,
-            'grand_total' => $grand_total,
-            'npwp' => $this->request->getVar('npwp'),
-            'terbilang' => $this->request->getVar('terbilang'),
-        ];
-        $this->db->table('returpenjualan1')->insert($data);
-
-        return redirect()->to(site_url('returpenjualan'))->with('Sukses', 'Data Berhasil Disimpan');
+        return $this->saveData();
     }
 
     /**
@@ -209,22 +229,23 @@ class ReturPenjualan extends ResourceController
         }
 
         // Ambil data berdasarkan ID
-        $dtreturpenjualan = $this->objReturPenjualan->find($id);
+        $dtheader = $this->objReturPenjualan->getById($id);
 
         // Cek jika data tidak ditemukan
-        if (!$dtreturpenjualan) {
+        if (!$dtheader) {
             return redirect()->to(site_url('returpenjualan'))->with('error', 'Data tidak ditemukan');
         }
 
+        // Ambil data detail berdasarkan ID
+        $dtdetail = $this->objReturPenjualanDetail->getById($id);
+
 
         // Lanjutkan jika semua pengecekan berhasil
-        $data['dtreturpenjualan'] = $dtreturpenjualan;
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtpelanggan'] = $this->objPelanggan->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->getAll();
+        $data = $this->getCommonData();
         $data['dtpenjualan'] = $this->objPenjualan->getAll();
-        return view('returpenjualan/edit', $data);
+        $data['dtheader'] = $dtheader;
+        $data['dtdetail'] = $dtdetail;
+        return view('transaksi/penjualan_v/returpenjualan/edit', $data);
     }
 
     /**
@@ -236,71 +257,18 @@ class ReturPenjualan extends ResourceController
      */
     public function update($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
-    }
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
 
-    // Cek apakah data dengan ID yang diberikan ada di database
-    $existingData = $this->objReturPenjualan->find($id);
-    if (!$existingData) {
-        return redirect()->to(site_url('returpenjualan'))->with('error', 'Data tidak ditemukan');
-    }
+        // Cek apakah data dengan ID yang diberikan ada di database
+        $existingData = $this->objReturPenjualan->find($id);
+        if (!$existingData) {
+            return redirect()->to(site_url('returpenjualan'))->with('error', 'Data tidak ditemukan');
+        }
 
-     // Ambil nilai dari form dan pastikan menjadi angka
-     $qty_1 = floatval($this->request->getVar('qty_1'));
-     $qty_2 = floatval($this->request->getVar('qty_2'));  // Ambil qty_2
-     $harga_satuan = floatval($this->request->getVar('harga_satuan'));
-     $disc_1 = floatval($this->request->getVar('disc_1'));
-     $disc_2 = floatval($this->request->getVar('disc_2'));
-     $disc_cash = floatval($this->request->getVar('disc_cash'));
-     $ppn = floatval($this->request->getVar('ppn'));
-
-     // Hitung jml_harga
-     $jml_harga = (($qty_1 + $qty_2) * $harga_satuan);  // Menghitung harga total berdasarkan qty_1, qty_2, dan harga_satuan
-
-     // Hitung diskon bertingkat
-     $totalAfterDisc1 = $jml_harga - (($jml_harga * $disc_1) / 100);  // Diskon pertama
-     $totalAfterDisc2 = $totalAfterDisc1 - (($totalAfterDisc1 * $disc_2) / 100);  // Diskon kedua
-
-     // Menghitung sub_total setelah diskon cash
-     $sub_total = $totalAfterDisc2 - (($totalAfterDisc2 * $disc_cash) / 100);
-
-     // Menghitung grand total setelah PPN
-     $grand_total = $sub_total + (($sub_total * $ppn) / 100);
-
-    // Ambil data yang diinputkan dari form
-    $data = [
-            'tanggal'           => $this->request->getPost('tanggal'),
-            'nota'              => $this->request->getPost('nota'),
-            'id_pelanggan'      => $this->request->getPost('id_pelanggan'),
-            'id_setupsalesman'  => $this->request->getPost('id_setupsalesman'),
-            'id_lokasi'         => $this->request->getPost('id_lokasi'),
-            'nama_stock'        => $this->request->getPost('nama_stock'),
-            'id_satuan'         => $this->request->getPost('id_satuan'),
-            'qty_1' => $qty_1,
-            'qty_2' => $qty_2,
-            'harga_satuan' => $harga_satuan,
-            'jml_harga' => $jml_harga,
-            'disc_1' => $disc_1,
-            'disc_2' => $disc_2,
-            'total' => $totalAfterDisc2,
-            'id_penjualan_tgl'  => $this->request->getPost('id_penjualan_tgl'),
-            'id_penjualan_nota' => $this->request->getPost('id_penjualan_nota'),
-            'pembayaran'        => $this->request->getPost('pembayaran'),
-            'tipe'              => $this->request->getPost('tipe'),
-            'sub_total' => $sub_total,
-            'disc_cash' => $disc_cash,
-            'ppn' => $ppn,
-            'grand_total' => $grand_total,
-            'npwp' => $this->request->getVar('npwp'),
-            'terbilang' => $this->request->getVar('terbilang'),
-    ];
-
-    // Update data berdasarkan ID
-    $this->objReturPenjualan->update($id, $data);
-
-    return redirect()->to(site_url('returpenjualan'))->with('success', 'Data berhasil diupdate.');
+        return $this->saveData($id);
     }
 
     /**

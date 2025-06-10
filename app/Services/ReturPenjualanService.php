@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\transaksi\penjualan\ModelPenjualan;
-use App\Models\transaksi\penjualan\ModelPenjualanDetail;
+use App\Models\transaksi\penjualan\ModelReturPenjualan;
+use App\Models\transaksi\penjualan\ModelReturPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelAntarmuka;
@@ -15,11 +15,11 @@ use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
 
-class PenjualanService
+class ReturPenjualanService
 {
     protected $riwayatTransaksi;
-    protected $penjualan;
-    protected $penjualanDetail;
+    protected $returPenjualan;
+    protected $returPenjualanDetail;
     protected $stockGudang;
     protected $bukuBesar;
     protected $riwayatHP;
@@ -32,8 +32,8 @@ class PenjualanService
     protected $db;
 
     public function __construct(
-        ModelPenjualan $penjualan,
-        ModelPenjualanDetail $detail,
+        ModelReturPenjualan $returpenjualan,
+        ModelReturPenjualanDetail $returdetail,
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
@@ -46,8 +46,8 @@ class PenjualanService
          */
         ConnectionInterface $db
     ) {
-        $this->penjualan = $penjualan;
-        $this->penjualanDetail = $detail;
+        $this->returPenjualan = $returpenjualan;
+        $this->returPenjualanDetail = $returdetail;
         $this->stockGudang = $stock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
@@ -64,15 +64,15 @@ class PenjualanService
 
         try {
 
-            $idPenjualan = $id
+            $idReturPenjualan = $id
                 ? $this->updateHeader($id, $headerData)
                 : $this->createHeader($headerData);
 
 
-            $this->saveDetails($idPenjualan, $detailData, $headerData);
+            $this->saveDetails($idReturPenjualan, $detailData, $headerData);
 
             $this->db->transCommit();
-            return $idPenjualan;
+            return $idReturPenjualan;
         } catch (\Throwable $e) {
             $this->db->transRollback();
             log_message('error', 'Error saving penjualan: ' . $e->getMessage());
@@ -82,12 +82,12 @@ class PenjualanService
 
     protected function createHeader(array $data): int
     {
-        return $this->penjualan->insert($data);
+        return $this->returPenjualan->insert($data);
     }
 
     protected function updateHeader($id, array $data): int
     {
-        $this->penjualan->update($id, $data);
+        $this->returPenjualan->update($id, $data);
         return $id;
     }
 
@@ -96,7 +96,7 @@ class PenjualanService
      */
     protected function restoreStock(int $idDetail, int $locationId): void
     {
-        $detail = $this->penjualanDetail->find($idDetail);
+        $detail = $this->returPenjualanDetail->find($idDetail);
 
         if (!$detail || empty($detail->id_stock)) {
             return;
@@ -126,44 +126,6 @@ class PenjualanService
         }
     }
 
-    /**
-     * Method untuk memverifikasi stok sebelum melakukan transaksi penjualan
-     * @throws \Exception jika stok tidak mencukupi
-     */
-    protected function verifyStockAvailability(array $details, int $locationId): void
-    {
-        foreach ($details as $detail) {
-            if (empty($detail['id_stock'])) continue;
-
-            $stock = $this->stockGudang->where([
-                'id_lokasi' => $locationId,
-                'id_stock' => $detail['id_stock']
-            ])->first();
-
-            if (!$stock) {
-                throw new \Exception("Stok dengan ID {$detail['id_stock']} tidak ditemukan di lokasi {$locationId}");
-            }
-
-            $new = $this->extractDetailValues($detail);
-            $old = [];
-
-            if (isset($detail['id_detail']) && !empty($detail['id_detail'])) {
-                $old = $this->getExistingDetailValues($detail);
-            }
-
-            $stock_normal_qty = $stock->qty1 * $new['conv_factor'] + $stock->qty2;
-            $old_normal_qty = isset($old['qty1']) ? $old['qty1'] * $new['conv_factor'] + $old['qty2'] : 0;
-            $new_normal_qty = $new['normal_qty'];
-
-            // Jika edit transaksi, kurangi yang lama kemudian tambahkan yang baru
-            $needed_qty = $new_normal_qty - $old_normal_qty;
-
-            if ($stock_normal_qty < $needed_qty) {
-                $produk = $this->getProductName($detail['id_stock']);
-                throw new \Exception("Stok {$produk} tidak mencukupi. Tersedia: {$stock_normal_qty}, dibutuhkan: {$needed_qty}");
-            }
-        }
-    }
 
     /**
      * Helper untuk mendapatkan nama produk
@@ -175,12 +137,10 @@ class PenjualanService
         return $produk ? $produk->nama_stock : "Produk #{$stockId}";
     }
 
-    protected function saveDetails(int $idPenjualan, array $newDetails, array $headerData)
+    protected function saveDetails(int $idReturPenjualan, array $newDetails, array $headerData)
     {
-        // Verifikasi ketersediaan stok sebelum menyimpan detail
-        $this->verifyStockAvailability($newDetails, $headerData['id_lokasi']);
 
-        $existing = $this->penjualanDetail->where('id_penjualan', $idPenjualan)->findAll();
+        $existing = $this->returPenjualanDetail->where('id_returpenjualan', $idReturPenjualan)->findAll();
         $existingIds = array_column($existing, 'id');
         $incomingIds = array_column($newDetails, 'id_detail');
 
@@ -188,7 +148,7 @@ class PenjualanService
         foreach ($existing as $row) {
             if (!in_array($row->id, $incomingIds)) {
                 $this->restoreStock($row->id, $headerData['id_lokasi']);
-                $this->penjualanDetail->delete($row->id);
+                $this->returPenjualanDetail->delete($row->id);
             }
         }
 
@@ -196,29 +156,30 @@ class PenjualanService
             // Skip empty rows (where there's no stock ID)
             if (empty($detail['id_stock'])) continue;
 
-            $detailPenjualan = new DetailItem($detail);
+
+            $detailReturPenjualan = new DetailItem($detail);
             // Create detail record
-            $detailRecord = $detailPenjualan->getRecords();
+            $detailRecord = $detailReturPenjualan->getRecords();
             $detailRecord = array_merge($detailRecord, [
-                'id_penjualan' => $idPenjualan,
+                'id_returpenjualan' => $idReturPenjualan,
             ]);
 
             if (isset($detail['id_detail']) && in_array($detail['id_detail'], $existingIds)) {
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
-                $this->penjualanDetail->update($detail['id_detail'], $detailRecord);
+                $this->returPenjualanDetail->update($detail['id_detail'], $detailRecord);
             } else {
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
-                $this->penjualanDetail->insert($detailRecord);
+                $this->returPenjualanDetail->insert($detailRecord);
             }
         }
 
-        if (isset($headerData['opsi_pembayaran'])) {
-            if ($headerData['opsi_pembayaran'] === 'kredit') {
-                $this->setPiutang($headerData, $idPenjualan);
-            } elseif ($headerData['opsi_pembayaran'] === 'tunai') {
-                $this->setPerubahanBukuBesar($headerData, $idPenjualan);
+        if (isset($headerData['opsi_return'])) {
+            if ($headerData['opsi_return'] === 'kredit') {
+                $this->setPiutang($headerData, $idReturPenjualan);
+            } elseif ($headerData['opsi_return'] === 'tunai') {
+                $this->setPerubahanBukuBesar($headerData, $idReturPenjualan);
             }
         }
     }
@@ -236,18 +197,14 @@ class PenjualanService
         if (empty($detail['id_stock'])) {
             return;
         }
-
         // 1. Ambil nilai lama dari detail pembelian jika ada
         $oldDetailValues = $this->getExistingDetailValues($detail);
-
         // 2. Ekstrak nilai baru dari detail
-        $newValues = $this->extractDetailValues($detail);
-
+        $newValues = $this->extractNewDetailValues($detail);
         // 3. Hitung perubahan dalam kuantitas normal dan harga
         $changes = $this->calculateChanges($oldDetailValues, $newValues);
-
         // 4. Dapatkan atau buat record stok
-        $this->updateOrCreateStock($headerData['id_lokasi'], $detail['id_stock'], $changes, $newValues);
+        $this->updateStock($headerData['id_lokasi'], $detail['id_stock'], $changes, $newValues);
     }
 
     /**
@@ -262,7 +219,7 @@ class PenjualanService
         ];
 
         if (isset($detail['id_detail']) && !empty($detail['id_detail'])) {
-            $existingDetail = $this->penjualanDetail->find($detail['id_detail']);
+            $existingDetail = $this->returPenjualanDetail->find($detail['id_detail']);
             if ($existingDetail) {
                 $result = [
                     'qty1' => floatval($existingDetail->qty1),
@@ -278,7 +235,7 @@ class PenjualanService
     /**
      * Ekstrak dan konversi nilai dari detail pembelian baru
      */
-    private function extractDetailValues(array $detail): array
+    private function extractNewDetailValues(array $detail): array
     {
         $conv_factor = floatval($detail['conv_factor']);
         $qty1 = floatval($detail['qty1']);
@@ -307,9 +264,8 @@ class PenjualanService
             ? $old['qty1'] * $new['conv_factor'] + $old['qty2']
             : 0;
 
-        // Untuk penjualan, qty_diff dikalikan -1 karena mengurangi stok
         return [
-            'qty_diff' => -1 * ($new['normal_qty'] - $old_normal_qty), // Negatif karena kita mengurangi stok
+            'qty_diff' => $new['normal_qty'] - $old_normal_qty,
             'price_diff' => $new['jml_harga'] - $old['jml_harga']
         ];
     }
@@ -317,7 +273,7 @@ class PenjualanService
     /**
      * Update stok yang ada atau buat record baru
      */
-    private function updateOrCreateStock(int $locationId, int $stockId, array $changes, array $newValues): void
+    private function updateStock(int $locationId, int $stockId, array $changes, array $newValues): void
     {
         // Cari stok yang sudah ada
         $existingStock = $this->stockGudang->where([
@@ -347,8 +303,7 @@ class PenjualanService
         $new_qty1 = floor($new_normal_qty / $newValues['conv_factor']);
         $new_qty2 = $new_normal_qty % $newValues['conv_factor'];
 
-        $new_jmlHarga = $old_jmlHarga - $changes['price_diff'];
-
+        $new_jmlHarga = $old_jmlHarga + $changes['price_diff'];
         $this->stockGudang->update($existingStock->id, [
             'qty1' => $new_qty1,
             'qty2' => $new_qty2,
@@ -359,7 +314,7 @@ class PenjualanService
     protected function getRekeningId(): Int
     {
         // Ambil rekening penjualan dari interface
-        $kode_rekening = $this->interface->getKodeRekening('penjualan');
+        $kode_rekening = $this->interface->getKodeRekening('retur_penjualan');
         if (!$kode_rekening) {
             throw new \Exception("Kode rekening untuk penjualan tidak ditemukan di antarmuka.");
         }
@@ -374,53 +329,53 @@ class PenjualanService
      * Set atau update perubahan buku besar untuk transaksi tunai
      * 
      * @param array $headerData Data header pembelian
-     * @param int $idPenjualan ID pembelian
+     * @param int $idReturPenjualan ID pembelian
      * @param float $tunai Jumlah tunai
      * @return void
      */
-    protected function setPerubahanBukuBesar(array $headerData, int $idPenjualan): void
+    protected function setPerubahanBukuBesar(array $headerData, int $idReturPenjualan): void
     {
-        // Cari riwayat transaksi kas masuk yang sudah ada (jika ada/ Edit)
-        $kas_masuk = $this->riwayatTransaksi
-            ->where('id_transaksi', $idPenjualan)
-            ->like('jenis_transaksi', 'penjualan')
+        // Cari riwayat transaksi kas keluar yang sudah ada (jika ada/ Edit)
+        $kas_keluar = $this->riwayatTransaksi
+            ->where('id_transaksi', $idReturPenjualan)
+            ->like('jenis_transaksi', 'retur penjualan')
             ->first();
 
-        $kredit_kas_masuk_lama = 0;
+        $debit_kas_keluar_lama = 0;
         $id_riwayat = null;
 
         // untuk edit transaksi
-        if ($kas_masuk) {
-            // Jika riwayat sudah ada, ambil nilai kredit lama dan ID riwayat
-            $id_riwayat = $kas_masuk->id;
-            $kredit_kas_masuk_lama = floatval($kas_masuk->kredit);
+        if ($kas_keluar) {
+            // Jika riwayat sudah ada, ambil nilai debit lama dan ID riwayat
+            $id_riwayat = $kas_keluar->id;
+            $debit_kas_keluar_lama = floatval($kas_keluar->debit);
         }
 
         // Ambil data rekening dan update saldo
-        $rekeningPenjualan = $this->getRekeningId();
-        $dt_rekening = $this->bukuBesar->find($rekeningPenjualan);
+        $rekeningReturPenjualan = $this->getRekeningId();
+        $dt_rekening = $this->bukuBesar->find($rekeningReturPenjualan);
         $old_saldo = floatval($dt_rekening->saldo_berjalan);
 
-        // Untuk update: kembalikan dulu saldo lama (jumlah kredit lama)
-        $current_saldo = $old_saldo - $kredit_kas_masuk_lama;
+        // Untuk update: kembalikan dulu saldo lama (jumlah debit lama)
+        $current_saldo = $old_saldo - $debit_kas_keluar_lama;
 
         // Lalu tambah dengan nilai tunai baru
         $new_saldo = $current_saldo + $headerData['grand_total'];
 
         // Update saldo rekening
-        $this->bukuBesar->update($rekeningPenjualan, [
+        $this->bukuBesar->update($rekeningReturPenjualan, [
             'saldo_berjalan' => $new_saldo
         ]);
 
         $transaksiData = [
             'tanggal' => $headerData['tanggal'],
-            'jenis_transaksi' => 'penjualan',
-            'id_transaksi' => $idPenjualan,
+            'jenis_transaksi' => 'retur penjualan',
+            'id_transaksi' => $idReturPenjualan,
             'nota' => $headerData['nota'],
-            'id_rekening' => $rekeningPenjualan,
-            'deskripsi' => 'Penjualan Tunai',
-            'debit' => '0',
-            'kredit' => $headerData['grand_total'],
+            'id_rekening' => $rekeningReturPenjualan,
+            'deskripsi' => 'Retur Penjualan Tunai',
+            'debit' => $headerData['grand_total'],
+            'kredit' => '0',
             'saldo_setelah' => $new_saldo
         ];
 
@@ -437,16 +392,16 @@ class PenjualanService
      * Set atau update hutang untuk transaksi
      * 
      * @param array $headerData Data header pembelian
-     * @param int $idPenjualan ID pembelian
+     * @param int $idReturPenjualan ID pembelian
      * @param float $hutang Jumlah hutang
      * @return void
      */
-    protected function setPiutang(array $headerData, int $idPenjualan): void
+    protected function setPiutang(array $headerData, int $idReturPenjualan): void
     {
         // Cari data piutang yang sudah ada (jika ada)
         $dt_piutang_lama = $this->riwayatHP
             ->where([
-                'id_transaksi' => $idPenjualan,
+                'id_transaksi' => $idReturPenjualan,
                 'relasi_id' => $headerData['id_pelanggan'],
                 'relasi_tipe' => 'pelanggan',
                 'jenis' => 'piutang'
@@ -455,7 +410,7 @@ class PenjualanService
 
         $data = [
             'tanggal' => $headerData['tanggal'],
-            'id_transaksi' => $idPenjualan,
+            'id_transaksi' => $idReturPenjualan,
             'nota' => $headerData['nota'],
             'tanggal_jt' => $headerData['tgl_jatuhtempo'],
             'saldo' => $headerData['grand_total'],

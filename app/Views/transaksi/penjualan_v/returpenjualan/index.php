@@ -8,21 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('returpenjualan/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
-  </div>
-
-  <!-- Tombol Print All -->
-  <div class="section-body">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <a href="<?= base_url('ReturPenjualan/printPDF') ?>" class="btn btn-success" target="_blank">
-            <i class="fas fa-print"></i> Cetak PDF
-          </a>
-        </div>
-      </div>
-    </div>
+    <h1>Dashboard Return Penjualan</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -43,6 +29,12 @@
     <div class="card">
       <div class="card-header">
         <h4>Transaksi Retur Penjualan</h4>
+        <div class="card-header-action">
+          <!-- <a href="<?= base_url('ReturPenjualan/printPDF') ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-print"></i> Cetak PDF
+          </a> -->
+          <a href="<?= site_url('transaksi/penjualan/returpenjualan/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+        </div>
       </div>
       <div class="section-body">
         <div class="card-body">
@@ -52,19 +44,12 @@
                 <tr class="eureeka-table-header">
                   <th>No</th>
                   <th>Tanggal</th>
-                  <th>Nota</th>
+                  <th>Nota Retur</th>
+                  <th>Nota Penjualan</th>
+                  <th>Tgl. Penjualan</th>
+                  <th>Salesman</th>
                   <th>Pelanggan</th>
-                  <!-- <th>Salesman</th>
-                          <th>Lokasi</th> -->
-                  <th>Nama Stock</th>
-                  <th>Satuan</th>
-                  <th>Qty 1</th>
-                  <th>Qty 2</th>
-                  <th>Harga</th>
-                  <th>Jml. Harga</th>
-                  <th>Disc.1</th>
-                  <th>Disc.2</th>
-                  <th>Total</th>
+                  <th>Lokasi Asal</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -75,18 +60,12 @@
                     <td><?= $key + 1 ?></td>
                     <td><?= $value->tanggal ?></td>
                     <td><?= $value->nota ?></td>
+                    <td><?= $value->nota_penjualan ?></td>
+                    <td><?= $value->tgl_penjualan ?></td>
+                    <td><?= $value->nama_salesman ?></td>
                     <td><?= $value->nama_pelanggan ?></td>
-                    <!-- <td><?= $value->nama_setupsalesman ?></td>
-                        <td><?= $value->lokasi_asal ?></td> -->
-                    <td><?= $value->nama_stock ?></td>
-                    <td><?= $value->kode_satuan ?></td>
-                    <td><?= $value->qty_1 ?></td>
-                    <td><?= $value->qty_2 ?></td>
-                    <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
-                    <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
-                    <td><?= $value->disc_1 ?></td>
-                    <td><?= $value->disc_2 ?></td>
-                    <td><?= "Rp " . number_format($value->total, 0, ',', '.') ?></td>
+                    <td><?= $value->lokasi_asal ?></td>
+
 
                     <td class="text-center">
                       <?php if ($is_closed === 'TRUE'): ?>
@@ -98,19 +77,19 @@
                         </button>
                       <?php else: ?>
                         <!-- Tombol Edit Data -->
-                        <a href="<?= site_url('returpenjualan/' . $value->id_returpenjualan) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
+                        <a href="<?= site_url('transaksi/penjualan/returpenjualan/' . $value->id_returpenjualan) .  '/edit' ?>" class="btn btn-warning"><i class="fas fa-pencil-alt btn-small"></i> Edit</a>
                         <input type="hidden" name="_method" value="PUT">
 
 
 
                         <!-- Tombol Hapus Data -->
-                        <form action="<?= site_url('returpenjualan/' . $value->id_returpenjualan) ?>" method="post" id="del-<?= $value->id_returpenjualan ?>" class="d-inline">
+                        <!-- <form action="<?= site_url('returpenjualan/' . $value->id_returpenjualan) ?>" method="post" id="del-<?= $value->id_returpenjualan ?>" class="d-inline">
                           <?= csrf_field() ?>
                           <input type="hidden" name="_method" value="DELETE">
                           <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id_returpenjualan ?>)">
                             <i class="fas fa-trash"></i>
                           </button>
-                        </form>
+                        </form> -->
                       <?php endif ?>
                       <!-- Tombol Print Data -->
                       <a href="<?= base_url('ReturPenjualan/printPDF/' . $value->id_returpenjualan) ?>" class="btn btn-success btn-small" target="_blank">
@@ -126,8 +105,24 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
+
+<script>
+  $(document).ready(function() {
+    $('#myTable').DataTable({
+      columnDefs: [{
+          targets: 8,
+          orderable: false,
+          searchable: false
+        },
+        {
+          targets: 2,
+          className: 'font-weight-bold',
+        }
+      ],
+    });
+  });
+</script>
 
 <?= $this->endSection(); ?>
