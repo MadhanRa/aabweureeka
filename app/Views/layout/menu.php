@@ -71,7 +71,7 @@
     <li><a class="nav-link text-dark" href="laporanpenjualan_st">Penjualan Per Salesman (Tahun)</a></li>
     <li><a class="nav-link text-dark" href="laporanpenjualan_pp">Penjualan Per Pelanggan</a></li>
     <li><a class="nav-link text-dark" href="laporanpenjualan_ppt">Penjualan Per Pelanggan (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Supplier Per Barang</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_sb">Penjualan Per Supplier Per Barang</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanreturpenjualan') ?>">ReturPenjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenyesuaianstock') ?>">Penyesuaian Stock</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpindahlokasi') ?>">Pindah Lokasi</a></li>

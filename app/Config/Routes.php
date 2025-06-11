@@ -454,7 +454,11 @@ $routes->get('laporanpenjualan_pp/printPDF', 'LaporanPenjualanPP::printPDF');
 
 //routes untuk penjualan per pelanggan (tahun)
 $routes->get('laporanpenjualan_ppt', 'LaporanPenjualanPPT::index');
-$routes->get('laporanpenjualan_pt/printPDF', 'LaporanPenjualanPPT::printPDF');
+$routes->get('laporanpenjualan_ppt/printPDF', 'LaporanPenjualanPPT::printPDF');
+
+//routes untuk penjualan per supplier per barang
+$routes->get('laporanpenjualan_sb', 'LaporanPenjualanSB::index');
+$routes->get('laporanpenjualan_sb/printPDF', 'LaporanPenjualanSB::printPDF');
 
 
 //laporanreturpenjualan

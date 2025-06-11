@@ -233,7 +233,7 @@ class ModelPenjualan extends Model
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_p3t($tahun, $salesman, $lokasi = null, $supplier = null, $stock = null, $pelanggan = null, $view_option)
+    public function get_laporan_p3t($tahun, $salesman, $lokasi = null, $supplier = null, $stock = null, $pelanggan = null, $view_option = 'qty')
     {
 
         if ($view_option == 'qty') {
@@ -389,7 +389,7 @@ class ModelPenjualan extends Model
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_ptb($tahun, $salesman, $lokasi = null, $supplier = null, $stock = null, $pelanggan = null, $view_option)
+    public function get_laporan_ptb($tahun, $salesman, $lokasi = null, $supplier = null, $stock = null, $pelanggan = null, $view_option = 'qty')
     {
 
         $builder = $this->db->table('penjualan1 p');
@@ -706,6 +706,65 @@ class ModelPenjualan extends Model
         return $builder->get()->getResult();
     }
 
+    public function get_laporan_sb($tglawal, $tglakhir)
+    {
+        $builder = $this->db->table('penjualan1 p');
+
+        // Pilih kolom yang dibutuhkan
+        $builder->select('
+            sp.kode AS kode_supplier,
+            sp.nama AS nama_supplier,
+            stck.conv_factor,
+            pd.kode AS kode_barang,
+            pd.nama_barang,
+            SUM(pd.qty1) AS qty1,
+            SUM(pd.qty2) AS qty2,
+            SUM(pd.harga_satuan) AS harga_satuan,
+            SUM(pd.jml_harga) AS jml_harga,  
+            SUM(pd.disc_1_perc) AS disc_1_perc, 
+            SUM(pd.disc_1_rp) AS disc_1_rp, 
+            SUM(pd.disc_2_perc) AS disc_2_perc,
+            SUM(pd.disc_2_rp) AS disc_2_rp,
+            SUM(pd.total) AS sub_total,
+            SUM(p.disc_cash) AS disc_cash,
+            SUM(p.netto) AS netto,
+            SUM(p.ppn) AS ppn,
+            SUM(p.grand_total) AS total
+        ');
+
+        // Join dengan tabel terkait
+        $builder->join('penjualan1_detail pd', 'p.id_penjualan = pd.id_penjualan', 'left');
+
+        $builder->join('stock1 stck', 'pd.id_stock = stck.id_stock', 'left');
+
+        $builder->join('setupsupplier1 sp', 'stck.id_setupsupplier = sp.id_setupsupplier', 'left');
+
+
+        // Filter tanggal
+        if (!empty($tglawal)) {
+            $builder->where('p.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('p.tanggal <=', $tglakhir);
+        }
+
+        // Group by stock-related columns only
+        $builder->groupBy([
+            'sp.id_setupsupplier',
+            'sp.kode',
+            'stck.conv_factor',
+            'sp.nama',
+            'pd.kode',
+            'pd.nama_barang',
+        ]);
+
+        // Order by stock code
+        $builder->orderBy('sp.id_setupsupplier');
+
+        // Eksekusi query dan kembalikan hasil
+        return $builder->get()->getResult();
+    }
+
 
     public function get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi = null)
     {
@@ -859,6 +918,40 @@ class ModelPenjualan extends Model
 
         $builder->groupBy([
             'pp.nama_pelanggan',
+        ]);
+
+
+        return $builder->get()->getResult();
+    }
+
+    public function get_laporan_summary_sb($tglawal, $tglakhir)
+    {
+        $builder = $this->db->table('penjualan1 p');
+        $builder->select('
+            sp.id_setupsupplier, 
+            SUM(pd.jml_harga) AS jml_harga,
+            SUM(pd.total) AS sub_total,
+            SUM(p.disc_cash) AS disc_cash,
+            SUM(p.netto) AS netto,
+            SUM(p.ppn) AS ppn,
+            SUM(p.grand_total) AS grand_total
+        ');
+
+        $builder->join('penjualan1_detail pd', 'p.id_penjualan = pd.id_penjualan', 'left');
+        $builder->join('stock1 stck', 'pd.id_stock = stck.id_stock', 'left');
+        $builder->join('setupsupplier1 sp', 'stck.id_setupsupplier = sp.id_setupsupplier', 'left');
+
+
+        // Filter tanggal
+        if (!empty($tglawal)) {
+            $builder->where('p.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('p.tanggal <=', $tglakhir);
+        }
+
+        $builder->groupBy([
+            'sp.id_setupsupplier',
         ]);
 
 

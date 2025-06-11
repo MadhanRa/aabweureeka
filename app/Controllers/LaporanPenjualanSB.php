@@ -3,26 +3,32 @@
 namespace App\Controllers;
 
 use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelStock;
+use App\Controllers\BaseController;
 use App\Models\transaksi\penjualan\ModelPenjualan;
 use App\Models\setup\ModelSetupsalesman;
-use App\Controllers\BaseController;
-use App\Models\transaksi\penjualan\ModelReturPenjualan;
+use App\Models\setup\ModelSetuppelanggan;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
-class LaporanReturPenjualan extends BaseController
+class LaporanPenjualanSB extends BaseController
 {
     protected $objLokasi;
     protected $objSetupsalesman;
     protected $objPenjualan;
-    protected $objReturPenjualan;
+    protected $objPelanggan;
+    protected $objSetupsupplier;
+    protected $objStock;
     protected $db;
     function __construct()
     {
         $this->objLokasi = new ModelLokasi();
         $this->objSetupsalesman = new ModelSetupsalesman();
         $this->objPenjualan = new ModelPenjualan();
-        $this->objReturPenjualan = new ModelReturPenjualan();
+        $this->objPelanggan = new ModelSetuppelanggan();
+        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->objStock = new ModelStock();
         $this->db = \Config\Database::connect();
     }
 
@@ -30,22 +36,11 @@ class LaporanReturPenjualan extends BaseController
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
         $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
-        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
-        $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
-
-        // ceck input
-        log_message('debug', 'Input Salesman: ' . $salesman);
-        log_message('debug', 'Input Lokasi: ' . $lokasi);
 
         // Panggil model untuk mendapatkan data laporan
-        $returpenjualan = $this->objReturPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan = $this->objPenjualan->get_laporan_sb($tglawal, $tglakhir);
 
-
-        $returpenjualan_summary = $this->objReturPenjualan->get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi);
-
-        //cek data
-        log_message('debug', 'Data returpenjualan: ' . print_r($returpenjualan, true));
-        log_message('debug', 'Data returpenjualan_summary: ' . print_r($returpenjualan_summary, true));
+        $penjualan_summary = $this->objPenjualan->get_laporan_summary_sb($tglawal, $tglakhir);
 
         // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
         $jml_harga = 0;
@@ -54,50 +49,41 @@ class LaporanReturPenjualan extends BaseController
         $dpp = 0;
         $ppn = 0;
         $total = 0;
-        $hpp = 0;
-        $laba = 0;
 
-        foreach ($returpenjualan as $row) {
+        foreach ($penjualan as $row) {
             $jml_harga += isset($row->jml_harga) ? floatval($row->jml_harga) : 0;
+            $row->qty = ($row->qty1 * $row->conv_factor) + $row->qty2;
         }
 
-        foreach ($returpenjualan_summary as $row) {
+        foreach ($penjualan_summary as $row) {
             $subtotal += isset($row->sub_total) ? floatval($row->sub_total) : 0;
             $discount_cash += isset($row->disc_cash) ? $row->disc_cash * floatval($row->sub_total) : 0;
             $dpp += isset($row->netto) ? floatval($row->netto) : 0;
             $ppn += isset($row->ppn) ? floatval($row->ppn) : 0;
             $total += isset($row->grand_total) ? floatval($row->grand_total) : 0;
-            $hpp += isset($row->hpp) ? $row->hpp : 0;
-            $laba += isset($row->laba) ? $row->laba : 0;
         }
 
-        foreach ($returpenjualan as $key => $value) {
+        foreach ($penjualan as $key => $value) {
             // masukkan key 'diskon_1' dan 'diskon_2' berdarasarkan kondisi
 
-            $returpenjualan[$key]->disc_1 = isset($value->disc_1_perc) ? floatval($value->disc_1_perc) * floatval($value->jml_harga) : $value->disc_1_rp;
-            $returpenjualan[$key]->disc_2 = isset($value->disc_2_perc) ? floatval($value->disc_2_perc) * floatval($value->jml_harga) : $value->disc_2_rp;
+            $penjualan[$key]->disc_1 = isset($value->disc_1_perc) ? floatval($value->disc_1_perc) * floatval($value->jml_harga) : $value->disc_1_rp;
+            $penjualan[$key]->disc_2 = isset($value->disc_2_perc) ? floatval($value->disc_2_perc) * floatval($value->jml_harga) : $value->disc_2_rp;
         }
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
-            'dtreturpenjualan'    => $returpenjualan,
+            'dtpenjualan'    => $penjualan,
             'jml_harga'      => $jml_harga,
             'subtotal'       => $subtotal,
             'discount_cash'  => $discount_cash,
             'dpp'            => $dpp,
             'ppn'            => $ppn,
-            'grand_total'          => $total,
-            'hpp'            => $hpp,
-            'laba'           => $laba,
-            'dtlokasi'       => $this->objLokasi->findAll(),
-            'dtsalesman'     => $this->objSetupsalesman->findAll(),
+            'grand_total'    => $total,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'lokasi'         => $lokasi,
         ];
 
-        return view('laporanreturpenjualan/index', $data);
+        return view('laporanpenjualan_sb/index', $data);
     }
 
     public function printPDF()
@@ -108,11 +94,11 @@ class LaporanReturPenjualan extends BaseController
         $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
 
         // Panggil model untuk mendapatkan data laporan
-        $returpenjualan = $this->objReturPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan = $this->objPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
 
 
         // Gabungkan data penjualan dan retur penjualan
-        $dtreturpenjualan = array_merge($returpenjualan);
+        $dtpenjualan = array_merge($penjualan);
 
         // Ambil nama salesman dan lokasi
         $nama_setupsalesman = !empty($salesman) ? $this->objSetupsalesman->find($salesman)->nama_setupsalesman : 'Semua Salesman';
@@ -128,7 +114,7 @@ class LaporanReturPenjualan extends BaseController
         $hpp = 0;
         $laba = 0;
 
-        foreach ($dtreturpenjualan as $row) {
+        foreach ($dtpenjualan as $row) {
             $jml_harga += isset($row->jml_harga) ? $row->jml_harga : 0;
             $subtotal += isset($row->sub_total) ? $row->sub_total : 0;
             $discount_cash += isset($row->discount_cash) ? $row->discount_cash : 0;
@@ -140,8 +126,8 @@ class LaporanReturPenjualan extends BaseController
         }
 
         // Load view untuk PDF
-        $html = view('laporanreturpenjualan/printPDF', [
-            'dtreturpenjualan'    => $dtreturpenjualan,
+        $html = view('laporanpenjualan/printPDF', [
+            'dtpenjualan'    => $dtpenjualan,
             'jml_harga'      => $jml_harga,
             'subtotal'       => $subtotal,
             'discount_cash'  => $discount_cash,
@@ -160,8 +146,8 @@ class LaporanReturPenjualan extends BaseController
         $pdf = new TCPDF('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('Your Name');
-        $pdf->SetTitle('Laporan Retur Penjualan');
-        $pdf->SetSubject('Laporan Retur Penjualan');
+        $pdf->SetTitle('Laporan Penjualan');
+        $pdf->SetSubject('Laporan Penjualan');
         $pdf->SetKeywords('TCPDF, PDF, laporan, penjualan');
 
         // Set header dan footer
@@ -179,6 +165,6 @@ class LaporanReturPenjualan extends BaseController
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Output PDF
-        $pdf->Output('laporan_retur_penjualan.pdf', 'I');
+        $pdf->Output('laporan_penjualan.pdf', 'I');
     }
 }
