@@ -10,7 +10,7 @@ use App\Models\setup\ModelSetupsalesman;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
-class LaporanPenjualan extends BaseController
+class LaporanPenjualanS extends BaseController
 {
     protected $objLokasi;
     protected $objSetupsalesman;
@@ -34,9 +34,13 @@ class LaporanPenjualan extends BaseController
         $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
 
         // Panggil model untuk mendapatkan data laporan
-        $penjualan = $this->objPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan = $this->objPenjualan->get_laporan_s($tglawal, $tglakhir);
 
-        $penjualan_summary = $this->objPenjualan->get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan_summary = $this->objPenjualan->get_laporan_summary_s($tglawal, $tglakhir);
+
+        // cek data
+        log_message('debug', 'Data Penjualan: ' . print_r($penjualan, true));
+        log_message('debug', 'Data Penjualan Summary: ' . print_r($penjualan_summary, true));
 
         // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
         $jml_harga = 0;
@@ -45,8 +49,6 @@ class LaporanPenjualan extends BaseController
         $dpp = 0;
         $ppn = 0;
         $total = 0;
-        $hpp = 0;
-        $laba = 0;
 
         foreach ($penjualan as $row) {
             $jml_harga += isset($row->jml_harga) ? floatval($row->jml_harga) : 0;
@@ -58,8 +60,6 @@ class LaporanPenjualan extends BaseController
             $dpp += isset($row->netto) ? floatval($row->netto) : 0;
             $ppn += isset($row->ppn) ? floatval($row->ppn) : 0;
             $total += isset($row->grand_total) ? floatval($row->grand_total) : 0;
-            $hpp += isset($row->hpp) ? $row->hpp : 0;
-            $laba += isset($row->laba) ? $row->laba : 0;
         }
 
         foreach ($penjualan as $key => $value) {
@@ -77,18 +77,12 @@ class LaporanPenjualan extends BaseController
             'discount_cash'  => $discount_cash,
             'dpp'            => $dpp,
             'ppn'            => $ppn,
-            'grand_total'          => $total,
-            'hpp'            => $hpp,
-            'laba'           => $laba,
-            'dtlokasi'       => $this->objLokasi->findAll(),
-            'dtsalesman'     => $this->objSetupsalesman->findAll(),
+            'grand_total'    => $total,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'lokasi'         => $lokasi,
         ];
 
-        return view('laporanpenjualan/index', $data);
+        return view('laporanpenjualan_s/index', $data);
     }
 
     public function printPDF()

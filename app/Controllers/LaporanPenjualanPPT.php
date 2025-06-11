@@ -3,92 +3,58 @@
 namespace App\Controllers;
 
 use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelStock;
 use App\Controllers\BaseController;
 use App\Models\transaksi\penjualan\ModelPenjualan;
-use App\Models\transaksi\penjualan\ModelReturPenjualan;
 use App\Models\setup\ModelSetupsalesman;
+use App\Models\setup\ModelSetuppelanggan;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
-class LaporanPenjualan extends BaseController
+class LaporanPenjualanPPT extends BaseController
 {
     protected $objLokasi;
     protected $objSetupsalesman;
     protected $objPenjualan;
-    protected $objReturPenjualan;
+    protected $objPelanggan;
+    protected $objSetupsupplier;
+    protected $objStock;
     protected $db;
     function __construct()
     {
         $this->objLokasi = new ModelLokasi();
         $this->objSetupsalesman = new ModelSetupsalesman();
         $this->objPenjualan = new ModelPenjualan();
-        $this->objReturPenjualan = new ModelReturPenjualan();
+        $this->objPelanggan = new ModelSetuppelanggan();
+        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->objStock = new ModelStock();
         $this->db = \Config\Database::connect();
     }
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
-        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
-        $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
+        $tahun = $this->request->getVar('tahun') ? $this->request->getVar('tahun') : date('Y');
 
         // Panggil model untuk mendapatkan data laporan
-        $penjualan = $this->objPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan = $this->objPenjualan->get_laporan_ppt($tahun);
 
-        $penjualan_summary = $this->objPenjualan->get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi);
-
-        // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
-        $jml_harga = 0;
-        $subtotal = 0;
-        $discount_cash = 0;
-        $dpp = 0;
-        $ppn = 0;
+        $total_tahun_lalu = 0;
         $total = 0;
-        $hpp = 0;
-        $laba = 0;
-
         foreach ($penjualan as $row) {
-            $jml_harga += isset($row->jml_harga) ? floatval($row->jml_harga) : 0;
-        }
-
-        foreach ($penjualan_summary as $row) {
-            $subtotal += isset($row->sub_total) ? floatval($row->sub_total) : 0;
-            $discount_cash += isset($row->disc_cash) ? $row->disc_cash * floatval($row->sub_total) : 0;
-            $dpp += isset($row->netto) ? floatval($row->netto) : 0;
-            $ppn += isset($row->ppn) ? floatval($row->ppn) : 0;
-            $total += isset($row->grand_total) ? floatval($row->grand_total) : 0;
-            $hpp += isset($row->hpp) ? $row->hpp : 0;
-            $laba += isset($row->laba) ? $row->laba : 0;
-        }
-
-        foreach ($penjualan as $key => $value) {
-            // masukkan key 'diskon_1' dan 'diskon_2' berdarasarkan kondisi
-
-            $penjualan[$key]->disc_1 = isset($value->disc_1_perc) ? floatval($value->disc_1_perc) * floatval($value->jml_harga) : $value->disc_1_rp;
-            $penjualan[$key]->disc_2 = isset($value->disc_2_perc) ? floatval($value->disc_2_perc) * floatval($value->jml_harga) : $value->disc_2_rp;
+            $total_tahun_lalu += $row->total_tahun_lalu;
+            $total += $row->Total;
         }
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
             'dtpenjualan'    => $penjualan,
-            'jml_harga'      => $jml_harga,
-            'subtotal'       => $subtotal,
-            'discount_cash'  => $discount_cash,
-            'dpp'            => $dpp,
-            'ppn'            => $ppn,
-            'grand_total'          => $total,
-            'hpp'            => $hpp,
-            'laba'           => $laba,
-            'dtlokasi'       => $this->objLokasi->findAll(),
-            'dtsalesman'     => $this->objSetupsalesman->findAll(),
-            'tglawal'        => $tglawal,
-            'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'lokasi'         => $lokasi,
+            'tahun'        => $tahun,
+            'total_tl'        => $total_tahun_lalu,
+            'total'        => $total,
         ];
 
-        return view('laporanpenjualan/index', $data);
+        return view('laporanpenjualan_ppt/index', $data);
     }
 
     public function printPDF()

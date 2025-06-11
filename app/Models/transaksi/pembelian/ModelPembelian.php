@@ -149,6 +149,40 @@ class ModelPembelian extends Model
 
         return $builder->get()->getResult();
     }
+
+    public function get_laporan_summary($tglawal, $tglakhir, $supplier = null)
+    {
+        $builder = $this->db->table('pembelian1 p');
+        $builder->select('
+        p.id_pembelian,
+        p.grand_total,
+        p.dpp,
+        p.ppn,
+        p.sub_total,
+        sp.nama AS nama_supplier,
+        sp.kode AS kode_supplier
+    ');
+
+        // Join dengan tabel supplier
+        $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
+
+        // Filter tanggal
+        if (!empty($tglawal)) {
+            $builder->where('p.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('p.tanggal <=', $tglakhir);
+        }
+
+        // Filter supplier (jika ada)
+        if (!empty($supplier)) {
+            $builder->where('p.id_setupsupplier', $supplier);
+        }
+
+        $builder->orderBy('p.tanggal');
+
+        return $builder->get()->getResult();
+    }
 }
 
     // // Validation

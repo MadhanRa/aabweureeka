@@ -1,14 +1,14 @@
 <?= $this->extend("layout/backend") ?>
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Laporan Penjualan P3</title>
+<title>Akuntansi Eureeka &mdash; Laporan Penjualan Per Salesman</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
 
 <section class="section">
   <div class="section-header">
-    <h1>Laporan Penjualan Per Salesman Per Pelanggan Per Barang</h1>
+    <h1>Laporan Penjualan Per Salesman</h1>
   </div>
 
   <!-- Menampilkan Pesan Sukses -->
@@ -26,21 +26,17 @@
   <div class="card">
     <div class="card-header">
       <div class="card-header-action">
-        <a href="<?= base_url('laporanpenjualan_p/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&salesman=' . $salesman . '&lokasi=' . $lokasi) ?>" class="btn btn-success" target="_blank">
+        <a href="<?= base_url('laporanpenjualan_ptb/printPDF?tahun=' . $tahun . '&salesman=' . $salesman . '&lokasi=' . $lokasi . '&pelanggan=' . $pelanggan . '&supplier=' . $supplier . '&view_option=' . $view_option) ?>" class="btn btn-success" target="_blank">
           <i class="fas fa-print"></i> Cetak PDF
         </a>
       </div>
     </div>
     <div class="card-body">
-      <form method="GET" action="<?= base_url('laporanpenjualan_p') ?>">
+      <form method="GET" action="<?= base_url('laporanpenjualan_ptb') ?>">
         <div class="row">
           <div class="col-md-3">
-            <label for="tglawal">Tanggal Awal</label>
-            <input type="date" name="tglawal" class="form-control" value="<?= $tglawal ?>">
-          </div>
-          <div class="col-md-3">
-            <label for="tglakhir">Tanggal Akhir</label>
-            <input type="date" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
+            <label for="tahun">Tahun</label>
+            <input type="number" name="tahun" class="form-control" value="<?= $tahun ?>" min="1900" max="<?= date('Y') ?>" value="<?= date('Y') ?>">
           </div>
           <div class="col-md-3">
             <label for="lokasi">Lokasi</label>
@@ -90,6 +86,20 @@
               <?php endforeach; ?>
             </select>
           </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <div class="form-group p-3">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="view_option" value="qty" id="view_option1" <?= $view_option === 'qty' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="view_option1">Qty</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="view_option" value="rp" id="view_option2" <?= $view_option === 'rp' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="view_option2">Rp</label>
+              </div>
+            </div>
+          </div>
           <div class="col-md-3">
             <button type="submit" class="btn btn-primary mt-4">Filter</button>
           </div>
@@ -101,20 +111,22 @@
           <thead>
             <tr class="eureeka-table-header">
               <th>No</th>
-              <th>Tanggal</th>
-              <th>Nota</th>
-              <th>Pelanggan</th>
-              <th>Salesman</th>
-              <th>Lokasi</th>
-              <th>Supplier</th>
+              <th>Kode Stock</th>
               <th>Nama Stock</th>
               <th>Satuan</th>
-              <th>Qty 1</th>
-              <th>Qty 2</th>
-              <th>Harga</th>
-              <th>Jml. Harga</th>
-              <th>Disc.1</th>
-              <th>Disc.2</th>
+              <th>Tahun Lalu</th>
+              <th>Januari</th>
+              <th>Februari</th>
+              <th>Maret</th>
+              <th>April</th>
+              <th>Mei</th>
+              <th>Juni</th>
+              <th>Juli</th>
+              <th>Agustus</th>
+              <th>September</th>
+              <th>Oktober</th>
+              <th>November</th>
+              <th>Desember</th>
               <th>Total</th>
               <!-- <th>Action</th> -->
             </tr>
@@ -124,65 +136,27 @@
             <?php foreach ($dtpenjualan as $key => $value) : ?>
               <tr>
                 <td><?= $key + 1 ?></td>
-                <td><?= $value->tanggal ?></td>
-                <td><?= $value->nota ?></td>
-                <td><?= $value->nama_pelanggan ?></td>
-                <td><?= $value->nama_salesman ?></td>
-                <td><?= $value->lokasi_asal ?></td>
-                <td><?= $value->nama_supplier ?></td>
+                <td><?= $value->kode ?></td>
                 <td><?= $value->nama_barang ?></td>
                 <td><?= $value->satuan ?></td>
-                <td><?= $value->qty1 ?></td>
-                <td><?= $value->qty2 ?></td>
-                <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
-                <td><?= $value->disc_1 ?></td>
-                <td><?= $value->disc_2 ?></td>
-                <td><?= "Rp " . number_format($value->sub_total, 0, ',', '.') ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->total_tahun_lalu, 0, ',', '.') : $value->total_tahun_lalu ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Jan, 0, ',', '.') : $value->Jan ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Feb, 0, ',', '.') : $value->Feb ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Mar, 0, ',', '.') : $value->Mar ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Apr, 0, ',', '.') : $value->Apr ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Mei, 0, ',', '.') : $value->Mei ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Jun, 0, ',', '.') : $value->Jun ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Jul, 0, ',', '.') : $value->Jul ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Agu, 0, ',', '.') : $value->Agu ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Sep, 0, ',', '.') : $value->Sep ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Okt, 0, ',', '.') : $value->Okt ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Nov, 0, ',', '.') : $value->Nov ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Des, 0, ',', '.') : $value->Des ?></td>
+                <td><?= ($view_option === 'rp') ? "Rp " . number_format($value->Total, 0, ',', '.') : $value->Total ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>
         </table>
-      </div>
-      <div class="row mt-3">
-        <div class="col">
-          <label>Jml. Harga</label>
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($jml_harga, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>Sub. Total</label>
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($subtotal, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>Discount Cash</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($discount_cash, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>DPP</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($dpp, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>PPN</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($ppn, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>Total</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($grand_total, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>Hpp</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($hpp, 0, ',', '.') ?>" readonly>
-        </div>
-        <div class="col">
-          <label>Laba</label>
-
-          <input class="form-control" type="text" value="<?= "Rp " . number_format($laba, 0, ',', '.') ?>" readonly>
-        </div>
       </div>
     </div>
   </div>

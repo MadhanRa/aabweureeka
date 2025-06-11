@@ -64,13 +64,13 @@
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpembelian') ?>">Pembelian</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanreturpembelian') ?>">Retur Pembelian</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan') ?>">Penjualan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('laporanPenjualanP') ?>">Penjualan Per Salesman Per Pelanggan Per Barang</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Salesman Per Pelanggan Per Barang (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Barang (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Salesman</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Salesman (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Pelanggan</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Pelanggan (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_p') ?>">Penjualan Per Salesman Per Pelanggan Per Barang</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_pt') ?>">Penjualan Per Salesman Per Pelanggan Per Barang (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_ptb">Penjualan Per Barang (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_s">Penjualan Per Salesman</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_st">Penjualan Per Salesman (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_pp">Penjualan Per Pelanggan</a></li>
+    <li><a class="nav-link text-dark" href="laporanpenjualan_ppt">Penjualan Per Pelanggan (Tahun)</a></li>
     <li><a class="nav-link text-dark" href="layout-top-navigation.html">Penjualan Per Supplier Per Barang</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanreturpenjualan') ?>">ReturPenjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenyesuaianstock') ?>">Penyesuaian Stock</a></li>

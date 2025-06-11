@@ -11,19 +11,6 @@
     <h1>Laporan Pembelian</h1>
   </div>
 
-  <!-- Tombol Print All -->
-  <!-- <div class="section-body">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <a href="<?= base_url('LaporanPembelian/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&supplier=' . $supplier) ?>" class="btn btn-success" target="_blank">
-            <i class="fas fa-print"></i> Cetak PDF
-          </a>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
   <!-- Menampilkan Pesan Sukses -->
   <?php if (session()->getFlashdata('Sukses')) : ?>
     <div class="alert alert-success alert-dismissible show fade">

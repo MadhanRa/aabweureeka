@@ -1,14 +1,14 @@
 <?= $this->extend("layout/backend") ?>
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Laporan Penjualan</title>
+<title>Akuntansi Eureeka &mdash; Laporan Penjualan Per Pelanggan</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
 
 <section class="section">
   <div class="section-header">
-    <h1>Laporan Penjualan</h1>
+    <h1>Laporan Penjualan Per Pelanggan</h1>
   </div>
 
   <!-- Menampilkan Pesan Sukses -->
@@ -26,13 +26,13 @@
   <div class="card">
     <div class="card-header">
       <div class="card-header-action">
-        <a href="<?= base_url('laporanpenjualan/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&salesman=' . $salesman . '&lokasi=' . $lokasi) ?>" class="btn btn-success" target="_blank">
+        <a href="<?= base_url('laporanpenjualan_pp/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir) ?>" class="btn btn-success" target="_blank">
           <i class="fas fa-print"></i> Cetak PDF
         </a>
       </div>
     </div>
     <div class="card-body">
-      <form method="GET" action="<?= base_url('laporanpenjualan') ?>">
+      <form method="GET" action="<?= base_url('laporanpenjualan_pp') ?>">
         <div class="row">
           <div class="col-md-3">
             <label for="tglawal">Tanggal Awal</label>
@@ -42,26 +42,6 @@
             <label for="tglakhir">Tanggal Akhir</label>
             <input type="date" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
           </div>
-          <div class="col-md-3">
-            <label for="salesman">Salesman</label>
-            <select name="salesman" class="form-control">
-              <option value="">Semua Salesman</option>
-              <?php foreach ($dtsalesman as $sales): ?>
-                <option value="<?= $sales->id_salesman ?>" <?= $sales->id_salesman == $salesman ? 'selected' : '' ?>><?= $sales->nama_salesman ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label for="lokasi">Lokasi</label>
-            <select name="lokasi" class="form-control">
-              <option value="">Semua Lokasi</option>
-              <?php foreach ($dtlokasi as $lok): ?>
-                <option value="<?= $lok->id_lokasi ?>" <?= $lok->id_lokasi == $lokasi ? 'selected' : '' ?>><?= $lok->nama_lokasi ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-        </div>
-        <div class="row">
           <div class="col-md-3">
             <button type="submit" class="btn btn-primary mt-4">Filter</button>
           </div>
@@ -73,20 +53,19 @@
           <thead>
             <tr class="eureeka-table-header">
               <th>No</th>
-              <th>Tanggal</th>
-              <th>Nota</th>
               <th>Pelanggan</th>
-              <th>Salesman</th>
-              <th>Lokasi</th>
-              <th>Nama Stock</th>
-              <th>Satuan</th>
-              <th>Qty 1</th>
-              <th>Qty 2</th>
-              <th>Harga</th>
+              <th>Alamat</th>
+              <th>Class</th>
               <th>Jml. Harga</th>
               <th>Disc.1</th>
               <th>Disc.2</th>
-              <th>Total</th>
+              <th>Sub.Tot</th>
+              <th>D.Cash</th>
+              <th>DPP</th>
+              <th>PPN</th>
+              <th>TOT</th>
+              <!-- <th>Hpp</th>
+              <th>Laba</th> -->
               <!-- <th>Action</th> -->
             </tr>
           </thead>
@@ -95,20 +74,17 @@
             <?php foreach ($dtpenjualan as $key => $value) : ?>
               <tr>
                 <td><?= $key + 1 ?></td>
-                <td><?= $value->tanggal ?></td>
-                <td><?= $value->nota ?></td>
                 <td><?= $value->nama_pelanggan ?></td>
-                <td><?= $value->nama_salesman ?></td>
-                <td><?= $value->lokasi_asal ?></td>
-                <td><?= $value->nama_barang ?></td>
-                <td><?= $value->satuan ?></td>
-                <td><?= $value->qty1 ?></td>
-                <td><?= $value->qty2 ?></td>
-                <td><?= "Rp " . number_format($value->harga_satuan, 0, ',', '.') ?></td>
+                <td><?= $value->alamat_pelanggan ?></td>
+                <td><?= $value->class_pelanggan ?></td>
                 <td><?= "Rp " . number_format($value->jml_harga, 0, ',', '.') ?></td>
                 <td><?= $value->disc_1 ?></td>
                 <td><?= $value->disc_2 ?></td>
                 <td><?= "Rp " . number_format($value->sub_total, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($value->disc_cash, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($value->netto, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($value->ppn, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($value->total, 0, ',', '.') ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>

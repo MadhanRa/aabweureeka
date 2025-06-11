@@ -422,20 +422,40 @@ $routes->get('/LaporanKasKecil/printPDF', 'LaporanKasKecil::printPDF');
 $routes->post('/laporankaskecil', 'LaporanKasKecil::index');
 
 //laporanpenjualan
-$routes->get('/laporanpenjualan', 'LaporanPenjualan::index');
 $routes->get('/laporanpenjualan/printPDF/(:num)', 'LaporanPenjualan::printPDF/$1');
-$routes->get('/LaporanPenjualan/printPDF/(:num)', 'LaporanPenjualan::printPDF/$1');
 $routes->get('/laporanpenjualan/printPDF', 'LaporanPenjualan::printPDF');
-$routes->get('/LaporanPenjualan/printPDF', 'LaporanPenjualan::printPDF');
 $routes->post('/laporanpenjualan', 'LaporanPenjualan::index');
-$routes->get('/LaporanPenjualan', 'LaporanPenjualan::index');
-$routes->get('/LaporanPenjualan/printPDF/(:num)', 'LaporanPenjualan::printPDF/$1');
-$routes->get('/LaporanPenjualan/printPDF', 'LaporanPenjualan::printPDF');
-$routes->post('/LaporanPenjualan', 'LaporanPenjualan::index');
+$routes->get('/laporanpenjualan', 'LaporanPenjualan::index');
 
 
 //routes untuk penjualan per salesman per pelanggan per barang
-$routes->get('laporanPenjualanP', 'LaporanPenjualanP::index');
+$routes->get('laporanpenjualan_p', 'LaporanPenjualanP::index');
+$routes->get('/laporanpenjualan_p/printPDF', 'LaporanPenjualanP::printPDF');
+
+//routes untuk penjualan per salesman per pelanggan per barang (tahun)
+$routes->get('laporanpenjualan_pt', 'LaporanPenjualanPT::index');
+$routes->get('/laporanpenjualan_pt/printPDF', 'LaporanPenjualanPT::printPDF');
+
+//routes untuk penjualan per barang (tahun)
+$routes->get('laporanpenjualan_ptb', 'LaporanPenjualanPTB::index');
+$routes->get('laporanpenjualan_ptb/printPDF', 'LaporanPenjualanPTB::printPDF');
+
+//routes untuk penjualan per salesman
+$routes->get('laporanpenjualan_s', 'LaporanPenjualanS::index');
+$routes->get('laporanpenjualan_s/printPDF', 'LaporanPenjualanS::printPDF');
+
+//routes untuk penjualan per salesman (tahun)
+$routes->get('laporanpenjualan_st', 'LaporanPenjualanST::index');
+$routes->get('laporanpenjualan_st/printPDF', 'LaporanPenjualanST::printPDF');
+
+//routes untuk penjualan per pelanggan
+$routes->get('laporanpenjualan_pp', 'LaporanPenjualanPP::index');
+$routes->get('laporanpenjualan_pp/printPDF', 'LaporanPenjualanPP::printPDF');
+
+//routes untuk penjualan per pelanggan (tahun)
+$routes->get('laporanpenjualan_ppt', 'LaporanPenjualanPPT::index');
+$routes->get('laporanpenjualan_pt/printPDF', 'LaporanPenjualanPPT::printPDF');
+
 
 //laporanreturpenjualan
 $routes->get('/laporanreturpenjualan', 'LaporanReturPenjualan::index');

@@ -3,26 +3,32 @@
 namespace App\Controllers;
 
 use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelStock;
 use App\Controllers\BaseController;
 use App\Models\transaksi\penjualan\ModelPenjualan;
-use App\Models\transaksi\penjualan\ModelReturPenjualan;
 use App\Models\setup\ModelSetupsalesman;
+use App\Models\setup\ModelSetuppelanggan;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
-class LaporanPenjualan extends BaseController
+class LaporanPenjualanPP extends BaseController
 {
     protected $objLokasi;
     protected $objSetupsalesman;
     protected $objPenjualan;
-    protected $objReturPenjualan;
+    protected $objPelanggan;
+    protected $objSetupsupplier;
+    protected $objStock;
     protected $db;
     function __construct()
     {
         $this->objLokasi = new ModelLokasi();
         $this->objSetupsalesman = new ModelSetupsalesman();
         $this->objPenjualan = new ModelPenjualan();
-        $this->objReturPenjualan = new ModelReturPenjualan();
+        $this->objPelanggan = new ModelSetuppelanggan();
+        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->objStock = new ModelStock();
         $this->db = \Config\Database::connect();
     }
 
@@ -30,13 +36,11 @@ class LaporanPenjualan extends BaseController
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
         $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
-        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
-        $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
 
         // Panggil model untuk mendapatkan data laporan
-        $penjualan = $this->objPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan = $this->objPenjualan->get_laporan_pp($tglawal, $tglakhir);
 
-        $penjualan_summary = $this->objPenjualan->get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi);
+        $penjualan_summary = $this->objPenjualan->get_laporan_summary_pp($tglawal, $tglakhir);
 
         // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
         $jml_harga = 0;
@@ -77,18 +81,14 @@ class LaporanPenjualan extends BaseController
             'discount_cash'  => $discount_cash,
             'dpp'            => $dpp,
             'ppn'            => $ppn,
-            'grand_total'          => $total,
+            'grand_total'    => $total,
             'hpp'            => $hpp,
             'laba'           => $laba,
-            'dtlokasi'       => $this->objLokasi->findAll(),
-            'dtsalesman'     => $this->objSetupsalesman->findAll(),
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'lokasi'         => $lokasi,
         ];
 
-        return view('laporanpenjualan/index', $data);
+        return view('laporanpenjualan_pp/index', $data);
     }
 
     public function printPDF()
