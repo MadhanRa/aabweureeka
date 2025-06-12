@@ -38,21 +38,21 @@
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pembelian/returpembelian') ?>">Retur Pembelian</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penjualan/penjualan') ?>">Penjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penjualan/returpenjualan') ?>">Retur Penjualan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/penyesuaianstock') ?>">Penyesuaian Stock</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pindahlokasi') ?>">Pindah Lokasi</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/bahansablon') ?>">Bahan Di Sablon</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/hasilsablon') ?>">Hasil Sablon</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pemakaianbahan') ?>">Pemakaian Bahan</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/hasilproduksi') ?>">Hasil Produksi</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/tutangusaha') ?>">Pelunasan Piutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/lunassalesman') ?>">Pelunasan Piutang Sales</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/pelunasanhutang') ?>">Pelunasan Hutang</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/mutasikasbank') ?>">Mutasi Kas dan Bank</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/jurnalumum') ?>">Jurnal Umum</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/kaskecil') ?>">Pengeluaran Kas Kecil</a></li>
-    <!-- <li><a class="nav-link text-dark" href="<?= site_url('transaksi/posting') ?>">Posting</a></li>  -->
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/close-period') ?>">Tutup Buku</a></li>
-    <li><a class="nav-link text-dark" href="<?= site_url('transaksi/stockopname') ?>">Stock Opname</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('penyesuaianstock') ?>">Penyesuaian Stock</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('pindahlokasi') ?>">Pindah Lokasi</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('bahansablon') ?>">Bahan Di Sablon</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('hasilsablon') ?>">Hasil Sablon</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('pemakaianbahan') ?>">Pemakaian Bahan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('hasilproduksi') ?>">Hasil Produksi</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('tutangusaha') ?>">Pelunasan Piutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('lunassalesman') ?>">Pelunasan Piutang Sales</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('pelunasanhutang') ?>">Pelunasan Hutang</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('mutasikasbank') ?>">Mutasi Kas dan Bank</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('jurnalumum') ?>">Jurnal Umum</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('kaskecil') ?>">Pengeluaran Kas Kecil</a></li>
+    <!-- <li><a class="nav-link text-dark" href="<?= site_url('posting') ?>">Posting</a></li>  -->
+    <li><a class="nav-link text-dark" href="<?= site_url('close-period') ?>">Tutup Buku</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('stockopname') ?>">Stock Opname</a></li>
   </ul>
 </li>
 
@@ -66,12 +66,12 @@
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan') ?>">Penjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_p') ?>">Penjualan Per Salesman Per Pelanggan Per Barang</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_pt') ?>">Penjualan Per Salesman Per Pelanggan Per Barang (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_ptb">Penjualan Per Barang (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_s">Penjualan Per Salesman</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_st">Penjualan Per Salesman (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_pp">Penjualan Per Pelanggan</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_ppt">Penjualan Per Pelanggan (Tahun)</a></li>
-    <li><a class="nav-link text-dark" href="laporanpenjualan_sb">Penjualan Per Supplier Per Barang</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_ptb') ?>">Penjualan Per Barang (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_s') ?>">Penjualan Per Salesman</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_st') ?>">Penjualan Per Salesman (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_pp') ?>">Penjualan Per Pelanggan</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_ppt') ?>">Penjualan Per Pelanggan (Tahun)</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanpenjualan_sb') ?>">Penjualan Per Supplier Per Barang</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanreturpenjualan') ?>">ReturPenjualan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpenyesuaianstock') ?>">Penyesuaian Stock</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpindahlokasi') ?>">Pindah Lokasi</a></li>
@@ -87,8 +87,8 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Bank</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="index-0.html">Kartu Bank</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Bank</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanbankkartu') ?>">Kartu Bank</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanbankdaftar') ?>">Daftar Bank</a></li>
   </ul>
 </li>
 

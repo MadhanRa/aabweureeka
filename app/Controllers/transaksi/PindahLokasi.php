@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
 use TCPDF;
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelPindahLokasi;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\ModelPindahLokasi;
 use App\Models\ClosedPeriodsModel;
-use App\Models\PeriodsModels;
+use App\Models\transaksi\PeriodsModels;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -52,7 +52,7 @@ class PindahLokasi extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
 

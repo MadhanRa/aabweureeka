@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -27,7 +27,7 @@ class PeriodsModels extends Model
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
 
-    
+
 
     public function isLocked($month, $year)
     {

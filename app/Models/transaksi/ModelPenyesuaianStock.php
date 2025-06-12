@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -125,7 +125,7 @@ class ModelPenyesuaianStock extends Model
     public function get_laporan($tglawal, $tglakhir = null)
     {
         $builder = $this->db->table('penyesuaianstock1 p');
-        
+
         // Pilih kolom yang dibutuhkan termasuk nama_setupbank dari tabel setupbank
         $builder->select('
             p.*, 
@@ -134,7 +134,7 @@ class ModelPenyesuaianStock extends Model
             sp.nama_group AS nama_group, 
             b.nama_setupbank AS nama_setupbank
         ');
-    
+
         // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi asal
         $builder->join('lokasi1 l1', 'p.id_lokasi = l1.id_lokasi', 'left');
 
@@ -146,7 +146,7 @@ class ModelPenyesuaianStock extends Model
 
         // Join dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('setupbank1 b', 'p.id_setupbank = b.id_setupbank', 'left');
-    
+
         // Filter tanggal
         if (!empty($tglawal)) {
             $builder->where('p.tanggal >=', $tglawal);
@@ -154,11 +154,11 @@ class ModelPenyesuaianStock extends Model
         if (!empty($tglakhir)) {
             $builder->where('p.tanggal <=', $tglakhir);
         }
-    
+
         // Ambil hasilnya dan kembalikan dalam bentuk objek
         return $builder->get()->getResult();
     }
-    
+
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

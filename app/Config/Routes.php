@@ -118,22 +118,25 @@ $routes->group('transaksi', static function ($routes) {
         $routes->resource('returpenjualan');
     });
 });
+$routes->group('', ['namespace' => 'App\Controllers\transaksi'], function ($routes) {
+    //routes untuk penyesuaianstock
+    $routes->get('penyesuaianstock/printPDF/(:num)', 'PenyesuaianStock::printPDF/$1');
+    $routes->get('PenyesuaianStock/printPDF/(:num)', 'PenyesuaianStock::printPDF/$1');
+    $routes->get('penyesuaianstock/printPDF', 'PenyesuaianStock::printPDF');
+    $routes->get('PenyesuaianStock/printPDF', 'PenyesuaianStock::printPDF');
+    $routes->put('/penyesuaianstock/(:segment)', 'PenyesuaianStock::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/penyesuaianstock/(:segment)/edit', 'PenyesuaianStock::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('penyesuaianstock');
 
-
-//routes pindahlokasi
-$routes->get('/pindahlokasi/new', 'PindahLokasi::new');
-$routes->get('/pindahlokasi/(:segment)/new', 'PindahLokasi::edit/$1');
-$routes->resource('pindahlokasi');
-$routes->post('/pindahlokasi', 'PindahLokasi::create');
-$routes->post('/pindahlokasi/(:any)', 'PindahLokasi::delete/$1');
-// $routes->put('/pindahlokasi/(:segment)/edit', 'PindahLokasi::edit/$1');
-$routes->get('pindahlokasi', 'PindahLokasi::index');
-$routes->get('pindahlokasi/printPDF/(:num)', 'PindahLokasi::printPDF/$1');
-$routes->get('PindahLokasi/printPDF/(:num)', 'PindahLokasi::printPDF/$1');
-$routes->get('pindahlokasi/printPDF', 'PindahLokasi::printPDF');
-$routes->get('PindahLokasi/printPDF', 'PindahLokasi::printPDF');
-$routes->put('/pindahlokasi/(:segment)', 'PindahLokasi::update/$1', ['filter' => 'role:admin']);
-$routes->put('/pindahlokasi/(:segment)/edit', 'PindahLokasi::edit/$1', ['filter' => 'role:admin']);
+    //routes pindahlokasi
+    $routes->get('pindahlokasi/printPDF/(:num)', 'PindahLokasi::printPDF/$1');
+    $routes->get('PindahLokasi/printPDF/(:num)', 'PindahLokasi::printPDF/$1');
+    $routes->get('pindahlokasi/printPDF', 'PindahLokasi::printPDF');
+    $routes->get('PindahLokasi/printPDF', 'PindahLokasi::printPDF');
+    $routes->put('/pindahlokasi/(:segment)', 'PindahLokasi::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/pindahlokasi/(:segment)/edit', 'PindahLokasi::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('pindahlokasi');
+});
 
 //routes bahansablon
 $routes->get('/bahansablon/new', 'BahanSablon::new');
@@ -317,19 +320,6 @@ $routes->get('accounting/closeBook', 'Accounting::index');
 // Route untuk menjalankan proses penutupan periode
 $routes->post('accounting/closeBook/closePeriod', 'Accounting::closePeriod');
 
-//routes untuk penyesuaianstock
-$routes->get('/penyesuaianstock/new', 'PenyesuaianStock::new');
-$routes->resource('penyesuaianstock');
-$routes->post('/penyesuaianstock', 'PenyesuaianStock::create');
-$routes->post('/penyesuaianstock/(:any)', 'PenyesuaianStock::delete/$1');
-$routes->get('penyesuaianstock', 'PenyesuaianStock::index');
-$routes->get('penyesuaianstock/printPDF/(:num)', 'PenyesuaianStock::printPDF/$1');
-$routes->get('PenyesuaianStock/printPDF/(:num)', 'PenyesuaianStock::printPDF/$1');
-$routes->get('penyesuaianstock/printPDF', 'PenyesuaianStock::printPDF');
-$routes->get('PenyesuaianStock/printPDF', 'PenyesuaianStock::printPDF');
-$routes->put('/penyesuaianstock/(:segment)', 'PenyesuaianStock::update/$1', ['filter' => 'role:admin']);
-$routes->put('/penyesuaianstock/(:segment)/edit', 'PenyesuaianStock::edit/$1', ['filter' => 'role:admin']);
-
 
 $routes->get('close-period', 'PeriodsController::index');
 $routes->get('period-add', 'PeriodsController::add');
@@ -372,6 +362,14 @@ $routes->get('/laporanpindahlokasi/printPDF', 'LaporanPindahLokasi::printPDF');
 $routes->get('/LaporanPindahLokasi/printPDF', 'LaporanPindahLokasi::printPDF');
 $routes->get('LaporanPindahLokasi/printPDF/(:any)/(:any)', 'LaporanPindahLokasi::printPDF/$1/$2');
 $routes->post('/laporanpindahlokasi', 'LaporanPindahLokasi::index');
+
+//laporankartubank
+$routes->get('/laporanbankkartu', 'LaporanBankKartu::index');
+$routes->get('/laporanbankkartu/printPDF', 'LaporanBankKartu::printPDF');
+
+//laporandaftarbank
+$routes->get('/laporanbankdaftar', 'LaporanBankDaftar::index');
+$routes->get('/laporanbankdaftar/printPDF', 'LaporanBankDaftar::printPDF');
 
 //laporanjurnalumum
 $routes->get('/laporanjurnalumum', 'LaporanJurnalUmum::index');
@@ -422,9 +420,7 @@ $routes->get('/LaporanKasKecil/printPDF', 'LaporanKasKecil::printPDF');
 $routes->post('/laporankaskecil', 'LaporanKasKecil::index');
 
 //laporanpenjualan
-$routes->get('/laporanpenjualan/printPDF/(:num)', 'LaporanPenjualan::printPDF/$1');
 $routes->get('/laporanpenjualan/printPDF', 'LaporanPenjualan::printPDF');
-$routes->post('/laporanpenjualan', 'LaporanPenjualan::index');
 $routes->get('/laporanpenjualan', 'LaporanPenjualan::index');
 
 
@@ -463,12 +459,4 @@ $routes->get('laporanpenjualan_sb/printPDF', 'LaporanPenjualanSB::printPDF');
 
 //laporanreturpenjualan
 $routes->get('/laporanreturpenjualan', 'LaporanReturPenjualan::index');
-$routes->get('/laporanreturpenjualan/printPDF/(:num)', 'LaporanReturPenjualan::printPDF/$1');
-$routes->get('/LaporanReturPenjualan/printPDF/(:num)', 'LaporanReturPenjualan::printPDF/$1');
 $routes->get('/laporanreturpenjualan/printPDF', 'LaporanReturPenjualan::printPDF');
-$routes->get('/LaporanReturPenjualan/printPDF', 'LaporanReturPenjualan::printPDF');
-$routes->post('/laporanreturpenjualan', 'LaporanReturPenjualan::index');
-$routes->get('/LaporanReturPenjualan', 'LaporanReturPenjualan::index');
-$routes->get('/LaporanReturPenjualan/printPDF/(:num)', 'LaporanReturPenjualan::printPDF/$1');
-$routes->get('/LaporanReturPenjualan/printPDF', 'LaporanReturPenjualan::printPDF');
-$routes->post('/LaporanReturPenjualan', 'LaporanReturPenjualan::index');
