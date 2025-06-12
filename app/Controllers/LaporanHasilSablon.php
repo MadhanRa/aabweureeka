@@ -2,10 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelHasilSablon;
-use App\Models\ModelSetupsupplier;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\ModelHasilSablon;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use TCPDF;
@@ -24,7 +24,6 @@ class LaporanHasilSablon extends ResourceController
         $this->objSatuan = new ModelSatuan();
         $this->objSetupsupplier = new ModelSetupsupplier();
         $this->db = \Config\Database::connect();
-        
     }
     /**
      * Return an array of resource objects, themselves in array format.
@@ -34,11 +33,11 @@ class LaporanHasilSablon extends ResourceController
     public function index()
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir')? $this->request->getVar('tglakhir') : '';
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
 
         // Panggil model untuk mendapatkan data laporan
         $dthasilsablon = $this->objHasilSablon->get_laporan($tglawal, $tglakhir);
-        
+
         // $data['dtpembelian'] = $rowdata;
         $data = [
             'dthasilsablon'     => $dthasilsablon,
@@ -55,15 +54,15 @@ class LaporanHasilSablon extends ResourceController
     {
         $tglawal = $this->request->getVar('tglawal') ?? '';
         $tglakhir = $this->request->getVar('tglakhir') ?? '';
-    
+
         // Ambil laporan dari model
         $dthasilsablon = $this->objHasilSablon->get_laporan($tglawal, $tglakhir);
-    
+
         // Konfigurasi TCPDF
         $pdf = new TCPDF();
         $pdf->AddPage();
         $pdf->SetFont('helvetica', '', 10);
-    
+
         // Tambahkan konten ke PDF
         $html = view('laporanhasilsablon/printPDF', [
             'dthasilsablon' => $dthasilsablon,
@@ -71,7 +70,7 @@ class LaporanHasilSablon extends ResourceController
             'tglakhir' => $tglakhir,
         ]);
         $pdf->writeHTML($html);
-    
+
         // Output PDF
         $this->response->setHeader('Content-Type', 'application/pdf');
         $pdf->Output('Laporan_Hasil_Sablon.pdf', 'I');

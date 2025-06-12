@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelBahanSablon;
-use App\Models\ModelHasilSablon;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\ModelBahanSablon;
+use App\Models\transaksi\ModelHasilSablon;
 use App\Models\ClosedPeriodsModel;
-use App\Models\ModelSetupsupplier;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -20,20 +20,19 @@ class HasilSablon extends ResourceController
     protected $objBahanSablon;
     protected $closedPeriodsModel;
     protected $db;
-     
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objLokasi = new ModelLokasi();
-       $this->objSatuan = new ModelSatuan();
-       $this->objSetupsupplier = new ModelSetupsupplier();
-       $this->objHasilSablon = new ModelHasilSablon();
-       $this->objBahanSablon = new ModelBahanSablon();
-       $this->closedPeriodsModel = new ClosedPeriodsModel();
-       $this->db = \Config\Database::connect();
-       
-   }
-    
+    function __construct()
+    {
+        $this->objLokasi = new ModelLokasi();
+        $this->objSatuan = new ModelSatuan();
+        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->objHasilSablon = new ModelHasilSablon();
+        $this->objBahanSablon = new ModelBahanSablon();
+        $this->closedPeriodsModel = new ClosedPeriodsModel();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -53,7 +52,7 @@ class HasilSablon extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
@@ -61,7 +60,7 @@ class HasilSablon extends ResourceController
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
         $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
-        return view('hasilsablon/index', $data);
+        return view('transaksi/sablon/hasilsablon/index', $data);
     }
 
     /**
@@ -89,7 +88,7 @@ class HasilSablon extends ResourceController
         $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
 
         // Load view formulir
-        return view('hasilsablon/new', $data);
+        return view('transaksi/sablon/hasilsablon/new', $data);
     }
 
     /**
@@ -124,20 +123,20 @@ class HasilSablon extends ResourceController
 
         // Ambil data yang diinputkan
         $data = [
-        'nota_sablon' => $this->request->getVar('nota_sablon'),
-        'bahan_sablon' => $this->request->getVar('bahan_sablon'),
-        'id_lokasi' => $this->request->getVar('id_lokasi'),
-        'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-        'terpakai' => $this->request->getVar('terpakai'),
-        'rusak' => $this->request->getVar('rusak'),
-        'nama_stock' => $this->request->getVar('nama_stock'),
-        'id_satuan' => $this->request->getVar('id_satuan'),
-        'qty_1' => $qty_1,
-        'qty_2' => $qty_2,
-        'harga_satuan' => $harga_satuan,
-        'jml_harga' => $jml_harga,
-        'tanggal' => $this->request->getVar('tanggal'),
-    ];
+            'nota_sablon' => $this->request->getVar('nota_sablon'),
+            'bahan_sablon' => $this->request->getVar('bahan_sablon'),
+            'id_lokasi' => $this->request->getVar('id_lokasi'),
+            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+            'terpakai' => $this->request->getVar('terpakai'),
+            'rusak' => $this->request->getVar('rusak'),
+            'nama_stock' => $this->request->getVar('nama_stock'),
+            'id_satuan' => $this->request->getVar('id_satuan'),
+            'qty_1' => $qty_1,
+            'qty_2' => $qty_2,
+            'harga_satuan' => $harga_satuan,
+            'jml_harga' => $jml_harga,
+            'tanggal' => $this->request->getVar('tanggal'),
+        ];
         $this->db->table('hasilsablon1')->insert($data);
 
         return redirect()->to(site_url('hasilsablon'))->with('Sukses', 'Data Berhasil Disimpan');
@@ -152,48 +151,48 @@ class HasilSablon extends ResourceController
      */
     public function edit($id = null)
     {
-       // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
+
+        // Ambil data berdasarkan ID
+        $dthasilsablon = $this->objHasilSablon->find($id);
+
+        // Cek jika data tidak ditemukan
+        if (!$dthasilsablon) {
+            return redirect()->to(site_url('hasilsablon'))->with('error', 'Data tidak ditemukan');
+        }
+
+        // Cek apakah tanggal data berada dalam periode tertutup
+        $transactionDate = $dthasilsablon->tanggal;
+        if ($this->closedPeriodsModel->isPeriodClosed($transactionDate)) {
+            return redirect()->to(site_url('hasilsablon'))->with('error', 'Akses edit dibatasi pada periode yang tertutup');
+        }
+
+        // Lanjutkan jika semua pengecekan berhasil
+        $data['dthasilsablon'] = $dthasilsablon;
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
+        return view('transaksi/sablon/hasilsablon/edit', $data);
     }
 
-    // Ambil data berdasarkan ID
-    $dthasilsablon = $this->objHasilSablon->find($id);
+    // Tambahkan fungsi ini di dalam controller HasilSablon
+    private function getUserGroup($userId)
+    {
+        $builder = $this->db->table('auth_groups_users');
+        $builder->select('group_id');
+        $builder->where('user_id', $userId);
+        $query = $builder->get();
 
-    // Cek jika data tidak ditemukan
-    if (!$dthasilsablon) {
-        return redirect()->to(site_url('hasilsablon'))->with('error', 'Data tidak ditemukan');
+        if ($query->getNumRows() > 0) {
+            // Ambil group_id pertama
+            return $query->getRow()->group_id;
+        }
+
+        return null; // Jika tidak ada grup ditemukan
     }
-
-    // Cek apakah tanggal data berada dalam periode tertutup
-    $transactionDate = $dthasilsablon->tanggal;
-    if ($this->closedPeriodsModel->isPeriodClosed($transactionDate)) {
-        return redirect()->to(site_url('hasilsablon'))->with('error', 'Akses edit dibatasi pada periode yang tertutup');
-    }
-
-    // Lanjutkan jika semua pengecekan berhasil
-    $data['dthasilsablon'] = $dthasilsablon;
-    $data['dtlokasi'] = $this->objLokasi->findAll();
-    $data['dtsatuan'] = $this->objSatuan->findAll();
-    $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
-    return view('hasilsablon/edit', $data);
-}
-
-// Tambahkan fungsi ini di dalam controller HasilSablon
-private function getUserGroup($userId)
-{
-    $builder = $this->db->table('auth_groups_users');
-    $builder->select('group_id');
-    $builder->where('user_id', $userId);
-    $query = $builder->get();
-
-    if ($query->getNumRows() > 0) {
-        // Ambil group_id pertama
-        return $query->getRow()->group_id; 
-    }
-
-    return null; // Jika tidak ada grup ditemukan
-}
 
     /**
      * Add or update a model resource, from "posted" properties.
@@ -207,7 +206,7 @@ private function getUserGroup($userId)
         if (!in_groups('admin')) {
             return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
         }
-    
+
         // Ambil nilai dari form dan pastikan menjadi angka
         $qty_1 = floatval($this->request->getVar('qty_1'));
         $qty_2 = floatval($this->request->getVar('qty_2'));
@@ -218,24 +217,24 @@ private function getUserGroup($userId)
 
         // Ambil data yang diinputkan
         $data = [
-        'nota_sablon' => $this->request->getVar('nota_sablon'),
-        'bahan_sablon' => $this->request->getVar('bahan_sablon'),
-        'id_lokasi' => $this->request->getVar('id_lokasi'),
-        'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
-        'terpakai' => $this->request->getVar('terpakai'),
-        'rusak' => $this->request->getVar('rusak'),
-        'nama_stock' => $this->request->getVar('nama_stock'),
-        'id_satuan' => $this->request->getVar('id_satuan'),
-        'qty_1' => $qty_1,
-        'qty_2' => $qty_2,
-        'harga_satuan' => $harga_satuan,
-        'jml_harga' => $jml_harga,  // Pastikan jml_harga terbaru disertakan
-        'tanggal' => $this->request->getVar('tanggal'),
-    ];
-    
+            'nota_sablon' => $this->request->getVar('nota_sablon'),
+            'bahan_sablon' => $this->request->getVar('bahan_sablon'),
+            'id_lokasi' => $this->request->getVar('id_lokasi'),
+            'id_setupsupplier' => $this->request->getVar('id_setupsupplier'),
+            'terpakai' => $this->request->getVar('terpakai'),
+            'rusak' => $this->request->getVar('rusak'),
+            'nama_stock' => $this->request->getVar('nama_stock'),
+            'id_satuan' => $this->request->getVar('id_satuan'),
+            'qty_1' => $qty_1,
+            'qty_2' => $qty_2,
+            'harga_satuan' => $harga_satuan,
+            'jml_harga' => $jml_harga,  // Pastikan jml_harga terbaru disertakan
+            'tanggal' => $this->request->getVar('tanggal'),
+        ];
+
         // Update data di database
         $this->objHasilSablon->update($id, $data);
-    
+
         return redirect()->to(site_url('hasilsablon'))->with('success', 'Data berhasil diupdate.');
     }
 
@@ -246,21 +245,21 @@ private function getUserGroup($userId)
      *
      * @return ResponseInterface
      */
-    
-    
-     public function getDateById($id)
-     {
-         // Ambil data berdasarkan ID dari tabel yang sesuai
-         $data = $this->db->table('hasilsablon1')->where('id_sablon', $id)->get()->getRowArray();
-         
-         // Kembalikan tanggal jika ada, jika tidak, kembalikan null
-         return $data ? $data['tanggal'] : null; // Ganti 'tanggal' dengan nama kolom yang sesuai
-     }
-     
-    
-     public function delete($id = null)
+
+
+    public function getDateById($id)
     {
-        
+        // Ambil data berdasarkan ID dari tabel yang sesuai
+        $data = $this->db->table('hasilsablon1')->where('id_sablon', $id)->get()->getRowArray();
+
+        // Kembalikan tanggal jika ada, jika tidak, kembalikan null
+        return $data ? $data['tanggal'] : null; // Ganti 'tanggal' dengan nama kolom yang sesuai
+    }
+
+
+    public function delete($id = null)
+    {
+
         $this->db->table('hasilsablon1')->where(['id_sablon' => $id])->delete();
         return redirect()->to(site_url('hasilsablon'))->with('Sukses', 'Data Berhasil Dihapus');
     }

@@ -1,31 +1,33 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
-use App\Models\ModelPelunasanHutang;
-use App\Models\ModelSetupbank;
-use App\Models\ModelSetupsupplier;
+use App\Models\transaksi\ModelPelunasanHutang;
+use App\Models\transaksi\pembelian\ModelPembelian;
+use App\Models\setup\ModelSetupbank;
+use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
-use TCPDF; 
+use TCPDF;
 
 class PelunasanHutang extends ResourceController
 {
     protected $objSetupsupplier;
     protected $objSetupbank;
     protected $objPelunasanHutang;
+    protected $objPembelian;
     protected $db;
-    
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objSetupsupplier = new ModelSetupsupplier();
-       $this->objSetupbank = new ModelSetupbank();
-       $this->objPelunasanHutang = new ModelPelunasanHutang();
-       $this->db = \Config\Database::connect();
-       
-   }
-    
+    function __construct()
+    {
+        $this->objSetupsupplier = new ModelSetupsupplier();
+        $this->objSetupbank = new ModelSetupbank();
+        $this->objPelunasanHutang = new ModelPelunasanHutang();
+        $this->objPembelian = new ModelPembelian();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -45,7 +47,7 @@ class PelunasanHutang extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         $data['dtpelunasanhutang'] = $this->objPelunasanHutang->getAll();
@@ -66,31 +68,31 @@ class PelunasanHutang extends ResourceController
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
         }
-    
+
         $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
         $data['dtsetupbank'] = $this->objSetupbank->getAll();
-        
+
         // Debugging: Tampilkan konten HTML sebelum PDF
         $html = view('pelunasanhutang/printPDF', $data);
         // echo $html;
         // exit; // Jika perlu debugging
-    
+
         // Buat PDF baru
         $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
-    
+
         // Hapus header/footer default
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
-    
+
         // Set font
         $pdf->SetFont('helvetica', '', 12);
-    
+
         // Tambah halaman baru
         $pdf->AddPage();
-    
+
         // Cetak konten menggunakan WriteHTML
         $pdf->writeHTML($html, true, false, true, false, '');
-    
+
         // Set tipe respons menjadi PDF
         $this->response->setContentType('application/pdf');
         $pdf->Output('pelunasan_hutang.pdf', 'I');
@@ -115,6 +117,7 @@ class PelunasanHutang extends ResourceController
      */
     public function new()
     {
+        $data['dtpembelian'] = $this->objPembelian->findAll();
         $data['dtpelunasanhutang'] = $this->objPelunasanHutang->getAll();
         $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
         $data['dtsetupbank'] = $this->objSetupbank->findAll();
@@ -132,13 +135,13 @@ class PelunasanHutang extends ResourceController
         $saldo = floatval($this->request->getVar('saldo'));
         $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
         $diskon = floatval($this->request->getVar('diskon'));
-    
+
         // Hitung diskon sebagai persentase dari nilai pelunasan
         $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
-    
+
         // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
         $sisa = $saldo - $nilai_pelunasan + $diskon_amount;
- 
+
         $data = [
             'id_lunashutang'    => $this->request->getVar('id_lunashutang'),
             'nota'              => $this->request->getVar('nota'),
@@ -149,10 +152,10 @@ class PelunasanHutang extends ResourceController
             'nilai_pelunasan'   => $nilai_pelunasan,
             'diskon'            => $diskon,
             'pdpt'              => $this->request->getVar('pdpt'),
-            'sisa'              => $sisa, 
+            'sisa'              => $sisa,
             'keterangan'        => $this->request->getVar('keterangan'),
-            
-            
+
+
         ];
         $this->db->table('pelunasanhutang1')->insert($data);
 
@@ -213,10 +216,10 @@ class PelunasanHutang extends ResourceController
         $saldo = floatval($this->request->getVar('saldo'));
         $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
         $diskon = floatval($this->request->getVar('diskon'));
-    
+
         // Hitung diskon sebagai persentase dari nilai pelunasan
         $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
-    
+
         // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
         $sisa = $saldo - $nilai_pelunasan + $diskon_amount;
 
@@ -231,7 +234,7 @@ class PelunasanHutang extends ResourceController
             'nilai_pelunasan'   => $nilai_pelunasan,
             'diskon'            => $diskon,
             'pdpt'              => $this->request->getVar('pdpt'),
-            'sisa'              => $sisa, 
+            'sisa'              => $sisa,
             'keterangan'        => $this->request->getVar('keterangan'),
         ];
 

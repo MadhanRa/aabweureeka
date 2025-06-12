@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -12,14 +12,16 @@ class ModelBahanSablon extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['nota_pindah',
+    protected $allowedFields    = [
+        'nota_pindah',
         'lokasi_asal',
         'lokasi_tujuan',
         'nama_stock',
         'satuan',
         'qty_1',
         'qty_2',
-        'tanggal',];
+        'tanggal',
+    ];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -34,12 +36,13 @@ class ModelBahanSablon extends Model
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-    function getAll() {
+    function getAll()
+    {
         $builder = $this->db->table('bahansablon1 p'); // Ganti dengan nama tabel yang benar
-        
+
         // Pilih kolom yang diperlukan, gunakan alias dengan benar
         $builder->select('p.*, l1.nama_lokasi AS lokasi_asal, l2.nama_lokasi AS lokasi_tujuan,  s.kode_satuan');
-        
+
         // Join yang benar, pastikan nama tabel dan kolomnya sesuai
         $builder->join('lokasi1 l1', 'p.id_lokasi_asal = l1.id_lokasi'); // Lokasi asal
         $builder->join('lokasi1 l2', 'p.id_lokasi_tujuan = l2.id_lokasi'); // Lokasi tujuan
@@ -54,10 +57,10 @@ class ModelBahanSablon extends Model
     public function getByMonthAndYear($bulan, $tahun)
     {
         $builder = $this->db->table('bahansablon1 p'); // Ganti dengan nama tabel yang benar
-        
+
         // Pilih kolom yang diperlukan, gunakan alias dengan benar
         $builder->select('p.*, l1.nama_lokasi AS lokasi_asal, l2.nama_lokasi AS lokasi_tujuan,  s.kode_satuan');
-        
+
         // Join yang benar, pastikan nama tabel dan kolomnya sesuai
         $builder->join('lokasi1 l1', 'p.id_lokasi_asal = l1.id_lokasi'); // Lokasi asal
         $builder->join('lokasi1 l2', 'p.id_lokasi_tujuan = l2.id_lokasi'); // Lokasi tujuan
@@ -67,24 +70,25 @@ class ModelBahanSablon extends Model
         $query = $builder->get(); // Eksekusi query
         $data = $query->getResult(); // Kembalikan hasil query
 
-    
-            return [
-                'data' => $data,           // Semua data
-            ];
+
+        return [
+            'data' => $data,           // Semua data
+        ];
     }
 
-    function getById($id) {
+    function getById($id)
+    {
         $builder = $this->db->table('bahansablon1 p');
-        
+
         // Pilih kolom yang diperlukan, dengan join yang sesuai
         $builder->select('p.*, l1.nama_lokasi AS lokasi_asal, l2.nama_lokasi AS lokasi_tujuan, s.kode_satuan');
         $builder->join('lokasi1 l1', 'p.id_lokasi_asal = l1.id_lokasi');
         $builder->join('lokasi1 l2', 'p.id_lokasi_tujuan = l2.id_lokasi');
         $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan');
-        
+
         // Tambahkan kondisi where untuk id_bahan
         $builder->where('p.id_bahan', $id);
-        
+
         $query = $builder->get();
         return $query->getRow(); // Mengembalikan satu baris sebagai objek
     }
@@ -92,11 +96,11 @@ class ModelBahanSablon extends Model
     public function get_laporan($tglawal, $tglakhir = null)
     {
         $builder = $this->db->table('bahansablon1 p');
-       // Pilih kolom yang diperlukan, dengan join yang sesuai
-       $builder->select('p.*, l1.nama_lokasi AS lokasi_asal, l2.nama_lokasi AS lokasi_tujuan, s.kode_satuan');
-       $builder->join('lokasi1 l1', 'p.id_lokasi_asal = l1.id_lokasi');
-       $builder->join('lokasi1 l2', 'p.id_lokasi_tujuan = l2.id_lokasi');
-       $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan');
+        // Pilih kolom yang diperlukan, dengan join yang sesuai
+        $builder->select('p.*, l1.nama_lokasi AS lokasi_asal, l2.nama_lokasi AS lokasi_tujuan, s.kode_satuan');
+        $builder->join('lokasi1 l1', 'p.id_lokasi_asal = l1.id_lokasi');
+        $builder->join('lokasi1 l2', 'p.id_lokasi_tujuan = l2.id_lokasi');
+        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan');
 
 
         // Filter tanggal

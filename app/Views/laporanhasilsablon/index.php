@@ -11,18 +11,6 @@
     <h1>Laporan Hasil Sablon</h1>
   </div>
 
-  <!-- Tombol Print All -->
-  <div class="section-body">
-    <div class="card-body">
-      <div class="row">
-        <div class="col">
-          <a href="<?= base_url('LaporanHasilSablon/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir) ?>" class="btn btn-success" target="_blank">
-            <i class="fas fa-print"></i> Cetak PDF
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Menampilkan Pesan Sukses -->
   <?php if (session()->getFlashdata('Sukses')) : ?>
@@ -38,25 +26,29 @@
 
   <!-- Tabel Data -->
   <div class="section-body">
-    <div class="card-body">
-      <form action="<?= site_url('laporanhasilsablon') ?>" method="POST">
-        <?= csrf_field() ?>
-        <div class="row g-3">
-          <div class="col">
-            <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
-          </div>
-          <div class="col">
-            <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
-          </div>
-          <div class="col">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
-          </div>
-        </div>
-      </form>
-
+    <div class="card">
+      <div class="card-header">
+        <a href="<?= base_url('LaporanHasilSablon/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir) ?>" class="btn btn-success" target="_blank">
+          <i class="fas fa-print"></i> Cetak PDF
+        </a>
+      </div>
       <div class="card-body">
+        <form action="<?= site_url('laporanhasilsablon') ?>" method="POST">
+          <?= csrf_field() ?>
+          <div class="row g-3">
+            <div class="col">
+              <input type="date" class="form-control" name="tglawal" value="<?= $tglawal ?>">
+            </div>
+            <div class="col">
+              <input type="date" class="form-control" name="tglakhir" value="<?= $tglakhir ?>">
+            </div>
+            <div class="col">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+            </div>
+          </div>
+        </form>
 
-        <div class="table-responsive">
+        <div class="table-responsive mt-3">
           <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
             <thead>
               <tr class="eureeka-table-header">

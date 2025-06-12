@@ -136,107 +136,66 @@ $routes->group('', ['namespace' => 'App\Controllers\transaksi'], function ($rout
     $routes->put('/pindahlokasi/(:segment)', 'PindahLokasi::update/$1', ['filter' => 'role:admin']);
     $routes->put('/pindahlokasi/(:segment)/edit', 'PindahLokasi::edit/$1', ['filter' => 'role:admin']);
     $routes->resource('pindahlokasi');
+
+    //routes bahansablon
+    $routes->get('bahansablon/printPDF/(:num)', 'BahanSablon::printPDF/$1');
+    $routes->get('BahanSablon/printPDF/(:num)', 'BahanSablon::printPDF/$1');
+    $routes->get('bahansablon/printPDF', 'BahanSablon::printPDF');
+    $routes->get('BahanSablon/printPDF', 'BahanSablon::printPDF');
+    $routes->put('/bahansablon/(:segment)', 'BahanSablon::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/bahansablon/(:segment)/edit', 'BahanSablon::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('bahansablon');
+
+    // Routes untuk hasilsablon
+    $routes->get('hasilsablon/printPDF/(:num)', 'HasilSablon::printPDF/$1'); // Print dengan ID
+    $routes->get('hasilsablon/printPDF', 'HasilSablon::printPDF'); // Print tanpa ID
+    $routes->put('/hasilsablon/(:segment)', 'HasilSablon::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/hasilsablon/(:segment)/edit', 'HasilSablon::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('hasilsablon');
+
+    //routes pemakaianbahan
+    $routes->get('pemakaianbahan/printPDF/(:num)', 'PemakaianBahan::printPDF/$1');
+    $routes->get('PemakaianBahan/printPDF/(:num)', 'PemakaianBahan::printPDF/$1');
+    $routes->get('pemakaianbahan/printPDF', 'PemakaianBahan::printPDF');
+    $routes->get('PemakaianBahan/printPDF', 'PemakaianBahan::printPDF');
+    $routes->put('/pemakaianbahan/(:segment)', 'PemakaianBahan::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/pemakaianbahan/(:segment)/edit', 'PemakaianBahan::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('pemakaianbahan');
+
+    //routes hasil produksi
+    $routes->get('hasilproduksi/printPDF/(:num)', 'HasilProduksi::printPDF/$1');
+    $routes->get('HasilProduksi/printPDF/(:num)', 'HasilProduksi::printPDF/$1');
+    $routes->get('hasilproduksi/printPDF', 'HasilProduksi::printPDF');
+    $routes->get('HasilProduksi/printPDF', 'HasilProduksi::printPDF');
+    $routes->resource('hasilproduksi');
+
+    //routes t_utangusaha
+    $routes->get('tutangusaha/printPDF/(:num)', 'TutangUsaha::printPDF/$1');
+    $routes->get('TutangUsaha/printPDF/(:num)', 'TutangUsaha::printPDF/$1');
+    $routes->get('tutangusaha/printPDF', 'TutangUsaha::printPDF');
+    $routes->get('TutangUsaha/printPDF', 'TutangUsaha::printPDF');
+    $routes->put('/tutangusaha/(:segment)', 'TutangUsaha::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/tutangusaha/(:segment)/edit', 'TutangUsaha::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('tutangusaha');
+
+    //routes lunassalesman
+    $routes->get('lunassalesman/printPDF/(:num)', 'LunasSalesman::printPDF/$1');
+    $routes->get('LunasSalesman/printPDF/(:num)', 'LunasSalesman::printPDF/$1');
+    $routes->get('lunassalesman/printPDF', 'LunasSalesman::printPDF');
+    $routes->get('LunasSalesman/printPDF', 'LunasSalesman::printPDF');
+    $routes->put('/lunassalesman/(:segment)', 'LunasSalesman::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/lunassalesman/(:segment)/edit', 'LunasSalesman::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('lunassalesman');
+
+    //routes pelunasanhutang
+    $routes->get('pelunasanhutang/printPDF/(:num)', 'PelunasanHutang::printPDF/$1');
+    $routes->get('PelunasanHutang/printPDF/(:num)', 'PelunasanHutang::printPDF/$1');
+    $routes->get('pelunasanhutang/printPDF', 'PelunasanHutang::printPDF');
+    $routes->get('PelunasanHutang/printPDF', 'PelunasanHutang::printPDF');
+    $routes->put('/pelunasanHutang/(:segment)', 'PelunasanHutang::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/pelunasanhutang/(:segment)/edit', 'PelunasanHutang::edit/$1', ['filter' => 'role:admin']);
+    $routes->resource('pelunasanhutang');
 });
-
-//routes bahansablon
-$routes->get('/bahansablon/new', 'BahanSablon::new');
-// $routes->get('/bahansablon/(:segment)/new', 'BahanSablon::edit/$1');
-$routes->resource('bahansablon');
-$routes->post('/bahansablon', 'BahanSablon::create');
-$routes->post('/bahansablon/(:any)', 'BahanSablon::delete/$1');
-// $routes->put('/bahansablon/(:segment)/edit', 'BahanSablon::edit/$1');
-$routes->get('bahansablon', 'BahanSablon::index');
-$routes->get('bahansablon/printPDF/(:num)', 'BahanSablon::printPDF/$1');
-$routes->get('BahanSablon/printPDF/(:num)', 'BahanSablon::printPDF/$1');
-$routes->get('bahansablon/printPDF', 'BahanSablon::printPDF');
-$routes->get('BahanSablon/printPDF', 'BahanSablon::printPDF');
-$routes->put('/bahansablon/(:segment)', 'BahanSablon::update/$1', ['filter' => 'role:admin']);
-$routes->put('/bahansablon/(:segment)/edit', 'BahanSablon::edit/$1', ['filter' => 'role:admin']);
-
-// Routes untuk hasilsablon
-$routes->resource('hasilsablon'); // Untuk route dasar seperti index, show, new, create, update, delete
-// $routes->get('hasilsablon/edit/(:num)', 'HasilSablon::edit/$1'); // Form edit
-// $routes->post('hasilsablon/update/(:num)', 'HasilSablon::update/$1', ['filter' => 'role:admin']); // Aksi update
-$routes->delete('hasilsablon/(:num)', 'HasilSablon::delete/$1'); // Route delete
-$routes->get('hasilsablon/printPDF/(:num)', 'HasilSablon::printPDF/$1'); // Print dengan ID
-$routes->get('hasilsablon/printPDF', 'HasilSablon::printPDF'); // Print tanpa ID
-// $routes->get('hasilsablon/edit/(:num)', 'HasilSablon::edit/$1');
-$routes->put('/hasilsablon/(:segment)', 'HasilSablon::update/$1', ['filter' => 'role:admin']);
-$routes->put('/hasilsablon/(:segment)/edit', 'HasilSablon::edit/$1', ['filter' => 'role:admin']);
-
-//routes hasil produksi
-$routes->get('/hasilproduksi/new', 'HasilProduksi::new');
-$routes->get('/hasilproduksi/(:segment)/new', 'HasilProduksi::edit/$1');
-$routes->resource('hasilproduksi');
-$routes->post('/hasilproduksi', 'HasilProduksi::create');
-$routes->post('/hasilproduksi/(:any)', 'HasilProduksi::delete/$1');
-$routes->put('/hasilsablon/(:segment)', 'HasilSablon::update/$1');
-$routes->put('/hasilproduksi/(:segment)/edit', 'HasilProduksi::edit/$1');
-$routes->get('hasilproduksi', 'HasilProduksi::index');
-$routes->get('hasilproduksi/printPDF/(:num)', 'HasilProduksi::printPDF/$1');
-$routes->get('HasilProduksi/printPDF/(:num)', 'HasilProduksi::printPDF/$1');
-$routes->get('hasilproduksi/printPDF', 'HasilProduksi::printPDF');
-$routes->get('HasilProduksi/printPDF', 'HasilProduksi::printPDF');
-
-//routes pemakaianbahan
-$routes->get('/pemakaianbahan/new', 'PemakaianBahan::new');
-// $routes->get('/pemakaianbahan/(:segment)/new', 'PemakaianBahan::edit/$1');
-$routes->resource('pemakaianbahan');
-$routes->post('/pemakaianbahan', 'PemakaianBahan::create');
-$routes->post('/pemakaianbahan/(:any)', 'PemakaianBahan::delete/$1');
-// $routes->put('/pemakaianbahan/(:segment)/edit', 'PemakaianBahan::edit/$1');
-$routes->get('pemakaianbahan', 'PemakaianBahan::index');
-$routes->get('pemakaianbahan/printPDF/(:num)', 'PemakaianBahan::printPDF/$1');
-$routes->get('PemakaianBahan/printPDF/(:num)', 'PemakaianBahan::printPDF/$1');
-$routes->get('pemakaianbahan/printPDF', 'PemakaianBahan::printPDF');
-$routes->get('PemakaianBahan/printPDF', 'PemakaianBahan::printPDF');
-$routes->put('/pemakaianbahan/(:segment)', 'PemakaianBahan::update/$1', ['filter' => 'role:admin']);
-$routes->put('/pemakaianbahan/(:segment)/edit', 'PemakaianBahan::edit/$1', ['filter' => 'role:admin']);
-
-//routes t_utangusaha
-$routes->get('/tutangusaha/new', 'TutangUsaha::new');
-// $routes->get('/tutangusaha/(:segment)/new', 'TutangUsaha::edit/$1');
-$routes->resource('tutangusaha');
-$routes->post('/tutangusaha', 'TutangUsaha::create');
-$routes->post('/tutangusaha/(:any)', 'TutangUsaha::delete/$1');
-// $routes->put('/tutangusaha/(:segment)/edit', 'TutangUsaha::edit/$1');
-$routes->get('tutangusaha', 'TutangUsaha::index');
-$routes->get('tutangusaha/printPDF/(:num)', 'TutangUsaha::printPDF/$1');
-$routes->get('TutangUsaha/printPDF/(:num)', 'TutangUsaha::printPDF/$1');
-$routes->get('tutangusaha/printPDF', 'TutangUsaha::printPDF');
-$routes->get('TutangUsaha/printPDF', 'TutangUsaha::printPDF');
-$routes->put('/tutangusaha/(:segment)', 'TutangUsaha::update/$1', ['filter' => 'role:admin']);
-$routes->put('/tutangusaha/(:segment)/edit', 'TutangUsaha::edit/$1', ['filter' => 'role:admin']);
-
-//routes lunassalesman
-$routes->get('/lunassalesman/new', 'LunasSalesman::new');
-// $routes->get('/lunassalesman/(:segment)/new', 'LunasSalesman::edit/$1');    
-$routes->resource('lunassalesman');
-$routes->post('/lunassalesman', 'LunasSalesman::create');
-$routes->post('/lunassalesman/(:any)', 'LunasSalesman::delete/$1');
-// $routes->put('/lunassalesman/(:segment)/edit', 'LunasSalesman::edit/$1');
-$routes->get('lunassalesman', 'LunasSalesman::index');
-$routes->get('lunassalesman/printPDF/(:num)', 'LunasSalesman::printPDF/$1');
-$routes->get('LunasSalesman/printPDF/(:num)', 'LunasSalesman::printPDF/$1');
-$routes->get('lunassalesman/printPDF', 'LunasSalesman::printPDF');
-$routes->get('LunasSalesman/printPDF', 'LunasSalesman::printPDF');
-$routes->put('/lunassalesman/(:segment)', 'LunasSalesman::update/$1', ['filter' => 'role:admin']);
-$routes->put('/lunassalesman/(:segment)/edit', 'LunasSalesman::edit/$1', ['filter' => 'role:admin']);
-
-//routes pelunasanhutang
-$routes->get('/pelunasanhutang/new', 'PelunasanHutang::new');
-// $routes->get('/pelunasanhutang/(:segment)/new', 'PelunasanHutang::edit/$1');
-$routes->resource('pelunasanhutang');
-$routes->post('/pelunasanhutang', 'PelunasanHutang::create');
-$routes->post('/pelunasanhutang/(:any)', 'PelunasanHutang::delete/$1');
-// $routes->put('/pelunasanhutang/(:segment)/edit', 'PelunasanHutang::edit/$1');
-$routes->get('pelunasanhutang', 'PelunasanHutang::index');
-$routes->get('pelunasanhutang/printPDF/(:num)', 'PelunasanHutang::printPDF/$1');
-$routes->get('PelunasanHutang/printPDF/(:num)', 'PelunasanHutang::printPDF/$1');
-$routes->get('pelunasanhutang/printPDF', 'PelunasanHutang::printPDF');
-$routes->get('PelunasanHutang/printPDF', 'PelunasanHutang::printPDF');
-$routes->put('/pelunasanHutang/(:segment)', 'PelunasanHutang::update/$1', ['filter' => 'role:admin']);
-$routes->put('/pelunasanhutang/(:segment)/edit', 'PelunasanHutang::edit/$1', ['filter' => 'role:admin']);
 
 //routes jurnalumum
 $routes->get('/jurnalumum/new', 'JurnalUmum::new');
@@ -370,6 +329,37 @@ $routes->get('/laporanbankkartu/printPDF', 'LaporanBankKartu::printPDF');
 //laporandaftarbank
 $routes->get('/laporanbankdaftar', 'LaporanBankDaftar::index');
 $routes->get('/laporanbankdaftar/printPDF', 'LaporanBankDaftar::printPDF');
+
+//laporan kartu piutang usaha
+$routes->get('/laporankartupiutangusaha', 'LaporanPiutangUsahaKartu::index');
+$routes->get('/laporankartupiutangusaha/printPDF', 'LaporanPiutangUsahaKartu::printPDF');
+
+//laporan daftar piutang usaha
+$routes->get('/laporandaftarpiutangusaha', 'LaporanPiutangUsahaDaftar::index');
+$routes->get('/laporandaftarpiutangusaha/printPDF', 'LaporanPiutangUsahaDaftar::printPDF');
+
+//laporan daftar piutang usaha nota
+$routes->get('/laporandaftarpiutangusahanota', 'LaporanPiutangUsahaDaftarNota::index');
+$routes->get('/laporandaftarpiutangusahanota/printPDF', 'LaporanPiutangUsahaDaftarNota::printPDF');
+
+//laporan umur piutang usaha
+$routes->get('/laporanumurpiutang', 'LaporanPiutangUsahaUmur::index');
+$routes->get('/laporanumurpiutang/printPDF', 'LaporanPiutangUsahaUmur::printPDF');
+
+
+//laporan kartu piutang salesman
+$routes->get('/laporankartupiutangsalesman', 'LaporanPiutangSalesmanKartu::index');
+$routes->get('/laporankartupiutangsalesman/printPDF', 'LaporanPiutangSalesmanKartu::printPDF');
+
+//laporan daftar piutang salesman
+$routes->get('/laporandaftarpiutangsalesman', 'LaporanPiutangSalesmanDaftar::index');
+$routes->get('/laporandaftarpiutangsalesman/printPDF', 'LaporanPiutangSalesmanDaftar::printPDF');
+
+//laporan daftar piutang salesman nota
+$routes->get('/laporandaftarpiutangsalesmannota', 'LaporanPiutangSalesmanDaftarNota::index');
+$routes->get('/laporandaftarpiutangsalesmannota/printPDF', 'LaporanPiutangSalesmanDaftarNota::printPDF');
+
+
 
 //laporanjurnalumum
 $routes->get('/laporanjurnalumum', 'LaporanJurnalUmum::index');

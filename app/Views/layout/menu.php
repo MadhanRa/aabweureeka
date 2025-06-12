@@ -95,18 +95,18 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Piutang Usaha</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="index-0.html">Kartu Piutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Piutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Piutang Usaha Per Nota</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Laporan Umur Piutang</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporankartupiutangusaha') ?>">Kartu Piutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarpiutangusaha') ?>">Daftar Piutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarpiutangusahanota') ?>">Daftar Piutang Usaha Per Nota</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanumurpiutang') ?>">Laporan Umur Piutang</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Piutang Salesman</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="index-0.html">Kartu Piutang Salesman</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Piutang Salesman</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Piutang Salesman Per Nota</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporankartupiutangsalesman') ?>">Kartu Piutang Salesman</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarpiutangsalesman') ?>">Daftar Piutang Salesman</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarpiutangsalesmannota') ?>">Daftar Piutang Salesman Per Nota</a></li>
   </ul>
 </li>
 

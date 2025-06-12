@@ -12,7 +12,7 @@ class ModelSetupsalesman extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_salesman', 'nama_salesman', 'id_lokasi', 'saldo'];
+    protected $allowedFields    = ['kode_salesman', 'nama_salesman', 'id_lokasi', 'saldo', 'saldo_awal'];
 
 
     public function getSalesmanwithLokasi()

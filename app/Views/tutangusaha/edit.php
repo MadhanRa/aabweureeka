@@ -24,12 +24,12 @@
             <label>Tanggal</label>
             <input type="date" class="form-control" name="tanggal" value="<?= esc($dtpiutangusaha->tanggal) ?>" required>
           </div>
-          
+
           <div class="form-group">
             <label>Nota</label>
             <input type="text" class="form-control" name="nota" value="<?= esc($dtpiutangusaha->nota) ?>" required>
           </div>
-          
+
           <div class="form-group">
             <label>Pelanggan</label>
             <select class="form-control" name="id_pelanggan" required>
@@ -38,8 +38,8 @@
                 <option value="<?= esc($value->id_pelanggan) ?>" <?= $dtpiutangusaha->id_pelanggan == $value->id_pelanggan ? 'selected' : '' ?>>
                   <?= esc($value->nama_pelanggan) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div class="form-group">
@@ -50,8 +50,21 @@
                 <option value="<?= esc($value->id_setupbank) ?>" <?= $dtpiutangusaha->id_setupbank == $value->id_setupbank ? 'selected' : '' ?>>
                   <?= esc($value->nama_setupbank) ?>
                 </option>
-              <?php endforeach; ?>    
-            </select>    
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <!-- Nota Penjualan - id_penjualan -->
+          <div class="form-group">
+            <label>Nota Penjualan</label>
+            <select class="form-control" name="id_penjualan" required>
+              <option value="" hidden>-- Pilih Nota Penjualan --</option>
+              <?php foreach ($dtpenjualan as $key => $value) : ?>
+                <option value="<?= esc($value->id_penjualan) ?>" <?= $dtpiutangusaha->id_penjualan == $value->id_penjualan ? 'selected' : '' ?>>
+                  <?= esc($value->nota) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div class="form-group">
@@ -88,14 +101,14 @@
             <button type="submit" class="btn btn-success">Update Data</button>
             <button type="reset" class="btn btn-danger">Reset</button>
           </div>
-        </form>          
+        </form>
       </div>
     </div>
   </div>
 </section>
 
 <script>
-document.addEventListener("input", function() {
+  document.addEventListener("input", function() {
     const saldo = parseFloat(document.querySelector("input[name='saldo']").value.replace(/\./g, '').replace(',', '.')) || 0;
     const nilai_pelunasan = parseFloat(document.querySelector("input[name='nilai_pelunasan']").value.replace(/\./g, '').replace(',', '.')) || 0;
     const diskon = parseFloat(document.querySelector("input[name='diskon']").value) || 0;
@@ -106,12 +119,15 @@ document.addEventListener("input", function() {
 
     // Tampilkan hasil sisa dalam format Rupiah dan di set ke field sisa
     document.querySelector("input[name='sisa']").value = formatRupiah(sisa);
-});
+  });
 
-// Fungsi untuk format angka ke Rupiah
-function formatRupiah(angka) {
-    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(angka);
-}
+  // Fungsi untuk format angka ke Rupiah
+  function formatRupiah(angka) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR"
+    }).format(angka);
+  }
 </script>
 
 <?= $this->endSection(); ?>

@@ -1,36 +1,35 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\ClosedPeriodsModel;
-use App\Models\ModelHasilProduksi;
-use App\Models\ModelKelompokproduksi;
+use App\Models\transaksi\ModelHasilProduksi;
+use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class HasilProduksi extends ResourceController
 {
     protected
-    $objLokasi,
-    $objSatuan, 
-    $objKelompokproduksi,
-    $objHasilProduksi,
-    $closedPeriodsModel,
-    $db;
+        $objLokasi,
+        $objSatuan,
+        $objKelompokproduksi,
+        $objHasilProduksi,
+        $closedPeriodsModel,
+        $db;
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objLokasi = new ModelLokasi();
-       $this->objSatuan = new ModelSatuan();
-       $this->objKelompokproduksi = new ModelKelompokproduksi();
-       $this->objHasilProduksi = new ModelHasilProduksi();
-       $this->closedPeriodsModel = new ClosedPeriodsModel();
-       $this->db = \Config\Database::connect();
-       
-   }
-    
+    function __construct()
+    {
+        $this->objLokasi = new ModelLokasi();
+        $this->objSatuan = new ModelSatuan();
+        $this->objKelompokproduksi = new ModelKelompokproduksi();
+        $this->objHasilProduksi = new ModelHasilProduksi();
+        $this->closedPeriodsModel = new ClosedPeriodsModel();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -50,15 +49,15 @@ class HasilProduksi extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-        $data['dthasilproduksi'] = $this->objHasilProduksi->getAll();
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->getAll();
-        return view('hasilproduksi/index', $data);
+        $data['dthasilproduksi'] = $this->objHasilProduksi->findAll();
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
+        return view('transaksi/bahan/hasilproduksi/index', $data);
     }
 
     /**
@@ -86,7 +85,7 @@ class HasilProduksi extends ResourceController
         $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
 
         // Load view formulir
-        return view('hasilproduksi/new', $data);
+        return view('transaksi/bahan/hasilproduksi/new', $data);
     }
 
     /**
@@ -96,7 +95,7 @@ class HasilProduksi extends ResourceController
      */
     public function create()
     {
-       
+
         // Ambil nilai dari form dan pastikan menjadi angka
         $qty_1 = floatval($this->request->getVar('qty_1'));
         $qty_2 = floatval($this->request->getVar('qty_2'));  // Ambil qty_2
@@ -132,32 +131,32 @@ class HasilProduksi extends ResourceController
      */
     public function edit($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
-    }
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
 
-    // Ambil data berdasarkan ID
-    $dthasilproduksi = $this->objHasilProduksi->find($id);
+        // Ambil data berdasarkan ID
+        $dthasilproduksi = $this->objHasilProduksi->find($id);
 
-    // Cek jika data tidak ditemukan
-    if (!$dthasilproduksi) {
-        return redirect()->to(site_url('hasilproduksi'))->with('error', 'Data tidak ditemukan');
-    }
+        // Cek jika data tidak ditemukan
+        if (!$dthasilproduksi) {
+            return redirect()->to(site_url('hasilproduksi'))->with('error', 'Data tidak ditemukan');
+        }
 
-    // Cek apakah tanggal data berada dalam periode tertutup
-    $transactionDate = $dthasilproduksi->tanggal;
-    if ($this->closedPeriodsModel->isPeriodClosed($transactionDate)) {
-        return redirect()->to(site_url('hasilproduksi'))->with('error', 'Akses edit dibatasi pada periode yang tertutup');
-    }
+        // Cek apakah tanggal data berada dalam periode tertutup
+        $transactionDate = $dthasilproduksi->tanggal;
+        if ($this->closedPeriodsModel->isPeriodClosed($transactionDate)) {
+            return redirect()->to(site_url('hasilproduksi'))->with('error', 'Akses edit dibatasi pada periode yang tertutup');
+        }
 
-    // Lanjutkan jika semua pengecekan berhasil
-    $data['dthasilproduksi'] = $dthasilproduksi;
-    $data['dtlokasi'] = $this->objLokasi->findAll();
-    $data['dtsatuan'] = $this->objSatuan->findAll();
-    $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
+        // Lanjutkan jika semua pengecekan berhasil
+        $data['dthasilproduksi'] = $dthasilproduksi;
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
 
-    return view('hasilproduksi/edit', $data);
+        return view('transaksi/bahan/hasilproduksi/edit', $data);
     }
 
     /**

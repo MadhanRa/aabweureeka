@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -31,23 +31,23 @@ class ModelPelunasanHutang extends Model
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('pelunasanhutang1 p');
-        
+
         // Memilih kolom yang diperlukan dengan alias yang sesuai
         $builder->select('
             p.*, 
             sp.nama AS nama, 
             sb.nama_setupbank AS nama_setupbank
         ');
-        
+
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-        
+
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('setupbank1 sb', 'p.id_setupbank = sb.id_setupbank', 'left');
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan hasil query sebagai array objek
         return $query->getResult();
 
@@ -69,30 +69,30 @@ class ModelPelunasanHutang extends Model
         $query = $builder->get();
         $data = $query->getResult();
 
-            return [
-                'data' => $data,           // Semua data
-            ];
+        return [
+            'data' => $data,           // Semua data
+        ];
     }
     function getById($id)
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('pelunasanhutang1 p');
-        
+
         // Pilih kolom yang diperlukan, dengan join yang sesuai
         $builder->select('p.*, sp.nama AS nama, sb.nama_setupbank AS nama_setupbank');
-        
+
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
-        
+
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('setupbank1 sb', 'p.id_setupbank = sb.id_setupbank', 'left');
-        
+
         // Tambahkan kondisi where untuk id_lunashusaha
         $builder->where('p.id_lunashutang', $id);
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan satu baris sebagai objek
         return $query->getRow();
     }

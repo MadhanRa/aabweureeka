@@ -8,8 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('hasilsablon/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+    <h1>Dashboard Hasil Sablon</h1>
   </div>
 
 
@@ -31,6 +30,10 @@
     <div class="card">
       <div class="card-header">
         <h4>Hasil Sablon</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('hasilsablon/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+
+        </div>
       </div>
       <div class="section-body">
         <div class="card-body">

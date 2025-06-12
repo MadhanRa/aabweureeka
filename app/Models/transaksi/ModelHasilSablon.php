@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -86,9 +86,9 @@ class ModelHasilSablon extends Model
 
     function getById($id)
     {
-            $builder = $this->db->table('hasilsablon1 p');
+        $builder = $this->db->table('hasilsablon1 p');
 
-            $builder->select('
+        $builder->select('
             p.*, 
             l1.nama_lokasi AS lokasi_asal, 
             sp.nama, 
@@ -114,9 +114,9 @@ class ModelHasilSablon extends Model
 
     public function get_laporan($tglawal, $tglakhir = null)
     {
-            $builder = $this->db->table('hasilsablon1 p');
+        $builder = $this->db->table('hasilsablon1 p');
 
-            $builder->select('
+        $builder->select('
             p.*, 
             l1.nama_lokasi AS lokasi_asal, 
             sp.nama, 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelBahanSablon;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\ModelBahanSablon;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use TCPDF;
@@ -15,17 +15,16 @@ class BahanSablon extends ResourceController
     protected $objSatuan;
     protected $objBahanSablon;
     protected $db;
-    
-    
+
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objLokasi = new ModelLokasi();
-       $this->objSatuan = new ModelSatuan();
-       $this->objBahanSablon = new ModelBahanSablon();
-       $this->db = \Config\Database::connect();
-       
-   }
+    function __construct()
+    {
+        $this->objLokasi = new ModelLokasi();
+        $this->objSatuan = new ModelSatuan();
+        $this->objBahanSablon = new ModelBahanSablon();
+        $this->db = \Config\Database::connect();
+    }
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -45,14 +44,14 @@ class BahanSablon extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
-         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-         $data['dtbahansablon'] = $this->objBahanSablon->getAll();
-         $data['dtlokasi'] = $this->objLokasi->getAll();
-         $data['dtsatuan'] = $this->objSatuan->getAll();
-         return view('bahansablon/index', $data);
+        // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
+        $data['dtbahansablon'] = $this->objBahanSablon->getAll();
+        $data['dtlokasi'] = $this->objLokasi->getAll();
+        $data['dtsatuan'] = $this->objSatuan->getAll();
+        return view('transaksi/sablon/bahansablon/index', $data);
     }
 
     public function printPDF($id = null)
@@ -67,31 +66,31 @@ class BahanSablon extends ResourceController
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
         }
-    
+
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
-        
+
         // Debugging: Tampilkan konten HTML sebelum PDF
-        $html = view('bahansablon/printPDF', $data);
+        $html = view('transaksi/sablon/bahansablon/printPDF', $data);
         // echo $html;
         // exit; // Jika perlu debugging
-    
+
         // Buat PDF baru
         $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
-    
+
         // Hapus header/footer default
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
-    
+
         // Set font
         $pdf->SetFont('helvetica', '', 12);
-    
+
         // Tambah halaman baru
         $pdf->AddPage();
-    
+
         // Cetak konten menggunakan WriteHTML
         $pdf->writeHTML($html, true, false, true, false, '');
-    
+
         // Set tipe respons menjadi PDF
         $this->response->setContentType('application/pdf');
         $pdf->Output('bahandisablon.pdf', 'I');
@@ -121,7 +120,7 @@ class BahanSablon extends ResourceController
         $data['dtsatuan'] = $this->objSatuan->findAll();
 
         // Load view formulir
-        return view('bahansablon/new', $data);
+        return view('transaksi/sablon/bahansablon/new', $data);
     }
 
     /**
@@ -157,8 +156,8 @@ class BahanSablon extends ResourceController
      */
     public function edit($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-         if (!in_groups('admin')) {
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
             return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
         }
 
@@ -175,7 +174,7 @@ class BahanSablon extends ResourceController
         $data['dtbahansablon'] = $dtbahansablon;
         $data['dtlokasi'] = $this->objLokasi->findAll();
         $data['dtsatuan'] = $this->objSatuan->findAll();
-        return view('bahansablon/edit', $data);
+        return view('transaksi/sablon/bahansablon/edit', $data);
     }
 
     /**
@@ -187,34 +186,34 @@ class BahanSablon extends ResourceController
      */
     public function update($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
-    }
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
 
-    // Cek apakah data dengan ID yang diberikan ada di database
-    $existingData = $this->objBahanSablon->find($id);
-    if (!$existingData) {
-        return redirect()->to(site_url('bahansablon'))->with('error', 'Data tidak ditemukan');
-    }
+        // Cek apakah data dengan ID yang diberikan ada di database
+        $existingData = $this->objBahanSablon->find($id);
+        if (!$existingData) {
+            return redirect()->to(site_url('bahansablon'))->with('error', 'Data tidak ditemukan');
+        }
 
-    // Ambil data yang diinputkan dari form
-    $data = [
-        'id_bahan' => $this->request->getVar('id_bahan'),
-        'nota_pindah' => $this->request->getVar('nota_pindah'),
-        'id_lokasi_asal'   => $this->request->getVar('id_lokasi_asal'),
-        'id_lokasi_tujuan' => $this->request->getVar('id_lokasi_tujuan'),
-        'nama_stock'       => $this->request->getVar('nama_stock'),
-        'id_satuan'        => $this->request->getVar('id_satuan'),
-        'qty_1'            => $this->request->getVar('qty_1'),
-        'qty_2'            => $this->request->getVar('qty_2'),
-        'tanggal'          => $this->request->getVar('tanggal'),
-    ];
+        // Ambil data yang diinputkan dari form
+        $data = [
+            'id_bahan' => $this->request->getVar('id_bahan'),
+            'nota_pindah' => $this->request->getVar('nota_pindah'),
+            'id_lokasi_asal'   => $this->request->getVar('id_lokasi_asal'),
+            'id_lokasi_tujuan' => $this->request->getVar('id_lokasi_tujuan'),
+            'nama_stock'       => $this->request->getVar('nama_stock'),
+            'id_satuan'        => $this->request->getVar('id_satuan'),
+            'qty_1'            => $this->request->getVar('qty_1'),
+            'qty_2'            => $this->request->getVar('qty_2'),
+            'tanggal'          => $this->request->getVar('tanggal'),
+        ];
 
-    // Update data berdasarkan ID
-    $this->objBahanSablon->update($id, $data);
+        // Update data berdasarkan ID
+        $this->objBahanSablon->update($id, $data);
 
-    return redirect()->to(site_url('bahansablon'))->with('success', 'Data berhasil diupdate.');
+        return redirect()->to(site_url('bahansablon'))->with('success', 'Data berhasil diupdate.');
     }
 
     /**

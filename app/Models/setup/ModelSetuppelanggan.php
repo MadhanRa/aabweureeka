@@ -12,7 +12,7 @@ class ModelSetuppelanggan extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe', 'saldo'];
+    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe', 'saldo', 'saldo_awal'];
 
 
     // protected bool $allowEmptyInserts = false;

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\transaksi\penjualan\ModelPenjualan;
 use App\Models\transaksi\penjualan\ModelPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\transaksi\ModelRiwayatPiutang;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupBuku;
@@ -18,6 +19,7 @@ use CodeIgniter\Database\ConnectionInterface;
 class PenjualanService
 {
     protected $riwayatTransaksi;
+    protected $riwayatPiutang;
     protected $penjualan;
     protected $penjualanDetail;
     protected $stockGudang;
@@ -37,6 +39,7 @@ class PenjualanService
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
+        ModelRiwayatPiutang $riwayatPiutang,
         ModelHutangPiutang $hutangPiutang,
         ModelAntarmuka $interface,
         ModelSetuppelanggan $pelanggan,
@@ -51,6 +54,7 @@ class PenjualanService
         $this->stockGudang = $stock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
+        $this->riwayatPiutang = $riwayatPiutang;
         $this->riwayatHP = $hutangPiutang;
         $this->interface = $interface;
         $this->pelanggan = $pelanggan;
@@ -443,52 +447,102 @@ class PenjualanService
      */
     protected function setPiutang(array $headerData, int $idPenjualan): void
     {
-        // Cari data piutang yang sudah ada (jika ada)
+        $this->handlePiutangRelasi(
+            $idPenjualan,
+            $headerData,
+            $headerData['id_pelanggan'],
+            'pelanggan'
+        );
+
+        $this->handlePiutangRelasi(
+            $idPenjualan,
+            $headerData,
+            $headerData['id_salesman'],
+            'salesman'
+        );
+    }
+
+    private function handlePiutangRelasi(int $idPenjualan, array $headerData, int $relasiId, string $relasiType): void
+    {
+        // Cari data piutang yang sudah ada
         $dt_piutang_lama = $this->riwayatHP
             ->where([
                 'id_transaksi' => $idPenjualan,
-                'relasi_id' => $headerData['id_pelanggan'],
-                'relasi_tipe' => 'pelanggan',
+                'relasi_id' => $relasiId,
+                'relasi_tipe' => $relasiType,
                 'jenis' => 'piutang'
             ])
             ->first();
 
-        $data = [
+        $data_piutang = [
             'tanggal' => $headerData['tanggal'],
             'id_transaksi' => $idPenjualan,
             'nota' => $headerData['nota'],
             'tanggal_jt' => $headerData['tgl_jatuhtempo'],
             'saldo' => $headerData['grand_total'],
-            'relasi_id' => $headerData['id_pelanggan'],
-            'relasi_tipe' => 'pelanggan',
+            'relasi_id' => $relasiId,
+            'relasi_tipe' => $relasiType,
             'jenis' => 'piutang'
         ];
+
+        $rekening_piutang_usaha = $this->bukuBesar->where('kode_setupbuku', $this->interface->getKodeRekening('piutang_dagang'))->first();
+
+        // Model reference based on relation type
+        $model = $relasiType === 'pelanggan' ? $this->pelanggan : $this->salesman;
 
         if ($dt_piutang_lama) {
             // Update data piutang yang sudah ada
             $piutang_masuk_lama = floatval($dt_piutang_lama->saldo);
-            $this->riwayatHP->update($dt_piutang_lama->id_piutang_piutang, $data);
+            $this->riwayatHP->update($dt_piutang_lama->id_hutang_piutang, $data_piutang);
 
-            // Update saldo pelanggan
-            $dt_pelanggan = $this->pelanggan->find($headerData['id_pelanggan']);
-            $old_saldo = floatval($dt_pelanggan->saldo);
+            // Update saldo relasi
+            $dt_relasi = $model->find($relasiId);
+            $old_saldo = floatval($dt_relasi->saldo);
             $current_saldo = $old_saldo - $piutang_masuk_lama; // Kembalikan dulu saldo lama
             $new_saldo = $current_saldo + $headerData['grand_total']; // Tambahkan dengan piutang baru
 
-            $this->pelanggan->update($headerData['id_pelanggan'], [
+            $model->update($relasiId, [
                 'saldo' => $new_saldo
             ]);
+
+            $riwayat_lama = $this->riwayatPiutang->where([
+                'id_transaksi' => $idPenjualan,
+                'jenis_transaksi' => 'penjualan',
+                'id_pelaku' => $relasiId,
+                'pelaku' => $relasiType
+            ])->first();
+
+            if ($riwayat_lama) {
+                // Update riwayat piutang yang sudah ada
+                $this->riwayatPiutang->update($riwayat_lama->id, [
+                    'debit' => $headerData['grand_total'],
+                    'saldo_setelah' => $new_saldo,
+                ]);
+            }
         } else {
             // Insert data piutang baru
-            $this->riwayatHP->insert($data);
+            $this->riwayatHP->insert($data_piutang);
 
-            // Update saldo pelanggan
-            $dt_pelanggan = $this->pelanggan->find($headerData['id_pelanggan']);
-            $old_saldo = floatval($dt_pelanggan->saldo);
+            $dt_relasi = $model->find($relasiId);
+            $old_saldo = floatval($dt_relasi->saldo);
             $new_saldo = $old_saldo + $headerData['grand_total'];
 
-            $this->pelanggan->update($headerData['id_pelanggan'], [
+            $model->update($relasiId, [
                 'saldo' => $new_saldo
+            ]);
+
+            // Insert riwayat piutang baru
+            $this->riwayatPiutang->insert([
+                'tanggal' => $headerData['tanggal'],
+                'pelaku' => $relasiType,
+                'id_transaksi' => $idPenjualan,
+                'jenis_transaksi' => 'penjualan',
+                'nota' => $headerData['nota'],
+                'id_pelaku' => $relasiId,
+                'debit' => $headerData['grand_total'],
+                'kredit' => 0,
+                'saldo_setelah' => $new_saldo,
+                'deskripsi' => 'Piutang penjualan',
             ]);
         }
     }

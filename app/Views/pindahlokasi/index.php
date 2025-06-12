@@ -8,24 +8,7 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('pindahlokasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
-  </div>
-
-  <!-- Tombol Print All -->
-  <div class="section-body">
-    <div class="card-body">
-      <form action="<?= site_url('pindahlokasi') ?>" method="POST">
-        <?= csrf_field() ?>
-        <div class="row">
-          <div class="col">
-            <a href="<?= base_url('PindahLokasi/printPDF') ?>" class="btn btn-success" target="_blank">
-              <i class="fas fa-print"></i> Cetak PDF
-            </a>
-          </div>
-        </div>
-      </form>
-    </div>
+    <h1>Dashboard Pindah Lokasi</h1>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -46,6 +29,12 @@
     <div class="card">
       <div class="card-header">
         <h4>Pindah Lokasi</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('pindahlokasi/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+          <a href="<?= base_url('PindahLokasi/printPDF') ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-print"></i> Cetak PDF
+          </a>
+        </div>
       </div>
       <div class="section-body">
         <div class="card-body">

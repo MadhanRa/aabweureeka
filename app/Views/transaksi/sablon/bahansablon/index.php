@@ -8,25 +8,8 @@
 
 <section class="section">
   <div class="section-header">
-    <!-- <h1>APA INI</h1> -->
-    <a href="<?= site_url('bahansablon/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
-  </div>
+    <h1>Dashboard Bahan di Sablon</h1>
 
-  <!-- Tombol Print All -->
-  <div class="section-body">
-    <div class="card-body">
-      <form action="<?= site_url('bahansablon') ?>" method="POST">
-        <?= csrf_field() ?>
-        <div class="row">
-          <div class="col">
-
-            <a href="<?= base_url('BahanSablon/printPDF') ?>" class="btn btn-success" target="_blank">
-              <i class="fas fa-print"></i> Cetak PDF
-            </a>
-          </div>
-        </div>
-      </form>
-    </div>
   </div>
 
   <!-- untuk menangkap session success dengan bawaan with -->
@@ -47,6 +30,12 @@
     <div class="card">
       <div class="card-header">
         <h4>Bahan di Sablon</h4>
+        <div class="card-header-action">
+          <a href="<?= site_url('bahansablon/new') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+          <a href="<?= base_url('BahanSablon/printPDF') ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-print"></i> Cetak PDF
+          </a>
+        </div>
       </div>
       <div class="section-body">
         <div class="card-body">

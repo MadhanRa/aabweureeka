@@ -2,22 +2,22 @@
 
 namespace App\Controllers\transaksi;
 
+use CodeIgniter\Model;
 use App\Models\setup\ModelSetupbank;
-use App\Models\transaksi\ModelPiutangUsaha;
-use App\Models\setup\ModelSetuppelanggan;
+use App\Models\transaksi\ModelLunasSalesman;
+use App\Models\setup\ModelSetupsalesman;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatPiutang;
 use App\Models\transaksi\penjualan\ModelPenjualan;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
-use PhpParser\Node\Stmt\TryCatch;
 use TCPDF;
 
-class TutangUsaha extends ResourceController
+class LunasSalesman extends ResourceController
 {
-    protected $objSetuppelanggan;
     protected $objSetupbank;
-    protected $objPiutangUsaha;
+    protected $objLunasSalesman;
+    protected $objSetupsalesman;
     protected $objRiwayatTransaksi;
     protected $objRiwayatPiutang;
     protected $objPenjualan;
@@ -26,14 +26,15 @@ class TutangUsaha extends ResourceController
     //  INISIALISASI OBJECT DATA
     function __construct()
     {
-        $this->objSetuppelanggan = new ModelSetuppelanggan();
+        $this->objSetupsalesman = new ModelSetupsalesman();
         $this->objSetupbank = new ModelSetupbank();
-        $this->objPiutangUsaha = new ModelPiutangUsaha();
+        $this->objLunasSalesman = new ModelLunasSalesman();
         $this->objRiwayatTransaksi = new ModelRiwayatTransaksi();
         $this->objRiwayatPiutang = new ModelRiwayatPiutang();
         $this->objPenjualan = new ModelPenjualan();
         $this->db = \Config\Database::connect();
     }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -56,52 +57,10 @@ class TutangUsaha extends ResourceController
         } else {
             $data['is_closed'] = 'FALSE';
         }
-        $data['dtpiutangusaha'] = $this->objPiutangUsaha->getAll();
-        $data['dtsetuppelanggan'] = $this->objSetuppelanggan->findAll();
+        $data['dtlunassalesman'] = $this->objLunasSalesman->getAll();
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
         $data['dtsetupbank'] = $this->objSetupbank->findAll();
-        return view('tutangusaha/index', $data);
-    }
-
-    public function printPDF($id = null)
-    {
-        // Jika $id tidak diberikan, ambil semua data
-        if ($id === null) {
-            $data['dtpiutangusaha'] = $this->objPiutangUsaha->getAll();
-        } else {
-            // Jika $id diberikan, ambil data berdasarkan ID dengan join
-            $data['dtpiutangusaha'] = $this->objPiutangUsaha->getById($id);
-            if (empty($data['dtpiutangusaha'])) {
-                return redirect()->back()->with('error', 'Data tidak ditemukan.');
-            }
-        }
-
-        $data['dtsetuppelanggan'] = $this->objSetuppelanggan->getAll();
-        $data['dtsetupbank'] = $this->objSetupbank->getAll();
-
-        // Debugging: Tampilkan konten HTML sebelum PDF
-        $html = view('tutangusaha/printPDF', $data);
-        // echo $html;
-        // exit; // Jika perlu debugging
-
-        // Buat PDF baru
-        $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
-
-        // Hapus header/footer default
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-
-        // Set font
-        $pdf->SetFont('helvetica', '', 12);
-
-        // Tambah halaman baru
-        $pdf->AddPage();
-
-        // Cetak konten menggunakan WriteHTML
-        $pdf->writeHTML($html, true, false, true, false, '');
-
-        // Set tipe respons menjadi PDF
-        $this->response->setContentType('application/pdf');
-        $pdf->Output('pelunasan_piutang_usaha.pdf', 'I');
+        return view('lunassalesman/index', $data);
     }
 
     /**
@@ -124,12 +83,11 @@ class TutangUsaha extends ResourceController
     public function new()
     {
         $data['dtpenjualan'] = $this->objPenjualan->where('opsi_pembayaran', 'kredit')->findAll();
-        $data['dtpiutangusaha'] = $this->objPiutangUsaha->getAll();
-        $data['dtsetuppelanggan'] = $this->objSetuppelanggan->findAll();
+        $data['dtlunassalesman'] = $this->objLunasSalesman->getAll();
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
         $data['dtsetupbank'] = $this->objSetupbank->findAll();
-        return view('tutangusaha/new', $data);
+        return view('lunassalesman/new', $data);
     }
-
 
     /**
      * Create a new resource object, from "posted" parameters.
@@ -139,6 +97,7 @@ class TutangUsaha extends ResourceController
     public function create()
     {
         $this->db->transBegin();
+
         try {
             // Ambil nilai dari form dan pastikan menjadi angka
             $saldo = floatval($this->request->getVar('saldo'));
@@ -151,21 +110,20 @@ class TutangUsaha extends ResourceController
             // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
             $sisa = $saldo - ($nilai_pelunasan + $diskon_amount);
 
-            // Data untuk disimpan di database
             $data = [
                 'nota'              => $this->request->getVar('nota'),
-                'id_penjualan'      => $this->request->getVar('id_penjualan'),
-                'id_pelanggan'      => $this->request->getVar('id_pelanggan'),
+                'id_penjualan'              => $this->request->getVar('id_penjualan'),
+                'id_salesman'      => $this->request->getVar('id_salesman'),
                 'tanggal'           => $this->request->getVar('tanggal'),
                 'id_setupbank'      => $this->request->getVar('id_setupbank'),
                 'saldo'             => $saldo,
                 'nilai_pelunasan'   => $nilai_pelunasan,
                 'diskon'            => $diskon,
                 'pdpt'              => $this->request->getVar('pdpt'),
-                'sisa'              => $sisa, // Gunakan nilai sisa yang dihitung
+                'sisa'              => $sisa,
                 'keterangan'        => $this->request->getVar('keterangan'),
             ];
-            $id_pelunasan = $this->objPiutangUsaha->insert($data);
+            $id_pelunasan = $this->objLunasSalesman->insert($data);
 
             $id_setupbuku = $this->objSetupbank->find($this->request->getVar('id_setupbank'))->id_setupbuku;
 
@@ -190,33 +148,36 @@ class TutangUsaha extends ResourceController
             $this->objRiwayatTransaksi->insert($dataRiwayatTransaksiRekening);
 
             // simpan riwayat transaksi piutang
-            $saldo_lama_pelanggan = $this->objSetuppelanggan->find($this->request->getVar('id_pelanggan'))->saldo;
+            $saldo_lama_salesman = $this->objSetupsalesman->find($this->request->getVar('id_salesman'))->saldo;
 
-            $sisa_saldo_pelanggan = $saldo_lama_pelanggan - $nilai_pelunasan;
+            $sisa_saldo_salesman = $saldo_lama_salesman - $nilai_pelunasan;
 
             $dataRiwayatPiutang = [
                 'tanggal' => $this->request->getVar('tanggal'),
-                'pelaku' => 'pelanggan',
+                'pelaku' => 'salesman',
                 'id_transaksi' => $id_pelunasan,
                 'jenis_transaksi' => 'pelunasan',
                 'nota' => $this->request->getVar('nota'),
-                'id_pelaku' => $this->request->getVar('id_pelanggan'),
+                'id_pelaku' => $this->request->getVar('id_salesman'),
                 'debit' => 0,
                 'kredit' => $nilai_pelunasan,
-                'saldo_setelah' => $sisa_saldo_pelanggan,
+                'saldo_setelah' => $sisa_saldo_salesman,
                 'deskripsi' => $this->request->getVar('keterangan'),
             ];
 
             $this->objRiwayatPiutang->insert($dataRiwayatPiutang);
 
-            // Update saldo pelanggan
-            $this->objSetuppelanggan->update($this->request->getVar('id_pelanggan'), ['saldo' => $sisa_saldo_pelanggan]);
+            // Update saldo salesman
+            $this->objSetupsalesman->update($this->request->getVar('id_salesman'), ['saldo' => $sisa_saldo_salesman]);
 
+            // Commit transaksi jika semua operasi berhasil
             $this->db->transCommit();
-            return redirect()->to(site_url('tutangusaha'))->with('Sukses', 'Data Berhasil Disimpan');
-        } catch (\Throwable $e) {
+
+            return redirect()->to(site_url('lunassalesman'))->with('Sukses', 'Data Berhasil Disimpan');
+        } catch (\Exception $e) {
+            // Jika terjadi kesalahan, rollback transaksi
             $this->db->transRollback();
-            return redirect()->to(site_url('tutangusaha'))->with('Error', 'Data gagal Disimpan ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
 
@@ -235,19 +196,20 @@ class TutangUsaha extends ResourceController
         }
 
         // Ambil data berdasarkan ID
-        $dtpiutangusaha = $this->objPiutangUsaha->find($id);
+        $dtlunassalesman = $this->objLunasSalesman->find($id);
 
         // Cek jika data tidak ditemukan
-        if (!$dtpiutangusaha) {
-            return redirect()->to(site_url('pindahlokasi'))->with('error', 'Data tidak ditemukan');
+        if (!$dtlunassalesman) {
+            return redirect()->to(site_url('lunassalesman'))->with('error', 'Data tidak ditemukan');
         }
 
 
         // Lanjutkan jika semua pengecekan berhasil
-        $data['dtpiutangusaha'] = $dtpiutangusaha;
-        $data['dtsetuppelanggan'] = $this->objSetuppelanggan->findAll();
+        $data['dtpenjualan'] = $this->objPenjualan->where('opsi_pembayaran', 'kredit')->findAll();
+        $data['dtlunassalesman'] = $dtlunassalesman;
+        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
         $data['dtsetupbank'] = $this->objSetupbank->findAll();
-        return view('tutangusaha/edit', $data);
+        return view('lunassalesman/edit', $data);
     }
 
     /**
@@ -259,16 +221,15 @@ class TutangUsaha extends ResourceController
      */
     public function update($id = null)
     {
-
         // Cek apakah pengguna memiliki peran admin
         if (!in_groups('admin')) {
             return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
         }
 
         // Cek apakah data dengan ID yang diberikan ada di database
-        $existingData = $this->objPiutangUsaha->find($id);
+        $existingData = $this->objLunasSalesman->find($id);
         if (!$existingData) {
-            return redirect()->to(site_url('tutangusaha'))->with('error', 'Data tidak ditemukan');
+            return redirect()->to(site_url('lunassalesman'))->with('error', 'Data tidak ditemukan');
         }
 
         $this->db->transBegin();
@@ -282,27 +243,27 @@ class TutangUsaha extends ResourceController
             $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
 
             // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
-            $sisa = $saldo - $nilai_pelunasan - $diskon_amount;
+            $sisa = $saldo - ($nilai_pelunasan + $diskon_amount);
 
             // Data untuk disimpan di database
             $data = [
                 'nota'              => $this->request->getVar('nota'),
                 'id_penjualan'      => $this->request->getVar('id_penjualan'),
-                'id_pelanggan'      => $this->request->getVar('id_pelanggan'),
+                'id_salesman'       => $this->request->getVar('id_salesman'),
                 'tanggal'           => $this->request->getVar('tanggal'),
                 'id_setupbank'      => $this->request->getVar('id_setupbank'),
                 'saldo'             => $saldo,
                 'nilai_pelunasan'   => $nilai_pelunasan,
                 'diskon'            => $diskon,
                 'pdpt'              => $this->request->getVar('pdpt'),
-                'sisa'              => $sisa, // Gunakan nilai sisa yang dihitung
+                'sisa'              => $sisa,
                 'keterangan'        => $this->request->getVar('keterangan'),
             ];
 
             // Update data berdasarkan ID
-            $this->objPiutangUsaha->update($id, $data);
+            $this->objLunasSalesman->update($id, $data);
 
-            // Dapatkan informasi bank lama sebelum update
+            // Dapatkan data bank dan nilai pelunasan lama
             $old_bank_id = $existingData->id_setupbank;
             $old_nilai_pelunasan = floatval($existingData->nilai_pelunasan);
             $new_bank_id = $this->request->getVar('id_setupbank');
@@ -311,7 +272,7 @@ class TutangUsaha extends ResourceController
             $old_id_setupbuku = $this->objSetupbank->find($old_bank_id)->id_setupbuku ?? null;
             $new_id_setupbuku = $this->objSetupbank->find($new_bank_id)->id_setupbuku;
 
-            // Jika bank berubah atau nilai pelunasan berubah, perbarui saldo bank terkait
+            // Jika bank berubah atau nilai pelunasan berubah
             if ($old_bank_id != $new_bank_id || $old_nilai_pelunasan != $nilai_pelunasan) {
                 // Jika bank lama ada, kembalikan saldo bank lama
                 if ($old_id_setupbuku) {
@@ -319,7 +280,7 @@ class TutangUsaha extends ResourceController
                     $restored_bank_saldo = $old_bank_saldo - $old_nilai_pelunasan;
                     $this->db->table('setupbuku1')->where('id_setupbuku', $old_id_setupbuku)->update(['saldo_berjalan' => $restored_bank_saldo]);
 
-                    // Update atau hapus riwayat transaksi lama jika perlu
+                    // Update atau hapus riwayat transaksi lama
                     $old_riwayat = $this->objRiwayatTransaksi
                         ->where(['id_transaksi' => $id, 'jenis_transaksi' => 'pelunasan piutang', 'id_setupbuku' => $old_id_setupbuku])
                         ->first();
@@ -334,7 +295,7 @@ class TutangUsaha extends ResourceController
                 $updated_bank_saldo = $new_bank_saldo + $nilai_pelunasan;
                 $this->db->table('setupbuku1')->where('id_setupbuku', $new_id_setupbuku)->update(['saldo_berjalan' => $updated_bank_saldo]);
 
-                // Buat riwayat transaksi baru untuk bank baru
+                // Buat riwayat transaksi baru
                 $dataRiwayatTransaksiRekening = [
                     'tanggal' => $this->request->getVar('tanggal'),
                     'jenis_transaksi' => 'pelunasan piutang',
@@ -350,43 +311,43 @@ class TutangUsaha extends ResourceController
                 $this->objRiwayatTransaksi->insert($dataRiwayatTransaksiRekening);
             }
 
-            // Handle perubahan data pelanggan jika ada
-            $old_id_pelanggan = $existingData->id_pelanggan;
-            $new_id_pelanggan = $this->request->getVar('id_pelanggan');
+            // Handle perubahan data salesman
+            $old_id_salesman = $existingData->id_salesman;
+            $new_id_salesman = $this->request->getVar('id_salesman');
 
-            if ($old_id_pelanggan != $new_id_pelanggan || $old_nilai_pelunasan != $nilai_pelunasan) {
-                // Jika pelanggan berubah, kembalikan saldo pelanggan lama
-                if ($old_id_pelanggan) {
-                    $old_pelanggan_saldo = $this->objSetuppelanggan->find($old_id_pelanggan)->saldo;
-                    $restored_pelanggan_saldo = $old_pelanggan_saldo + $old_nilai_pelunasan;
-                    $this->objSetuppelanggan->update($old_id_pelanggan, ['saldo' => $restored_pelanggan_saldo]);
+            if ($old_id_salesman != $new_id_salesman || $old_nilai_pelunasan != $nilai_pelunasan) {
+                // Jika salesman berubah, kembalikan saldo salesman lama
+                if ($old_id_salesman) {
+                    $old_salesman_saldo = $this->objSetupsalesman->find($old_id_salesman)->saldo;
+                    $restored_salesman_saldo = $old_salesman_saldo + $old_nilai_pelunasan;
+                    $this->objSetupsalesman->update($old_id_salesman, ['saldo' => $restored_salesman_saldo]);
 
                     // Hapus riwayat piutang lama
                     $old_riwayat_piutang = $this->objRiwayatPiutang
-                        ->where(['id_transaksi' => $id, 'jenis_transaksi' => 'pelunasan', 'id_pelaku' => $old_id_pelanggan])
+                        ->where(['id_transaksi' => $id, 'jenis_transaksi' => 'pelunasan', 'id_pelaku' => $old_id_salesman])
                         ->first();
 
                     if ($old_riwayat_piutang) {
-                        $this->objRiwayatPiutang->delete($old_riwayat_piutang->id);
+                        $this->objRiwayatPiutang->delete($old_riwayat_piutang->id_riwayat);
                     }
                 }
 
-                // Update saldo pelanggan baru
-                $new_pelanggan_saldo = $this->objSetuppelanggan->find($new_id_pelanggan)->saldo;
-                $updated_pelanggan_saldo = $new_pelanggan_saldo - $nilai_pelunasan;
-                $this->objSetuppelanggan->update($new_id_pelanggan, ['saldo' => $updated_pelanggan_saldo]);
+                // Update saldo salesman baru
+                $new_salesman_saldo = $this->objSetupsalesman->find($new_id_salesman)->saldo;
+                $updated_salesman_saldo = $new_salesman_saldo - $nilai_pelunasan;
+                $this->objSetupsalesman->update($new_id_salesman, ['saldo' => $updated_salesman_saldo]);
 
                 // Buat riwayat piutang baru
                 $dataRiwayatPiutang = [
                     'tanggal' => $this->request->getVar('tanggal'),
-                    'pelaku' => 'pelanggan',
+                    'pelaku' => 'salesman',
                     'id_transaksi' => $id,
                     'jenis_transaksi' => 'pelunasan',
                     'nota' => $this->request->getVar('nota'),
-                    'id_pelaku' => $new_id_pelanggan,
+                    'id_pelaku' => $new_id_salesman,
                     'debit' => 0,
                     'kredit' => $nilai_pelunasan,
-                    'saldo_setelah' => $updated_pelanggan_saldo,
+                    'saldo_setelah' => $updated_salesman_saldo,
                     'deskripsi' => $this->request->getVar('keterangan'),
                 ];
 
@@ -394,10 +355,10 @@ class TutangUsaha extends ResourceController
             }
 
             $this->db->transCommit();
-            return redirect()->to(site_url('tutangusaha'))->with('success', 'Data berhasil diupdate.');
+            return redirect()->to(site_url('lunassalesman'))->with('success', 'Data berhasil diupdate.');
         } catch (\Throwable $e) {
             $this->db->transRollback();
-            return redirect()->to(site_url('tutangusaha'))->with('error', 'Data gagal diupdate: ' . $e->getMessage());
+            return redirect()->to(site_url('lunassalesman'))->with('error', 'Data gagal diupdate: ' . $e->getMessage());
         }
     }
 
@@ -410,7 +371,7 @@ class TutangUsaha extends ResourceController
      */
     public function delete($id = null)
     {
-        $this->db->table('tutangusaha1')->where(['id_lunashusaha' => $id])->delete();
-        return redirect()->to(site_url('tutangusaha'))->with('Sukses', 'Data Berhasil Dihapus');
+        $this->db->table('lunassalesman1')->where(['id_lunashusalesman' => $id])->delete();
+        return redirect()->to(site_url('lunassalesman'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 }

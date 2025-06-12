@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\ModelSetupbank;
-use App\Models\ModelPemakaianBahan;
-use App\Models\ModelKelompokproduksi;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\setup\ModelSetupbank;
+use App\Models\transaksi\ModelPemakaianBahan;
+use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -18,18 +18,18 @@ class PemakaianBahan extends ResourceController
     protected $objPemakaianBahan;
     protected $objKelompokproduksi;
     protected $db;
-    
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objLokasi = new ModelLokasi();
-       $this->objSatuan = new ModelSatuan();
-       $this->objKelompokproduksi = new ModelKelompokproduksi();
-       $this->objPemakaianBahan = new ModelPemakaianBahan();
-       $this->objSetupbank = new ModelSetupbank();
-       $this->db = \Config\Database::connect();
-   }
-    
+    function __construct()
+    {
+        $this->objLokasi = new ModelLokasi();
+        $this->objSatuan = new ModelSatuan();
+        $this->objKelompokproduksi = new ModelKelompokproduksi();
+        $this->objPemakaianBahan = new ModelPemakaianBahan();
+        $this->objSetupbank = new ModelSetupbank();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -49,16 +49,16 @@ class PemakaianBahan extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-        $data['dtpemakaianbahan'] = $this->objPemakaianBahan->getAll();
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->getAll();
-        $data['dtsetupbank'] = $this->objSetupbank->getAll();
-        return view('pemakaianbahan/index', $data);
+        $data['dtpemakaianbahan'] = $this->objPemakaianBahan->findAll();
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
+        $data['dtsetupbank'] = $this->objSetupbank->findAll();
+        return view('transaksi/bahan/pemakaianbahan/index', $data);
     }
 
     /**
@@ -80,15 +80,15 @@ class PemakaianBahan extends ResourceController
      */
     public function new()
     {
-         // Mengambil data lokasi, satuan, dan stock untuk dropdown
-         $data['dtlokasi'] = $this->objLokasi->findAll();
-         $data['dtsatuan'] = $this->objSatuan->findAll();
-         $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
-         $data['dtsetupbank'] = $this->objSetupbank->findAll();
-         $data['dtpemakaianbahan'] = $this->objPemakaianBahan->findAll();
- 
-         // Load view formulir
-         return view('pemakaianbahan/new', $data);
+        // Mengambil data lokasi, satuan, dan stock untuk dropdown
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
+        $data['dtsetupbank'] = $this->objSetupbank->findAll();
+        $data['dtpemakaianbahan'] = $this->objPemakaianBahan->findAll();
+
+        // Load view formulir
+        return view('transaksi/bahan/pemakaianbahan/new', $data);
     }
 
     /**
@@ -125,8 +125,8 @@ class PemakaianBahan extends ResourceController
      */
     public function edit($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-         if (!in_groups('admin')) {
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
             return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
         }
 
@@ -141,11 +141,11 @@ class PemakaianBahan extends ResourceController
 
         // Lanjutkan jika semua pengecekan berhasil
         $data['dtpemakaianbahan'] = $dtpemakaianbahan;
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsatuan'] = $this->objSatuan->getAll();
-        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->getAll();
-        $data['dtsetupbank'] = $this->objSetupbank->getAll();
-        return view('pemakaianbahan/edit', $data);
+        $data['dtlokasi'] = $this->objLokasi->findAll();
+        $data['dtsatuan'] = $this->objSatuan->findAll();
+        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
+        $data['dtsetupbank'] = $this->objSetupbank->findAll();
+        return view('transaksi/bahan/pemakaianbahan/edit', $data);
     }
 
     /**
@@ -157,20 +157,20 @@ class PemakaianBahan extends ResourceController
      */
     public function update($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
-    }
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
 
-    // Cek apakah data dengan ID yang diberikan ada di database
-    $existingData = $this->objPemakaianBahan->find($id);
-    if (!$existingData) {
-        return redirect()->to(site_url('pemakaianbahan'))->with('error', 'Data tidak ditemukan');
-    }
+        // Cek apakah data dengan ID yang diberikan ada di database
+        $existingData = $this->objPemakaianBahan->find($id);
+        if (!$existingData) {
+            return redirect()->to(site_url('pemakaianbahan'))->with('error', 'Data tidak ditemukan');
+        }
 
-    // Ambil data yang diinputkan dari form
-    $data = [
-        'id_bahan' => $this->request->getVar('id_bahan'),
+        // Ambil data yang diinputkan dari form
+        $data = [
+            'id_bahan' => $this->request->getVar('id_bahan'),
             'nota_bahan' => $this->request->getVar('nota_bahan'),
             'id_lokasi'   => $this->request->getVar('id_lokasi'),
             'id_kelproduksi' => $this->request->getVar('id_kelproduksi'),
@@ -180,12 +180,12 @@ class PemakaianBahan extends ResourceController
             'qty_1'            => $this->request->getVar('qty_1'),
             'qty_2'            => $this->request->getVar('qty_2'),
             'tanggal'          => $this->request->getVar('tanggal'),
-    ];
+        ];
 
-    // Update data berdasarkan ID
-    $this->objPemakaianBahan->update($id, $data);
+        // Update data berdasarkan ID
+        $this->objPemakaianBahan->update($id, $data);
 
-    return redirect()->to(site_url('pemakaianbahan'))->with('success', 'Data berhasil diupdate.');
+        return redirect()->to(site_url('pemakaianbahan'))->with('success', 'Data berhasil diupdate.');
     }
 
     /**

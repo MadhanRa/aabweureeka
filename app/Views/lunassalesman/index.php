@@ -56,7 +56,7 @@
                   <tr>
                     <td><?= $key + 1 ?></td>
                     <td><?= $value->nota ?></td>
-                    <td><?= $value->nama_setupsalesman ?></td>
+                    <td><?= $value->nama_salesman ?></td>
                     <td><?= $value->tanggal ?></td>
                     <td><?= $value->nama_setupbank ?></td>
                     <td><?= "Rp " . number_format($value->saldo, 0, ',', '.') ?></td>
