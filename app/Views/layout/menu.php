@@ -113,9 +113,9 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Supplier</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="index-0.html">Kartu Hutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Hutang Usaha</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Hutang Per Nota</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporankartuhutangsupplier') ?>">Kartu Hutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarhutangsupplier') ?>">Daftar Hutang Usaha</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarhutangsuppliernota') ?>">Daftar Hutang Per Nota</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">

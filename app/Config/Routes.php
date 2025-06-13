@@ -360,6 +360,19 @@ $routes->get('/laporandaftarpiutangsalesmannota', 'LaporanPiutangSalesmanDaftarN
 $routes->get('/laporandaftarpiutangsalesmannota/printPDF', 'LaporanPiutangSalesmanDaftarNota::printPDF');
 
 
+//laporan kartu hutang supplier
+$routes->get('/laporankartuhutangsupplier', 'LaporanHutangSupplierKartu::index');
+$routes->get('/laporankartuhutangsupplier/printPDF', 'LaporanHutangSupplierKartu::printPDF');
+
+//laporan daftar hutang supplier
+$routes->get('/laporandaftarhutangsupplier', 'LaporanHutangSupplierDaftar::index');
+$routes->get('/laporandaftarhutangsupplier/printPDF', 'LaporanHutangSupplierDaftar::printPDF');
+
+//laporan daftar hutang supplier per nota
+$routes->get('/laporandaftarhutangsuppliernota', 'LaporanHutangSupplierDaftarNota::index');
+$routes->get('/laporandaftarhutangsuppliernota/printPDF', 'LaporanHutangSupplierDaftarNota::printPDF');
+
+
 
 //laporanjurnalumum
 $routes->get('/laporanjurnalumum', 'LaporanJurnalUmum::index');

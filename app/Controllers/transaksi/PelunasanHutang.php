@@ -3,6 +3,8 @@
 namespace App\Controllers\transaksi;
 
 use App\Models\transaksi\ModelPelunasanHutang;
+use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\pembelian\ModelPembelian;
 use App\Models\setup\ModelSetupbank;
 use App\Models\setup\ModelSetupsupplier;
@@ -15,6 +17,8 @@ class PelunasanHutang extends ResourceController
     protected $objSetupsupplier;
     protected $objSetupbank;
     protected $objPelunasanHutang;
+    protected $objRiwayatTransaksi;
+    protected $objRiwayatHutang;
     protected $objPembelian;
     protected $db;
 
@@ -25,6 +29,8 @@ class PelunasanHutang extends ResourceController
         $this->objSetupbank = new ModelSetupbank();
         $this->objPelunasanHutang = new ModelPelunasanHutang();
         $this->objPembelian = new ModelPembelian();
+        $this->objRiwayatTransaksi = new ModelRiwayatTransaksi();
+        $this->objRiwayatHutang = new ModelRiwayatHutang();
         $this->db = \Config\Database::connect();
     }
 
@@ -131,35 +137,90 @@ class PelunasanHutang extends ResourceController
      */
     public function create()
     {
-        // Ambil nilai dari form dan pastikan menjadi angka
-        $saldo = floatval($this->request->getVar('saldo'));
-        $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
-        $diskon = floatval($this->request->getVar('diskon'));
+        $this->db->transBegin();
 
-        // Hitung diskon sebagai persentase dari nilai pelunasan
-        $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
+        try {
+            log_message('info', 'Pelunasan Hutang: Memulai proses penyimpanan data');
+            // Ambil nilai dari form dan pastikan menjadi angka
+            $saldo = floatval($this->request->getVar('saldo'));
+            $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
+            $diskon = floatval($this->request->getVar('diskon'));
 
-        // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
-        $sisa = $saldo - $nilai_pelunasan + $diskon_amount;
+            // Hitung diskon sebagai persentase dari nilai pelunasan
+            $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
 
-        $data = [
-            'id_lunashutang'    => $this->request->getVar('id_lunashutang'),
-            'nota'              => $this->request->getVar('nota'),
-            'id_setupsupplier'      => $this->request->getVar('id_setupsupplier'),
-            'tanggal'           => $this->request->getVar('tanggal'),
-            'id_setupbank'      => $this->request->getVar('id_setupbank'),
-            'saldo'             => $saldo,
-            'nilai_pelunasan'   => $nilai_pelunasan,
-            'diskon'            => $diskon,
-            'pdpt'              => $this->request->getVar('pdpt'),
-            'sisa'              => $sisa,
-            'keterangan'        => $this->request->getVar('keterangan'),
+            // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
+            $sisa = $saldo - ($nilai_pelunasan + $diskon_amount);
+
+            $data = [
+                'nota'              => $this->request->getVar('nota'),
+                'id_pembelian'     => $this->request->getVar('id_pembelian'),
+                'id_setupsupplier'      => $this->request->getVar('id_setupsupplier'),
+                'tanggal'           => $this->request->getVar('tanggal'),
+                'id_setupbank'      => $this->request->getVar('id_setupbank'),
+                'saldo'             => $saldo,
+                'nilai_pelunasan'   => $nilai_pelunasan,
+                'diskon'            => $diskon,
+                'pdpt'              => $this->request->getVar('pdpt'),
+                'sisa'              => $sisa,
+                'keterangan'        => $this->request->getVar('keterangan'),
 
 
-        ];
-        $this->db->table('pelunasanhutang1')->insert($data);
+            ];
+            $id_pelunasan = $this->objPelunasanHutang->insert($data);
 
-        return redirect()->to(site_url('pelunasanhutang'))->with('Sukses', 'Data Berhasil Disimpan');
+            // Pengurangan saldo rekening bank di setupbuku
+            $id_setupbuku = $this->objSetupbank->find($this->request->getVar('id_setupbank'))->id_setupbuku;
+
+            $old_saldo = $this->db->table('setupbuku1')->where('id_setupbuku', $id_setupbuku)->get()->getRow()->saldo_berjalan;
+            $new_saldo = $old_saldo - $nilai_pelunasan;
+            $this->db->table('setupbuku1')->where('id_setupbuku', $id_setupbuku)->update(['saldo_berjalan' => $new_saldo]);
+
+            // Tambahkan riwayat transaksi rekening bank
+            $riwayatData = [
+                'tanggal'           => $this->request->getVar('tanggal'),
+                'id_transaksi'     => $id_pelunasan,
+                'jenis_transaksi'  => 'pelunasan',
+                'nota'             => $this->request->getVar('nota'),
+                'id_setupbuku' => $id_setupbuku,
+                'debit'            => 0,
+                'kredit'           => $nilai_pelunasan,
+                'saldo_setelah'    => $new_saldo,
+                'deskripsi'        => $this->request->getVar('keterangan'),
+            ];
+
+            $this->objRiwayatTransaksi->insert($riwayatData);
+
+            // Tambahkan riwayat transaksi hutang
+            $riwayatHutangData = [
+                'tanggal'           => $this->request->getVar('tanggal'),
+                'id_transaksi'      => $id_pelunasan,
+                'jenis_transaksi'   => 'pelunasan',
+                'nota'              => $this->request->getVar('nota'),
+                'id_setupsupplier'  => $this->request->getVar('id_setupsupplier'),
+                'deskripsi'         => $this->request->getVar('keterangan'),
+                'debit'             => $nilai_pelunasan,
+                'kredit'            => 0,
+                'saldo_setelah'     => $sisa, // Sisa setelah pelunasan
+            ];
+
+            $this->objRiwayatHutang->insert($riwayatHutangData);
+
+            // Update saldo supplier
+            $saldo_lama_supplier = $this->objSetupsupplier->find($this->request->getVar('id_setupsupplier'))->saldo;
+
+            $saldo_baru_supplier = $saldo_lama_supplier - $nilai_pelunasan;
+            $this->objSetupsupplier->update($this->request->getVar('id_setupsupplier'), ['saldo' => $saldo_baru_supplier]);
+
+            // Commit transaksi jika semua operasi berhasil
+            $this->db->transCommit();
+
+            return redirect()->to(site_url('pelunasanhutang'))->with('Sukses', 'Data Berhasil Disimpan');
+        } catch (\Throwable $th) {
+            // Jika terjadi kesalahan, rollback transaksi
+            $this->db->transRollback();
+            return redirect()->to(site_url('pelunasanhutang'))->with('error', 'Data Gagal Disimpan: ' . $th->getMessage());
+        }
     }
 
     /**
@@ -186,6 +247,7 @@ class PelunasanHutang extends ResourceController
 
 
         // Lanjutkan jika semua pengecekan berhasil
+        $data['dtpembelian'] = $this->objPembelian->findAll();
         $data['dtpelunasanhutang'] = $dtpelunasanhutang;
         $data['dtsetupsupplier'] = $this->objSetupsupplier->findAll();
         $data['dtsetupbank'] = $this->objSetupbank->findAll();
@@ -212,36 +274,125 @@ class PelunasanHutang extends ResourceController
             return redirect()->to(site_url('pelunasanhutang'))->with('error', 'Data tidak ditemukan');
         }
 
-        // Ambil nilai dari form dan pastikan menjadi angka
-        $saldo = floatval($this->request->getVar('saldo'));
-        $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
-        $diskon = floatval($this->request->getVar('diskon'));
+        $this->db->transBegin();
 
-        // Hitung diskon sebagai persentase dari nilai pelunasan
-        $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
+        try {
+            // Ambil nilai dari form dan pastikan menjadi angka
+            $saldo = floatval($this->request->getVar('saldo'));
+            $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));
+            $diskon = floatval($this->request->getVar('diskon'));
 
-        // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
-        $sisa = $saldo - $nilai_pelunasan + $diskon_amount;
+            // Hitung diskon sebagai persentase dari nilai pelunasan
+            $diskon_amount = ($diskon / 100) * $nilai_pelunasan;
 
-        // Ambil data yang diinputkan dari form
-        $data = [
-            'id_lunashutang'    => $this->request->getVar('id_lunashutang'),
-            'nota'              => $this->request->getVar('nota'),
-            'id_setupsupplier'  => $this->request->getVar('id_setupsupplier'),
-            'tanggal'           => $this->request->getVar('tanggal'),
-            'id_setupbank'      => $this->request->getVar('id_setupbank'),
-            'saldo'             => $saldo,
-            'nilai_pelunasan'   => $nilai_pelunasan,
-            'diskon'            => $diskon,
-            'pdpt'              => $this->request->getVar('pdpt'),
-            'sisa'              => $sisa,
-            'keterangan'        => $this->request->getVar('keterangan'),
-        ];
+            // Kalkulasi sisa sesuai logika yang diterapkan pada JavaScript
+            $sisa = $saldo - $nilai_pelunasan + $diskon_amount;
 
-        // Update data berdasarkan ID
-        $this->objPelunasanHutang->update($id, $data);
+            // Ambil data yang diinputkan dari form
+            $data = [
+                'nota'              => $this->request->getVar('nota'),
+                'id_setupsupplier'  => $this->request->getVar('id_setupsupplier'),
+                'tanggal'           => $this->request->getVar('tanggal'),
+                'id_setupbank'      => $this->request->getVar('id_setupbank'),
+                'saldo'             => $saldo,
+                'nilai_pelunasan'   => $nilai_pelunasan,
+                'diskon'            => $diskon,
+                'pdpt'              => $this->request->getVar('pdpt'),
+                'sisa'              => $sisa,
+                'keterangan'        => $this->request->getVar('keterangan'),
+            ];
 
-        return redirect()->to(site_url('pelunasanhutang'))->with('success', 'Data berhasil diupdate.');
+            // Ambil data lama untuk keperluan pembaruan saldo
+            $old_nilai_pelunasan = floatval($existingData->nilai_pelunasan);
+            $old_bank_id = $existingData->id_setupbank;
+            $old_supplier_id = $existingData->id_setupsupplier;
+
+            // Update data pelunasan hutang
+            $this->objPelunasanHutang->update($id, $data);
+
+            // Pengaturan saldo rekening bank
+            // 1. Kembalikan saldo lama
+            $old_bank_setupbuku_id = $this->objSetupbank->find($old_bank_id)->id_setupbuku;
+            $current_bank_saldo = $this->db->table('setupbuku1')->where('id_setupbuku', $old_bank_setupbuku_id)->get()->getRow()->saldo_berjalan;
+            $restored_bank_saldo = $current_bank_saldo + $old_nilai_pelunasan;
+            $this->db->table('setupbuku1')->where('id_setupbuku', $old_bank_setupbuku_id)->update(['saldo_berjalan' => $restored_bank_saldo]);
+
+            // 2. Kurangkan dengan nilai pelunasan baru (jika bank sama)
+            $new_bank_setupbuku_id = $this->objSetupbank->find($this->request->getVar('id_setupbank'))->id_setupbuku;
+            if ($old_bank_setupbuku_id == $new_bank_setupbuku_id) {
+                $new_bank_saldo = $restored_bank_saldo - $nilai_pelunasan;
+                $this->db->table('setupbuku1')->where('id_setupbuku', $new_bank_setupbuku_id)->update(['saldo_berjalan' => $new_bank_saldo]);
+            } else {
+                // Jika bank berbeda, kurangi saldo bank baru
+                $new_bank_current_saldo = $this->db->table('setupbuku1')->where('id_setupbuku', $new_bank_setupbuku_id)->get()->getRow()->saldo_berjalan;
+                $new_bank_saldo = $new_bank_current_saldo - $nilai_pelunasan;
+                $this->db->table('setupbuku1')->where('id_setupbuku', $new_bank_setupbuku_id)->update(['saldo_berjalan' => $new_bank_saldo]);
+            }
+
+            // Update riwayat transaksi rekening bank
+            // Hapus riwayat lama
+            $this->objRiwayatTransaksi->where(['jenis_transaksi' => 'pelunasan_hutang', 'id_transaksi' => $id])->delete();
+
+            // Tambah riwayat baru
+            $riwayatData = [
+                'tanggal'          => $this->request->getVar('tanggal'),
+                'jenis_transaksi'  => 'pelunasan_hutang',
+                'id_transaksi'     => $id,
+                'nota'             => $this->request->getVar('nota'),
+                'id_setupbuku'     => $new_bank_setupbuku_id,
+                'debit'            => 0,
+                'kredit'           => $nilai_pelunasan,
+                'saldo_setelah'    => $new_bank_saldo,
+                'deskripsi'        => $this->request->getVar('keterangan'),
+            ];
+            $this->objRiwayatTransaksi->insert($riwayatData);
+
+            // Update riwayat hutang
+            // Hapus riwayat lama
+            $this->objRiwayatHutang->where(['jenis_transaksi' => 'pelunasan_hutang', 'id_transaksi' => $id])->delete();
+
+            // Tambah riwayat baru
+            $riwayatHutangData = [
+                'tanggal'           => $this->request->getVar('tanggal'),
+                'id_transaksi'      => $id,
+                'jenis_transaksi'   => 'pelunasan_hutang',
+                'nota'              => $this->request->getVar('nota'),
+                'id_setupsupplier'  => $this->request->getVar('id_setupsupplier'),
+                'deskripsi'         => $this->request->getVar('keterangan'),
+                'debit'             => $nilai_pelunasan,
+                'kredit'            => 0,
+                'saldo_setelah'     => $sisa,
+            ];
+            $this->objRiwayatHutang->insert($riwayatHutangData);
+
+            // Update saldo supplier
+            // 1. Kembalikan saldo lama supplier
+            $old_supplier_saldo = $this->objSetupsupplier->find($old_supplier_id)->saldo;
+            $restored_supplier_saldo = $old_supplier_saldo + $old_nilai_pelunasan;
+
+            if ($old_supplier_id == $this->request->getVar('id_setupsupplier')) {
+                // Jika supplier sama, kurangkan langsung dengan nilai baru
+                $new_supplier_saldo = $restored_supplier_saldo - $nilai_pelunasan;
+                $this->objSetupsupplier->update($this->request->getVar('id_setupsupplier'), ['saldo' => $new_supplier_saldo]);
+            } else {
+                // Jika supplier berbeda, kembalikan saldo supplier lama
+                $this->objSetupsupplier->update($old_supplier_id, ['saldo' => $restored_supplier_saldo]);
+
+                // Kurangkan saldo supplier baru
+                $new_supplier_current_saldo = $this->objSetupsupplier->find($this->request->getVar('id_setupsupplier'))->saldo;
+                $new_supplier_saldo = $new_supplier_current_saldo - $nilai_pelunasan;
+                $this->objSetupsupplier->update($this->request->getVar('id_setupsupplier'), ['saldo' => $new_supplier_saldo]);
+            }
+
+            // Commit transaksi jika semua operasi berhasil
+            $this->db->transCommit();
+
+            return redirect()->to(site_url('pelunasanhutang'))->with('success', 'Data berhasil diupdate.');
+        } catch (\Throwable $th) {
+            // Jika terjadi kesalahan, rollback transaksi
+            $this->db->transRollback();
+            return redirect()->to(site_url('pelunasanhutang'))->with('error', 'Data Gagal Diupdate: ' . $th->getMessage());
+        }
     }
 
     /**

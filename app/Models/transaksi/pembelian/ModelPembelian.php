@@ -81,7 +81,7 @@ class ModelPembelian extends Model
             ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left')
             ->join('lokasi1', 'pembelian1.id_lokasi = lokasi1.id_lokasi', 'left')
             ->join('setupbuku1', 'pembelian1.id_setupbuku = setupbuku1.id_setupbuku', 'left')
-            ->orderBy('pembelian1.tanggal', 'DESC')
+            ->orderBy('pembelian1.id_pembelian', 'asc')
             ->findAll(); // Mengambil semua data dari tabel pembelian1
     }
 

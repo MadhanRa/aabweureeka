@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\transaksi\pembelian\ModelPembelian;
 use App\Models\transaksi\pembelian\ModelPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
@@ -16,6 +17,7 @@ use CodeIgniter\Database\ConnectionInterface;
 class PembelianService
 {
     protected $riwayatTransaksi;
+    protected $riwayatHutang;
     protected $pembelian;
     protected $pembelianDetail;
     protected $stockGudang;
@@ -33,6 +35,7 @@ class PembelianService
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
+        ModelRiwayatHutang $hutang,
         ModelSetupsupplier $supplier,
         ModelHutangPiutang $hutangPiutang,
         /**
@@ -45,6 +48,7 @@ class PembelianService
         $this->stockGudang = $stock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
+        $this->riwayatHutang = $hutang;
         $this->supplier = $supplier;
         $this->riwayatHP = $hutangPiutang;
         $this->db = $db;
@@ -283,25 +287,33 @@ class PembelianService
      * @param float $tunai Jumlah tunai
      * @return void
      */
-    protected function setPerubahanBukuBesar(array $headerData, int $idPembelian, $tunai): void
+    protected function setPerubahanBukuBesar(array $headerData, int $idPembelian, float $tunai): void
     {
+        log_message('debug', 'setPerubahanBukuBesar called with headerData: ' . json_encode($headerData) . ', idPembelian: ' . $idPembelian . ', tunai: ' . $tunai);
+
+        // Validasi data rekening
+        $dt_rekening = $this->bukuBesar->find($headerData['id_setupbuku']);
+        if (!$dt_rekening) {
+            throw new \Exception('Data rekening tidak ditemukan');
+        }
+
         // Cari riwayat transaksi kas keluar yang sudah ada (jika ada)
         $kas_keluar = $this->riwayatTransaksi
-            ->where('id_transaksi', $idPembelian)
-            ->like('deskripsi', 'Kas Keluar')
+            ->where([
+                'id_transaksi' => $idPembelian,
+                'jenis_transaksi' => 'pembelian',
+                'id_setupbuku' => $headerData['id_setupbuku']
+            ])
             ->first();
 
         $kredit_kas_keluar_lama = 0;
-        $id_riwayat = null;
 
         if ($kas_keluar) {
             // Jika riwayat sudah ada, ambil nilai kredit lama dan ID riwayat
-            $id_riwayat = $kas_keluar->id;
             $kredit_kas_keluar_lama = floatval($kas_keluar->kredit);
         }
 
         // Ambil data rekening dan update saldo
-        $dt_rekening = $this->bukuBesar->find($headerData['id_setupbuku']);
         $old_saldo = floatval($dt_rekening->saldo_berjalan);
 
         // Untuk update: kembalikan dulu saldo lama (jumlah kredit lama)
@@ -320,16 +332,16 @@ class PembelianService
             'jenis_transaksi' => 'pembelian',
             'id_transaksi' => $idPembelian,
             'nota' => $headerData['nota'],
-            'id_rekening' => $headerData['id_setupbuku'],
-            'deskripsi' => 'Kas Keluar',
-            'debit' => '0',
+            'id_setupbuku' => $headerData['id_setupbuku'],
+            'debit' => 0,
             'kredit' => $tunai,
-            'saldo_setelah' => $new_saldo
+            'saldo_setelah' => $new_saldo,
+            'deskripsi' => 'Kas Keluar'
         ];
 
-        if ($id_riwayat) {
+        if ($kas_keluar) {
             // Update riwayat transaksi yang sudah ada
-            $this->riwayatTransaksi->update($id_riwayat, $transaksiData);
+            $this->riwayatTransaksi->update($kas_keluar->id, $transaksiData);
         } else {
             // Buat riwayat transaksi baru
             $this->riwayatTransaksi->insert($transaksiData);
@@ -344,8 +356,14 @@ class PembelianService
      * @param float $hutang Jumlah hutang
      * @return void
      */
-    protected function setHutang(array $headerData, int $idPembelian, $hutang): void
+    protected function setHutang(array $headerData, int $idPembelian, float $hutang): void
     {
+        // Validasi data supplier
+        $dt_supplier = $this->supplier->find($headerData['id_setupsupplier']);
+        if (!$dt_supplier) {
+            throw new \Exception('Data supplier tidak ditemukan');
+        }
+
         // Cari data hutang piutang yang sudah ada (jika ada)
         $dt_hutang_lama = $this->riwayatHP
             ->where([
@@ -367,65 +385,53 @@ class PembelianService
             'jenis' => 'hutang'
         ];
 
+        // Update Saldo Supplier
+        $old_saldo = floatval($dt_supplier->saldo);
+        $current_saldo = $old_saldo;
+
         if ($dt_hutang_lama) {
             // Update data hutang piutang yang sudah ada
             $hutang_masuk_lama = floatval($dt_hutang_lama->saldo);
-            $this->riwayatHP->update($dt_hutang_lama->id_hutang_piutang, $data);
-
-            // Update saldo supplier
-            $dt_supplier = $this->supplier->find($headerData['id_setupsupplier']);
-            $old_saldo = floatval($dt_supplier->saldo);
             $current_saldo = $old_saldo - $hutang_masuk_lama; // Kembalikan dulu saldo lama
-            $new_saldo = $current_saldo + $hutang; // Tambahkan dengan hutang baru
 
-            $this->supplier->update($headerData['id_setupsupplier'], [
-                'saldo' => $new_saldo
-            ]);
-
-            // Optional: Update riwayat transaksi hutang
-            // $riwayat_hutang_masuk = $this->riwayatTransaksi
-            //     ->where([
-            //         'id_transaksi' => $idPembelian,
-            //         'deskripsi' => 'Hutang ke Supplier'
-            //     ])
-            //     ->first();
-
-            // if ($riwayat_hutang_masuk) {
-            //     $this->riwayatTransaksi->update($riwayat_hutang_masuk->id, [
-            //         'tanggal' => $headerData['tanggal'],
-            //         'jenis_transaksi' => 'Pembelian',
-            //         'id_transaksi' => $idPembelian,
-            //         'id_rekening' => $headerData['id_setupsupplier'],
-            //         'deskripsi' => 'Hutang ke Supplier',
-            //         'debit' => 0,
-            //         'kredit' => $hutang,
-            //         'saldo_setelah' => $new_saldo
-            //     ]);
-            // }
+            $this->riwayatHP->update($dt_hutang_lama->id_hutang_piutang, $data);
         } else {
             // Insert data hutang piutang baru
             $this->riwayatHP->insert($data);
+        }
 
-            // Update saldo supplier
-            $dt_supplier = $this->supplier->find($headerData['id_setupsupplier']);
-            $old_saldo = floatval($dt_supplier->saldo);
-            $new_saldo = $old_saldo + $hutang;
+        // tambahkan dengan hutang baru
+        $new_saldo = $current_saldo + $hutang;
 
-            $this->supplier->update($headerData['id_setupsupplier'], [
-                'saldo' => $new_saldo
-            ]);
+        // Update saldo supplier
+        $this->supplier->update($headerData['id_setupsupplier'], [
+            'saldo' => $new_saldo
+        ]);
 
-            // Optional: Buat riwayat transaksi hutang
-            // $this->riwayatTransaksi->insert([
-            //     'tanggal' => $headerData['tanggal'],
-            //     'jenis_transaksi' => 'Pembelian',
-            //     'id_transaksi' => $idPembelian,
-            //     'id_rekening' => $headerData['id_setupsupplier'],
-            //     'deskripsi' => 'Hutang ke Supplier',
-            //     'debit' => 0,
-            //     'kredit' => $hutang,
-            //     'saldo_setelah' => $new_saldo
-            // ]);
+        // Cari riwayat transaksi hutang yang sudah ada
+        $riwayatHutangLama = $this->riwayatHutang
+            ->where([
+                'id_transaksi' => $idPembelian,
+                'deskripsi' => 'Hutang ke Supplier'
+            ])
+            ->first();
+
+        $riwayatHutangData = [
+            'tanggal' => $headerData['tanggal'],
+            'nota' => $headerData['nota'],
+            'id_transaksi' => $idPembelian,
+            'jenis_transaksi' => 'pembelian',
+            'id_setupsupplier' => $headerData['id_setupsupplier'],
+            'debit' => 0,
+            'kredit' => $hutang,
+            'saldo_setelah' => $new_saldo,
+            'deskripsi' => 'Hutang pembelian'
+        ];
+
+        if ($riwayatHutangLama) {
+            $this->riwayatHutang->update($riwayatHutangLama->id, []);
+        } else {
+            $this->riwayatHutang->insert($riwayatHutangData);
         }
     }
 }

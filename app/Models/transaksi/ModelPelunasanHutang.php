@@ -12,7 +12,7 @@ class ModelPelunasanHutang extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['nota', 'id_setupsupplier', 'tanggal', 'id_setupbank', 'saldo', 'nilai_pelunasan', 'diskon', 'pdpt', 'sisa', 'keterangan'];
+    protected $allowedFields    = ['nota', 'id_pembelian', 'id_setupsupplier', 'tanggal', 'id_setupbank', 'saldo', 'nilai_pelunasan', 'diskon', 'pdpt', 'sisa', 'keterangan'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
