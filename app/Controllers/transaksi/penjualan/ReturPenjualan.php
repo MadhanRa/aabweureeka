@@ -10,6 +10,8 @@ use App\Models\transaksi\penjualan\ModelReturPenjualan;
 use App\Models\transaksi\penjualan\ModelReturPenjualanDetail;
 use App\Models\transaksi\penjualan\ModelPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\transaksi\ModelRiwayatPiutang;
+use App\Models\transaksi\ModelMutasiStock;
 use App\Models\setup\ModelSetuppelanggan;
 use App\Models\setup\ModelSetupsalesman;
 use App\Models\setup\ModelSetupBuku;
@@ -42,7 +44,9 @@ class ReturPenjualan extends ResourceController
             new ModelStockGudang(),
             new ModelSetupBuku(),
             new ModelRiwayatTransaksi(),
+            new ModelRiwayatPiutang(),
             new ModelHutangPiutang(),
+            new ModelMutasiStock(),
             new ModelAntarmuka(),
             $this->objPelanggan,
             $this->objSetupsalesman,

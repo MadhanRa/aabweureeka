@@ -3,7 +3,8 @@
 namespace App\Services;
 
 use App\Models\transaksi\pembelian\ModelPembelian;
-use App\Models\transaksi\pembelian\ModelPembelianDetail;
+use App\Models\transaksi\pembelian\ModelReturPembelian;
+use App\Models\transaksi\pembelian\ModelReturPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\ModelMutasiStock;
@@ -15,17 +16,18 @@ use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
 
-class PembelianService
+class ReturPembelianService
 {
     protected $riwayatTransaksi;
     protected $riwayatHutang;
     protected $mutasiStock;
-    protected $pembelian;
-    protected $pembelianDetail;
+    protected $returPembelian;
+    protected $returPembelianDetail;
     protected $stockGudang;
     protected $bukuBesar;
     protected $supplier;
     protected $riwayatHP;
+    protected $pembelian;
     /**
      * @var \CodeIgniter\Database\BaseConnection $db
      */
@@ -33,7 +35,8 @@ class PembelianService
 
     public function __construct(
         ModelPembelian $pembelian,
-        ModelPembelianDetail $detail,
+        ModelReturPembelian $returPembelian,
+        ModelReturPembelianDetail $detail,
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
@@ -47,7 +50,8 @@ class PembelianService
         ConnectionInterface $db
     ) {
         $this->pembelian = $pembelian;
-        $this->pembelianDetail = $detail;
+        $this->returPembelian = $returPembelian;
+        $this->returPembelianDetail = $detail;
         $this->stockGudang = $stock;
         $this->mutasiStock = $mutasiStock;
         $this->bukuBesar = $buku;
@@ -64,15 +68,15 @@ class PembelianService
 
         try {
 
-            $idPembelian = $id
+            $idReturPembelian = $id
                 ? $this->updateHeader($id, $headerData)
                 : $this->createHeader($headerData);
 
 
-            $this->saveDetails($idPembelian, $detailData, $headerData);
+            $this->saveDetails($idReturPembelian, $detailData, $headerData);
 
             $this->db->transCommit();
-            return $idPembelian;
+            return $idReturPembelian;
         } catch (\Throwable $e) {
             $this->db->transRollback();
             throw $e;
@@ -81,18 +85,18 @@ class PembelianService
 
     protected function createHeader(array $data): int
     {
-        return $this->pembelian->insert($data);
+        return $this->returPembelian->insert($data);
     }
 
     protected function updateHeader($id, array $data): int
     {
-        $this->pembelian->update($id, $data);
+        $this->returPembelian->update($id, $data);
         return $id;
     }
 
-    protected function saveDetails(int $idPembelian, array $newDetails, array $headerData)
+    protected function saveDetails(int $idReturPembelian, array $newDetails, array $headerData)
     {
-        $existing = $this->pembelianDetail->where('id_pembelian', $idPembelian)->findAll();
+        $existing = $this->returPembelianDetail->where('id_returpembelian', $idReturPembelian)->findAll();
         $existingIds = array_column($existing, 'id');
         $incomingIds = array_column($newDetails, 'id_detail');
 
@@ -100,7 +104,7 @@ class PembelianService
         foreach ($existing as $row) {
             if (!in_array($row->id, $incomingIds)) {
                 // Hapus detail pembelian yang tidak ada di detail baru
-                $this->pembelianDetail->delete($row->id);
+                $this->returPembelianDetail->delete($row->id);
 
                 // Kembalikan stok ke gudang
                 $stock = $this->stockGudang->where([
@@ -120,8 +124,8 @@ class PembelianService
                     'id_stock' => $row->id_stock,
                     'id_lokasi' => $headerData['id_lokasi'],
                     'jenis' => 'masuk',
-                    'sumber_transaksi' => 'pembelian',
-                    'id_transaksi' => $idPembelian
+                    'sumber_transaksi' => 'retur_pembelian',
+                    'id_transaksi' => $idReturPembelian
                 ])->delete();
             }
         }
@@ -135,31 +139,29 @@ class PembelianService
             // Create detail record
             $detailRecord = $detailPembelian->getRecords();
             $detailRecord = array_merge($detailRecord, [
-                'id_pembelian' => $idPembelian,
+                'id_returpembelian' => $idReturPembelian,
             ]);
 
             if (isset($detail['id_detail']) && in_array($detail['id_detail'], $existingIds)) {
-                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idPembelian);
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idReturPembelian);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
-                $this->pembelianDetail->update($detail['id_detail'], $detailRecord);
+                $this->returPembelianDetail->update($detail['id_detail'], $detailRecord);
             } else {
-                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idPembelian);
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idReturPembelian);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
-                $this->pembelianDetail->insert($detailRecord);
+                $this->returPembelianDetail->insert($detailRecord);
             }
         }
 
-        $tunai = floatval($headerData['tunai']);
-        $hutang = floatval($headerData['hutang']);
+        // Jika opsi retur pembelian tunai, maka update buku besar, jika tidak update hutang
+        $opsi_return = $headerData['opsi_return'];
 
-        if ($tunai > 0) {
-            $this->setPerubahanBukuBesar($headerData, $idPembelian, $tunai);
-        }
-
-        if ($hutang > 0) {
-            $this->setHutang($headerData, $idPembelian, $hutang);
+        if ($opsi_return === 'tunai') {
+            $this->setPerubahanBukuBesar($headerData, $idReturPembelian);
+        } else {
+            $this->setHutang($headerData, $idReturPembelian);
         }
     }
 
@@ -170,7 +172,7 @@ class PembelianService
      * @param array $detail Data detail pembelian
      * @return void
      */
-    protected function insertOrUpdatteMutasiStock(array $headerData, array $detail, $idPembelian): void
+    protected function insertOrUpdatteMutasiStock(array $headerData, array $detail, $idReturPembelian): void
     {
         // Skip jika tidak ada id stock
         if (empty($detail['id_stock'])) {
@@ -182,9 +184,9 @@ class PembelianService
             ->where([
                 'id_stock' => $detail['id_stock'],
                 'id_lokasi' => $headerData['id_lokasi'],
-                'jenis' => 'masuk',
-                'sumber_transaksi' => 'pembelian',
-                'id_transaksi' => $idPembelian
+                'jenis' => 'keluar',
+                'sumber_transaksi' => 'retur_pembelian',
+                'id_transaksi' => $idReturPembelian
             ])
             ->first();
 
@@ -203,12 +205,12 @@ class PembelianService
             'id_stock' => $detail['id_stock'],
             'id_lokasi' => $headerData['id_lokasi'],
             'tanggal' => $headerData['tanggal'],
-            'jenis' => 'masuk',
+            'jenis' => 'keluar',
             'qty1' => floatval($detail['qty1']),
             'qty2' => floatval($detail['qty2']),
             'nilai' => floatval($detail['total_raw']),
-            'sumber_transaksi' => 'pembelian',
-            'id_transaksi' => $idPembelian
+            'sumber_transaksi' => 'retur_pembelian',
+            'id_transaksi' => $idReturPembelian
         ];
 
         // Insert mutasi stok baru
@@ -254,7 +256,7 @@ class PembelianService
         ];
 
         if (isset($detail['id_detail']) && !empty($detail['id_detail'])) {
-            $existingDetail = $this->pembelianDetail->find($detail['id_detail']);
+            $existingDetail = $this->returPembelianDetail->find($detail['id_detail']);
             if ($existingDetail) {
                 $result = [
                     'qty1' => floatval($existingDetail->qty1),
@@ -324,11 +326,11 @@ class PembelianService
 
             // Konversi ke kuantitas normal, tambahkan perbedaan, lalu konversi kembali
             $normal_old_qty = $old_qty1 * $newValues['conv_factor'] + $old_qty2;
-            $new_normal_qty = $normal_old_qty + $changes['qty_diff'];
+            $new_normal_qty = $normal_old_qty - $changes['qty_diff'];
 
             $new_qty1 = floor($new_normal_qty / $newValues['conv_factor']);
             $new_qty2 = $new_normal_qty % $newValues['conv_factor'];
-            $new_jmlHarga = $old_jmlHarga + $changes['price_diff'];
+            $new_jmlHarga = $old_jmlHarga - $changes['price_diff'];
 
             $this->stockGudang->update($existingStock->id, [
                 'qty1' => $new_qty1,
@@ -353,16 +355,15 @@ class PembelianService
      * Set atau update perubahan buku besar untuk transaksi tunai
      * 
      * @param array $headerData Data header pembelian
-     * @param int $idPembelian ID pembelian
+     * @param int $idReturPembelian ID pembelian
      * @param float $tunai Jumlah tunai
      * @return void
      */
-    protected function setPerubahanBukuBesar(array $headerData, int $idPembelian, float $tunai): void
+    protected function setPerubahanBukuBesar(array $headerData, int $idReturPembelian): void
     {
-        log_message('debug', 'setPerubahanBukuBesar called with headerData: ' . json_encode($headerData) . ', idPembelian: ' . $idPembelian . ', tunai: ' . $tunai);
-
         // Validasi data rekening
-        $dt_rekening = $this->bukuBesar->find($headerData['id_setupbuku']);
+        $id_rekening = $this->pembelian->find($headerData['id_pembelian'])->id_setupbuku;
+        $dt_rekening = $this->bukuBesar->find($id_rekening);
         if (!$dt_rekening) {
             throw new \Exception('Data rekening tidak ditemukan');
         }
@@ -370,9 +371,9 @@ class PembelianService
         // Cari riwayat transaksi kas keluar yang sudah ada (jika ada)
         $kas_keluar = $this->riwayatTransaksi
             ->where([
-                'id_transaksi' => $idPembelian,
-                'jenis_transaksi' => 'pembelian',
-                'id_setupbuku' => $headerData['id_setupbuku']
+                'id_transaksi' => $idReturPembelian,
+                'jenis_transaksi' => 'retur pembelian',
+                'id_setupbuku' => $id_rekening
             ])
             ->first();
 
@@ -390,23 +391,23 @@ class PembelianService
         $current_saldo = $old_saldo + $kredit_kas_keluar_lama;
 
         // Lalu kurangi dengan nilai tunai baru
-        $new_saldo = $current_saldo - $tunai;
+        $new_saldo = $current_saldo + $headerData['grand_total'];
 
         // Update saldo rekening
-        $this->bukuBesar->update($headerData['id_setupbuku'], [
+        $this->bukuBesar->update($id_rekening, [
             'saldo_berjalan' => $new_saldo
         ]);
 
         $transaksiData = [
             'tanggal' => $headerData['tanggal'],
-            'jenis_transaksi' => 'pembelian',
-            'id_transaksi' => $idPembelian,
+            'jenis_transaksi' => 'retur pembelian',
+            'id_transaksi' => $idReturPembelian,
             'nota' => $headerData['nota'],
-            'id_setupbuku' => $headerData['id_setupbuku'],
+            'id_setupbuku' => $id_rekening,
             'debit' => 0,
-            'kredit' => $tunai,
+            'kredit' => $headerData['grand_total'],
             'saldo_setelah' => $new_saldo,
-            'deskripsi' => 'Kas Keluar'
+            'deskripsi' => 'Kas Masuk dari Retur'
         ];
 
         if ($kas_keluar) {
@@ -422,11 +423,11 @@ class PembelianService
      * Set atau update hutang untuk transaksi
      * 
      * @param array $headerData Data header pembelian
-     * @param int $idPembelian ID pembelian
+     * @param int $idReturPembelian ID pembelian
      * @param float $hutang Jumlah hutang
      * @return void
      */
-    protected function setHutang(array $headerData, int $idPembelian, float $hutang): void
+    protected function setHutang(array $headerData, int $idReturPembelian): void
     {
         // Validasi data supplier
         $dt_supplier = $this->supplier->find($headerData['id_setupsupplier']);
@@ -437,22 +438,22 @@ class PembelianService
         // Cari data hutang piutang yang sudah ada (jika ada)
         $dt_hutang_lama = $this->riwayatHP
             ->where([
-                'id_transaksi' => $idPembelian,
+                'id_transaksi' => $idReturPembelian,
                 'relasi_id' => $headerData['id_setupsupplier'],
                 'relasi_tipe' => 'supplier',
-                'jenis' => 'hutang'
+                'jenis' => 'pengurang_hutang'
             ])
             ->first();
 
         $data = [
             'tanggal' => $headerData['tanggal'],
-            'id_transaksi' => $idPembelian,
+            'id_transaksi' => $idReturPembelian,
             'nota' => $headerData['nota'],
             'tanggal_jt' => $headerData['tgl_jatuhtempo'],
-            'saldo' => $hutang,
+            'saldo' => $headerData['grand_total'],
             'relasi_id' => $headerData['id_setupsupplier'],
             'relasi_tipe' => 'supplier',
-            'jenis' => 'hutang'
+            'jenis' => 'pengurang_hutang'
         ];
 
         // Update Saldo Supplier
@@ -471,7 +472,7 @@ class PembelianService
         }
 
         // tambahkan dengan hutang baru
-        $new_saldo = $current_saldo + $hutang;
+        $new_saldo = $current_saldo - $headerData['grand_total'];
 
         // Update saldo supplier
         $this->supplier->update($headerData['id_setupsupplier'], [
@@ -481,21 +482,21 @@ class PembelianService
         // Cari riwayat transaksi hutang yang sudah ada
         $riwayatHutangLama = $this->riwayatHutang
             ->where([
-                'id_transaksi' => $idPembelian,
-                'deskripsi' => 'Hutang ke Supplier'
+                'id_transaksi' => $idReturPembelian,
+                'jenis_transaksi' => 'retur pembelian',
             ])
             ->first();
 
         $riwayatHutangData = [
             'tanggal' => $headerData['tanggal'],
             'nota' => $headerData['nota'],
-            'id_transaksi' => $idPembelian,
-            'jenis_transaksi' => 'pembelian',
+            'id_transaksi' => $idReturPembelian,
+            'jenis_transaksi' => 'retur pembelian',
             'id_setupsupplier' => $headerData['id_setupsupplier'],
             'debit' => 0,
-            'kredit' => $hutang,
+            'kredit' => $headerData['grand_total'],
             'saldo_setelah' => $new_saldo,
-            'deskripsi' => 'Hutang pembelian'
+            'deskripsi' => 'Pengurangan Hutang dari Retur Pembelian'
         ];
 
         if ($riwayatHutangLama) {

@@ -4,7 +4,7 @@ namespace App\Controllers\transaksi;
 
 use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup_persediaan\ModelSatuan;
-use App\Models\ClosedPeriodsModel;
+use App\Models\transaksi\ClosedPeriodsModel;
 use App\Models\transaksi\ModelHasilProduksi;
 use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;

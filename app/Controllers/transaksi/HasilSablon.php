@@ -6,7 +6,7 @@ use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\transaksi\ModelBahanSablon;
 use App\Models\transaksi\ModelHasilSablon;
-use App\Models\ClosedPeriodsModel;
+use App\Models\transaksi\ClosedPeriodsModel;
 use App\Models\setup\ModelSetupsupplier;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;

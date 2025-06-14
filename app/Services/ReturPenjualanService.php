@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\transaksi\penjualan\ModelReturPenjualan;
 use App\Models\transaksi\penjualan\ModelReturPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
+use App\Models\transaksi\ModelRiwayatPiutang;
+use App\Models\transaksi\ModelMutasiStock;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupBuku;
@@ -14,10 +16,13 @@ use App\Models\setup\ModelHutangPiutang;
 use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
+use CodeIgniter\Model;
 
 class ReturPenjualanService
 {
     protected $riwayatTransaksi;
+    protected $riwayatPiutang;
+    protected $mutasiStock;
     protected $returPenjualan;
     protected $returPenjualanDetail;
     protected $stockGudang;
@@ -37,7 +42,9 @@ class ReturPenjualanService
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
+        ModelRiwayatPiutang $riwayatPiutang,
         ModelHutangPiutang $hutangPiutang,
+        ModelMutasiStock $mutasiStock,
         ModelAntarmuka $interface,
         ModelSetuppelanggan $pelanggan,
         ModelSetupsalesman $salesman,
@@ -51,7 +58,9 @@ class ReturPenjualanService
         $this->stockGudang = $stock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
+        $this->riwayatPiutang = $riwayatPiutang;
         $this->riwayatHP = $hutangPiutang;
+        $this->mutasiStock = $mutasiStock;
         $this->interface = $interface;
         $this->pelanggan = $pelanggan;
         $this->salesman = $salesman;
@@ -149,6 +158,15 @@ class ReturPenjualanService
             if (!in_array($row->id, $incomingIds)) {
                 $this->restoreStock($row->id, $headerData['id_lokasi']);
                 $this->returPenjualanDetail->delete($row->id);
+
+                // Hapus mutasi stok terkait
+                $this->mutasiStock->where([
+                    'id_stock' => $row->id_stock,
+                    'id_lokasi' => $headerData['id_lokasi'],
+                    'jenis' => 'masuk',
+                    'sumber_transaksi' => 'retur_penjualan',
+                    'id_transaksi' => $idReturPenjualan
+                ])->delete();
             }
         }
 
@@ -165,10 +183,12 @@ class ReturPenjualanService
             ]);
 
             if (isset($detail['id_detail']) && in_array($detail['id_detail'], $existingIds)) {
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idReturPenjualan);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
                 $this->returPenjualanDetail->update($detail['id_detail'], $detailRecord);
             } else {
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idReturPenjualan);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
                 $this->returPenjualanDetail->insert($detailRecord);
@@ -182,6 +202,58 @@ class ReturPenjualanService
                 $this->setPerubahanBukuBesar($headerData, $idReturPenjualan);
             }
         }
+    }
+
+    /**
+     * Insert atau update mutasi stok berdasarkan detail pembelian
+     * 
+     * @param array $headerData Data header pembelian
+     * @param array $detail Data detail pembelian
+     * @return void
+     */
+    protected function insertOrUpdatteMutasiStock(array $headerData, array $detail, $idReturPenjualan): void
+    {
+        // Skip jika tidak ada id stock
+        if (empty($detail['id_stock'])) {
+            return;
+        }
+
+        // Cek apakah mutasi stok sudah ada
+        $existingMutasi = $this->mutasiStock
+            ->where([
+                'id_stock' => $detail['id_stock'],
+                'id_lokasi' => $headerData['id_lokasi'],
+                'jenis' => 'masuk',
+                'sumber_transaksi' => 'retur_penjualan',
+                'id_transaksi' => $idReturPenjualan
+            ])
+            ->first();
+
+        if ($existingMutasi) {
+            // Update mutasi stok yang sudah ada
+            $this->mutasiStock->update($existingMutasi->id_mutasi, [
+                'qty1' => floatval($detail['qty1']),
+                'qty2' => floatval($detail['qty2']),
+                'nilai' => floatval($detail['total_raw']),
+                'tanggal' => $headerData['tanggal']
+            ]);
+            return;
+        }
+
+        $mutasiData = [
+            'id_stock' => $detail['id_stock'],
+            'id_lokasi' => $headerData['id_lokasi'],
+            'tanggal' => $headerData['tanggal'],
+            'jenis' => 'masuk',
+            'qty1' => floatval($detail['qty1']),
+            'qty2' => floatval($detail['qty2']),
+            'nilai' => floatval($detail['total_raw']),
+            'sumber_transaksi' => 'retur_penjualan',
+            'id_transaksi' => $idReturPenjualan
+        ];
+
+        // Insert mutasi stok baru
+        $this->mutasiStock->insert($mutasiData);
     }
 
     /**
@@ -392,58 +464,108 @@ class ReturPenjualanService
      * Set atau update hutang untuk transaksi
      * 
      * @param array $headerData Data header pembelian
-     * @param int $idReturPenjualan ID pembelian
+     * @param int $idPenjualan ID pembelian
      * @param float $hutang Jumlah hutang
      * @return void
      */
     protected function setPiutang(array $headerData, int $idReturPenjualan): void
     {
-        // Cari data piutang yang sudah ada (jika ada)
+        $this->handlePiutangRelasi(
+            $idReturPenjualan,
+            $headerData,
+            $headerData['id_pelanggan'],
+            'pelanggan'
+        );
+
+        $this->handlePiutangRelasi(
+            $idReturPenjualan,
+            $headerData,
+            $headerData['id_salesman'],
+            'salesman'
+        );
+    }
+
+    private function handlePiutangRelasi(int $idReturPenjualan, array $headerData, int $relasiId, string $relasiType): void
+    {
+        // Cari data piutang yang sudah ada
         $dt_piutang_lama = $this->riwayatHP
             ->where([
                 'id_transaksi' => $idReturPenjualan,
-                'relasi_id' => $headerData['id_pelanggan'],
-                'relasi_tipe' => 'pelanggan',
+                'relasi_id' => $relasiId,
+                'relasi_tipe' => $relasiType,
                 'jenis' => 'piutang'
             ])
             ->first();
 
-        $data = [
+        $data_piutang = [
             'tanggal' => $headerData['tanggal'],
             'id_transaksi' => $idReturPenjualan,
             'nota' => $headerData['nota'],
             'tanggal_jt' => $headerData['tgl_jatuhtempo'],
             'saldo' => $headerData['grand_total'],
-            'relasi_id' => $headerData['id_pelanggan'],
-            'relasi_tipe' => 'pelanggan',
+            'relasi_id' => $relasiId,
+            'relasi_tipe' => $relasiType,
             'jenis' => 'piutang'
         ];
+
+        $rekening_piutang_usaha = $this->bukuBesar->where('kode_setupbuku', $this->interface->getKodeRekening('piutang_dagang'))->first();
+
+        // Model reference based on relation type
+        $model = $relasiType === 'pelanggan' ? $this->pelanggan : $this->salesman;
 
         if ($dt_piutang_lama) {
             // Update data piutang yang sudah ada
             $piutang_masuk_lama = floatval($dt_piutang_lama->saldo);
-            $this->riwayatHP->update($dt_piutang_lama->id_piutang_piutang, $data);
+            $this->riwayatHP->update($dt_piutang_lama->id_hutang_piutang, $data_piutang);
 
-            // Update saldo pelanggan
-            $dt_pelanggan = $this->pelanggan->find($headerData['id_pelanggan']);
-            $old_saldo = floatval($dt_pelanggan->saldo);
-            $current_saldo = $old_saldo - $piutang_masuk_lama; // Kembalikan dulu saldo lama
-            $new_saldo = $current_saldo + $headerData['grand_total']; // Tambahkan dengan piutang baru
+            // Update saldo relasi
+            $dt_relasi = $model->find($relasiId);
+            $old_saldo = floatval($dt_relasi->saldo);
+            $current_saldo = $old_saldo + $piutang_masuk_lama; // Kembalikan dulu saldo lama
+            $new_saldo = $current_saldo - $headerData['grand_total']; // Tambahkan dengan piutang baru
 
-            $this->pelanggan->update($headerData['id_pelanggan'], [
+            $model->update($relasiId, [
                 'saldo' => $new_saldo
             ]);
+
+            $riwayat_lama = $this->riwayatPiutang->where([
+                'id_transaksi' => $idReturPenjualan,
+                'jenis_transaksi' => 'retur penjualan',
+                'id_pelaku' => $relasiId,
+                'pelaku' => $relasiType
+            ])->first();
+
+            if ($riwayat_lama) {
+                // Update riwayat piutang yang sudah ada
+                $this->riwayatPiutang->update($riwayat_lama->id, [
+                    'debit' => $headerData['grand_total'],
+                    'saldo_setelah' => $new_saldo,
+                ]);
+            }
         } else {
             // Insert data piutang baru
-            $this->riwayatHP->insert($data);
+            $this->riwayatHP->insert($data_piutang);
 
-            // Update saldo pelanggan
-            $dt_pelanggan = $this->pelanggan->find($headerData['id_pelanggan']);
-            $old_saldo = floatval($dt_pelanggan->saldo);
-            $new_saldo = $old_saldo + $headerData['grand_total'];
+            $dt_relasi = $model->find($relasiId);
+            $old_saldo = floatval($dt_relasi->saldo);
+            $new_saldo = $old_saldo - $headerData['grand_total'];
 
-            $this->pelanggan->update($headerData['id_pelanggan'], [
+            $model->update($relasiId, [
                 'saldo' => $new_saldo
+            ]);
+
+            // Insert riwayat piutang baru
+            $this->riwayatPiutang->insert([
+                'tanggal' => $headerData['tanggal'],
+                'pelaku' => $relasiType,
+                'id_transaksi' => $idReturPenjualan,
+                'jenis_transaksi' => 'retur penjualan',
+                'nota' => $headerData['nota'],
+                'id_pelaku' => $relasiId,
+                'debit' => 0,
+                'kredit' => $headerData['grand_total'],
+                'saldo_setelah' => $new_saldo,
+                'deskripsi' => 'Pengurangan piutang dari retur penjualan',
             ]);
         }
     }

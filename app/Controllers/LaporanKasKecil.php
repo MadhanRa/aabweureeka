@@ -2,36 +2,35 @@
 
 namespace App\Controllers;
 
-use App\Models\ModelKasKecil;
-use App\Models\ModelAntarmuka;
+use App\Models\transaksi\akuntansi\ModelKasKecil;
+use App\Models\setup\ModelAntarmuka;
 use App\Controllers\BaseController;
-use App\Models\ModelKelompokproduksi;
+use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
 class LaporanKasKecil extends BaseController
 {
     protected
-    $objKasKecil,
-    $objAntarmuka,
-    $objKelompokproduksi,
-    $db;
+        $objKasKecil,
+        $objAntarmuka,
+        $objKelompokproduksi,
+        $db;
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-        $this->objKasKecil = new ModelKasKecil();   
+    function __construct()
+    {
+        $this->objKasKecil = new ModelKasKecil();
         $this->objAntarmuka = new ModelAntarmuka();
         $this->objKelompokproduksi = new ModelKelompokproduksi();
         $this->db = \Config\Database::connect();
-       
-   }
-    
+    }
+
     public function index()
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir')? $this->request->getVar('tglakhir') : '';
-        $rekeningkas = $this->request->getVar('rekeningkas')? $this->request->getVar('rekeningkas') : '';
-        $kelproduksi = $this->request->getVar('kelproduksi')? $this->request->getVar('kelproduksi') : '';
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $rekeningkas = $this->request->getVar('rekeningkas') ? $this->request->getVar('rekeningkas') : '';
+        $kelproduksi = $this->request->getVar('kelproduksi') ? $this->request->getVar('kelproduksi') : '';
 
         // Ambil data untuk dropdown filter
         $dataRekeningKas = $this->objAntarmuka->findAll(); // Data rekening kas
@@ -42,7 +41,7 @@ class LaporanKasKecil extends BaseController
 
         // Hitung total mutasi
         $totalMutasi = array_sum(array_column($dtkaskecil, 'rp'));
-        
+
         // Siapkan data untuk view
         $data = [
             'dtkaskecil' => $dtkaskecil,

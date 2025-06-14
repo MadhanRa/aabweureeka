@@ -6,6 +6,7 @@ use App\Models\transaksi\penjualan\ModelPenjualan;
 use App\Models\transaksi\penjualan\ModelPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatPiutang;
+use App\Models\transaksi\ModelMutasiStock;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupBuku;
@@ -20,6 +21,7 @@ class PenjualanService
 {
     protected $riwayatTransaksi;
     protected $riwayatPiutang;
+    protected $mutasiStock;
     protected $penjualan;
     protected $penjualanDetail;
     protected $stockGudang;
@@ -41,6 +43,7 @@ class PenjualanService
         ModelRiwayatTransaksi $riwayat,
         ModelRiwayatPiutang $riwayatPiutang,
         ModelHutangPiutang $hutangPiutang,
+        ModelMutasiStock $mutasiStock,
         ModelAntarmuka $interface,
         ModelSetuppelanggan $pelanggan,
         ModelSetupsalesman $salesman,
@@ -56,6 +59,7 @@ class PenjualanService
         $this->riwayatTransaksi = $riwayat;
         $this->riwayatPiutang = $riwayatPiutang;
         $this->riwayatHP = $hutangPiutang;
+        $this->mutasiStock = $mutasiStock;
         $this->interface = $interface;
         $this->pelanggan = $pelanggan;
         $this->salesman = $salesman;
@@ -193,6 +197,15 @@ class PenjualanService
             if (!in_array($row->id, $incomingIds)) {
                 $this->restoreStock($row->id, $headerData['id_lokasi']);
                 $this->penjualanDetail->delete($row->id);
+
+                // Hapus mutasi stok terkait
+                $this->mutasiStock->where([
+                    'id_stock' => $row->id_stock,
+                    'id_lokasi' => $headerData['id_lokasi'],
+                    'jenis' => 'keluar',
+                    'sumber_transaksi' => 'penjualan',
+                    'id_transaksi' => $idPenjualan
+                ])->delete();
             }
         }
 
@@ -208,10 +221,12 @@ class PenjualanService
             ]);
 
             if (isset($detail['id_detail']) && in_array($detail['id_detail'], $existingIds)) {
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idPenjualan);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
                 $this->penjualanDetail->update($detail['id_detail'], $detailRecord);
             } else {
+                $this->insertOrUpdatteMutasiStock($headerData, $detail, $idPenjualan);
                 // Sync stock in stock1_gudang table
                 $this->syncStockGudang($headerData, $detail);
                 $this->penjualanDetail->insert($detailRecord);
@@ -225,6 +240,58 @@ class PenjualanService
                 $this->setPerubahanBukuBesar($headerData, $idPenjualan);
             }
         }
+    }
+
+    /**
+     * Insert atau update mutasi stok berdasarkan detail pembelian
+     * 
+     * @param array $headerData Data header pembelian
+     * @param array $detail Data detail pembelian
+     * @return void
+     */
+    protected function insertOrUpdatteMutasiStock(array $headerData, array $detail, $idPenjualan): void
+    {
+        // Skip jika tidak ada id stock
+        if (empty($detail['id_stock'])) {
+            return;
+        }
+
+        // Cek apakah mutasi stok sudah ada
+        $existingMutasi = $this->mutasiStock
+            ->where([
+                'id_stock' => $detail['id_stock'],
+                'id_lokasi' => $headerData['id_lokasi'],
+                'jenis' => 'keluar',
+                'sumber_transaksi' => 'penjualan',
+                'id_transaksi' => $idPenjualan
+            ])
+            ->first();
+
+        if ($existingMutasi) {
+            // Update mutasi stok yang sudah ada
+            $this->mutasiStock->update($existingMutasi->id_mutasi, [
+                'qty1' => floatval($detail['qty1']),
+                'qty2' => floatval($detail['qty2']),
+                'nilai' => floatval($detail['total_raw']),
+                'tanggal' => $headerData['tanggal']
+            ]);
+            return;
+        }
+
+        $mutasiData = [
+            'id_stock' => $detail['id_stock'],
+            'id_lokasi' => $headerData['id_lokasi'],
+            'tanggal' => $headerData['tanggal'],
+            'jenis' => 'keluar',
+            'qty1' => floatval($detail['qty1']),
+            'qty2' => floatval($detail['qty2']),
+            'nilai' => floatval($detail['total_raw']),
+            'sumber_transaksi' => 'penjualan',
+            'id_transaksi' => $idPenjualan
+        ];
+
+        // Insert mutasi stok baru
+        $this->mutasiStock->insert($mutasiData);
     }
 
     /**

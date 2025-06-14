@@ -9,6 +9,7 @@ use App\Models\transaksi\penjualan\ModelPenjualan;
 use App\Models\transaksi\penjualan\ModelPenjualanDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatPiutang;
+use App\Models\transaksi\ModelMutasiStock;
 use App\Models\setup\ModelSetuppelanggan;
 use App\Models\setup\ModelSetupsalesman;
 use App\Models\setup\ModelSetupBuku;
@@ -50,6 +51,7 @@ class Penjualan extends ResourceController
             new ModelRiwayatTransaksi(),
             new ModelRiwayatPiutang(),
             new ModelHutangPiutang(),
+            new ModelMutasiStock(),
             new ModelAntarmuka(),
             $this->objSetuppelanggan,
             $this->objSetupsalesman,

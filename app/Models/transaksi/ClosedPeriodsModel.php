@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi;
 
 use CodeIgniter\Model;
 
@@ -20,8 +20,8 @@ class ClosedPeriodsModel extends Model
     // protected array $casts = [];
     // protected array $castHandlers = [];
 
-    
-    
+
+
 
     // Method untuk mengecek apakah periode tertentu sudah ditutup
     public function isPeriodClosed($date)

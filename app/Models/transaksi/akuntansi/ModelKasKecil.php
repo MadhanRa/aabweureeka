@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi\akuntansi;
 
 use CodeIgniter\Model;
 
@@ -31,23 +31,23 @@ class ModelKasKecil extends Model
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('kaskecil1 p');
-        
+
         // Memilih kolom yang diperlukan dengan alias yang sesuai
         $builder->select('
             p.*, 
-            sp.kas_interface AS kas_interface, 
+            sp.kas_setara AS kas_setara, 
             sb.nama_kelproduksi AS nama_kelproduksi
         ');
-        
+
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
-        
+
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan hasil query sebagai array objek
         return $query->getResult();
 
@@ -71,55 +71,55 @@ class ModelKasKecil extends Model
 
 
         $grandtotal =  $this->selectSum('rp')
-        ->where('MONTH(tanggal)', $bulan)
-        ->where('YEAR(tanggal)', $tahun)
-        ->get()
-        ->getRow()
-        ->grand_total ?? 0;
+            ->where('MONTH(tanggal)', $bulan)
+            ->where('YEAR(tanggal)', $tahun)
+            ->get()
+            ->getRow()
+            ->grand_total ?? 0;
 
-            return [
-                'data' => $data,           // Semua data
-                'grandtotal' => $grandtotal, // Total nilai grand_total
-            ];
+        return [
+            'data' => $data,           // Semua data
+            'grandtotal' => $grandtotal, // Total nilai grand_total
+        ];
     }
 
     function getById($id)
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('kaskecil1 p');
-        
+
         // Pilih kolom yang diperlukan, dengan join yang sesuai
         $builder->select('p.*, sp.kas_interface AS kas_interface, sb.nama_kelproduksi AS nama_kelproduksi');
-        
+
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
-        
+
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
-        
+
         // Tambahkan kondisi where untuk id_lunashusaha
         $builder->where('p.id_kaskecil', $id);
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan satu baris sebagai objek
         return $query->getRow();
     }
 
     public function get_laporan($tglawal, $tglakhir, $rekeningkas, $kelproduksi = null)
     {
-            $builder = $this->db->table('kaskecil1 p');
+        $builder = $this->db->table('kaskecil1 p');
 
-            $builder->select('
+        $builder->select('
             p.*, 
             sp.kas_interface AS kas_interface, 
             sb.nama_kelproduksi AS nama_kelproduksi
         ');
-        
+
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
-        
+
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
 

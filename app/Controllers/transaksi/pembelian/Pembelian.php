@@ -6,6 +6,7 @@ use App\Models\transaksi\pembelian\ModelPembelian;
 use App\Models\transaksi\pembelian\ModelPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
+use App\Models\transaksi\ModelMutasiStock;
 use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\setup_persediaan\ModelStock;
 use App\Models\setup_persediaan\ModelStockGudang;
@@ -55,6 +56,7 @@ class Pembelian extends ResourceController
             new ModelSetupBuku(),
             new ModelRiwayatTransaksi(),
             new ModelRiwayatHutang(),
+            new ModelMutasiStock(),
             new ModelSetupsupplier(),
             new ModelHutangPiutang(),
             $this->db

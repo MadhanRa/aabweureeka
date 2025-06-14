@@ -2,64 +2,64 @@
 
 namespace App\Controllers;
 
-use App\Models\ClosedPeriodsModel;
+use App\Models\transaksi\ClosedPeriodsModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Accounting extends ResourceController
 {
     protected $db;
-    
+
     protected $closedPeriodsModel;
-    
+
     public function __construct()
     {
         $this->db = \Config\Database::connect();
         $this->closedPeriodsModel = new ClosedPeriodsModel();
     }
-    
+
     public function index()
     {
         return view('accounting/closeBook');
     }
 
     // Method untuk proses "Tutup Buku"
-    public function closePeriod() 
+    public function closePeriod()
     {
         if ($this->request->getMethod() === 'post') {
             // $startDate = $this->request->getPost('start_date');
             // $endDate = $this->request->getPost('end_date');
-    
+
             // Validasi dan pemeriksaan lainnya...
-    
+
             $data = [
                 'periode_start' => '2024-01-01',
                 'periode_end'   => '2024-01-31',
                 'is_closed'     => 1,
                 'created_at'    => date('Y-m-d H:i:s'), // Atau gunakan $this->request->getVar('created_at') jika ada input
             ];
-    
+
             $this->db->table('closed_periods')->insert($data);
-    
+
             return redirect()->to('/accounting/closeBook')->with('success', 'Periode berhasil ditutup');
         }
-    
+
         return view('accounting/closeBook');
     }
-    
-    
+
+
 
     public function isPeriodClosed($date)
-{
-    $query = $this->db->table('closed_periods')
-        ->where('periode_start <=', $date)
-        ->where('periode_end >=', $date)
-        ->where('is_closed', 1)
-        ->get();
+    {
+        $query = $this->db->table('closed_periods')
+            ->where('periode_start <=', $date)
+            ->where('periode_end >=', $date)
+            ->where('is_closed', 1)
+            ->get();
 
-    return $query->getNumRows() > 0; // Kembali true jika periode ditutup
-}
-    
+        return $query->getNumRows() > 0; // Kembali true jika periode ditutup
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *

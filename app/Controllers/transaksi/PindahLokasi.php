@@ -6,7 +6,7 @@ use TCPDF;
 use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\transaksi\ModelPindahLokasi;
-use App\Models\ClosedPeriodsModel;
+use App\Models\transaksi\ClosedPeriodsModel;
 use App\Models\transaksi\PeriodsModels;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;

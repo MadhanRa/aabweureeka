@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup_persediaan\ModelSatuan;
-use App\Models\ClosedPeriodsModel;
+use App\Models\transaksi\ClosedPeriodsModel;
 use App\Models\transaksi\ModelHasilProduksi;
 use App\Controllers\BaseController;
 use App\Models\setup\ModelKelompokproduksi;

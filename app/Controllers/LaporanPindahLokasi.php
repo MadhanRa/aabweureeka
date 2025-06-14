@@ -2,19 +2,19 @@
 
 namespace App\Controllers;
 
-use App\Models\ModelLokasi;
-use App\Models\ModelSatuan;
-use App\Models\PeriodsModels;
-use App\Models\ModelPindahLokasi;
-use App\Models\ClosedPeriodsModel;
+use App\Models\setup_persediaan\ModelLokasi;
+use App\Models\setup_persediaan\ModelSatuan;
+use App\Models\transaksi\PeriodsModels;
+use App\Models\transaksi\ModelPindahLokasi;
+use App\Models\transaksi\ClosedPeriodsModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use TCPDF;
 
 class LaporanPindahLokasi extends ResourceController
 {
-    
-    protected $objPenyesuaianStock; 
+
+    protected $objPenyesuaianStock;
     protected $objLokasi;
     protected $objSatuan;
     protected $objPindahLokasi;
@@ -38,13 +38,13 @@ class LaporanPindahLokasi extends ResourceController
     public function index()
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir')? $this->request->getVar('tglakhir') : '';
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
 
         // Panggil model untuk mendapatkan data laporan
         $dtpindahlokasi = $this->objPindahLokasi->get_laporan($tglawal, $tglakhir);
-    
+
         // $data['dtpembelian'] = $rowdata;
-        
+
         $data['dtpindahlokasi'] = $dtpindahlokasi;
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsatuan'] = $this->objSatuan->getAll();
@@ -54,44 +54,44 @@ class LaporanPindahLokasi extends ResourceController
     }
 
     public function printPDF($tglawal = null, $tglakhir = null)
-{
-    // If the dates are provided in the URL, use them; otherwise, use default values from the form (if applicable)
-    $tglawal = $tglawal ?: $this->request->getVar('tglawal');
-    $tglakhir = $tglakhir ?: $this->request->getVar('tglakhir');
+    {
+        // If the dates are provided in the URL, use them; otherwise, use default values from the form (if applicable)
+        $tglawal = $tglawal ?: $this->request->getVar('tglawal');
+        $tglakhir = $tglakhir ?: $this->request->getVar('tglakhir');
 
-    // Panggil model untuk mendapatkan data laporan berdasarkan tanggal
-    $dtpindahlokasi = $this->objPindahLokasi->get_laporan($tglawal, $tglakhir);
+        // Panggil model untuk mendapatkan data laporan berdasarkan tanggal
+        $dtpindahlokasi = $this->objPindahLokasi->get_laporan($tglawal, $tglakhir);
 
-    // Passing data to the view for the PDF generation
-    $data['dtpindahlokasi'] = $dtpindahlokasi;
-    $data['dtlokasi'] = $this->objLokasi->getAll();
-    $data['dtsatuan'] = $this->objSatuan->getAll();
-    $data['tglawal'] = $tglawal;
-    $data['tglakhir'] = $tglakhir;
+        // Passing data to the view for the PDF generation
+        $data['dtpindahlokasi'] = $dtpindahlokasi;
+        $data['dtlokasi'] = $this->objLokasi->getAll();
+        $data['dtsatuan'] = $this->objSatuan->getAll();
+        $data['tglawal'] = $tglawal;
+        $data['tglakhir'] = $tglakhir;
 
-    // Debugging: Tampilkan konten HTML sebelum PDF
-    $html = view('laporanpindahlokasi/printPDF', $data);
+        // Debugging: Tampilkan konten HTML sebelum PDF
+        $html = view('laporanpindahlokasi/printPDF', $data);
 
-    // Buat PDF baru
-    $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
+        // Buat PDF baru
+        $pdf = new TCPDF('landscape', PDF_UNIT, 'A4', true, 'UTF-8', false);
 
-    // Hapus header/footer default
-    $pdf->setPrintHeader(false);
-    $pdf->setPrintFooter(false);
+        // Hapus header/footer default
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
 
-    // Set font
-    $pdf->SetFont('helvetica', '', 12);
+        // Set font
+        $pdf->SetFont('helvetica', '', 12);
 
-    // Tambah halaman baru
-    $pdf->AddPage();
+        // Tambah halaman baru
+        $pdf->AddPage();
 
-    // Cetak konten menggunakan WriteHTML
-    $pdf->writeHTML($html, true, false, true, false, '');
+        // Cetak konten menggunakan WriteHTML
+        $pdf->writeHTML($html, true, false, true, false, '');
 
-    // Set tipe respons menjadi PDF
-    $this->response->setContentType('application/pdf');
-    $pdf->Output('laporan_pindah_lokasi.pdf', 'D');
-}
+        // Set tipe respons menjadi PDF
+        $this->response->setContentType('application/pdf');
+        $pdf->Output('laporan_pindah_lokasi.pdf', 'D');
+    }
 
 
     /**
