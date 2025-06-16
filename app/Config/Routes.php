@@ -372,6 +372,11 @@ $routes->get('/laporandaftarhutangsupplier/printPDF', 'LaporanHutangSupplierDaft
 $routes->get('/laporandaftarhutangsuppliernota', 'LaporanHutangSupplierDaftarNota::index');
 $routes->get('/laporandaftarhutangsuppliernota/printPDF', 'LaporanHutangSupplierDaftarNota::printPDF');
 
+//laporan kartu stock
+$routes->get('/laporankartustock', 'LaporanStockKartu::index');
+$routes->get('/laporankartustock/cari-stock/(:any)', 'LaporanStockKartu::getStockData/$1');
+$routes->get('/laporankartustock/printPDF', 'LaporanStockKartu::printPDF');
+
 
 
 //laporanjurnalumum

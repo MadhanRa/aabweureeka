@@ -249,7 +249,8 @@ class ReturPenjualanService
             'qty2' => floatval($detail['qty2']),
             'nilai' => floatval($detail['total_raw']),
             'sumber_transaksi' => 'retur_penjualan',
-            'id_transaksi' => $idReturPenjualan
+            'id_transaksi' => $idReturPenjualan,
+            'nota' => $headerData['nota']
         ];
 
         // Insert mutasi stok baru

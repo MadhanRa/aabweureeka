@@ -210,7 +210,8 @@ class ReturPembelianService
             'qty2' => floatval($detail['qty2']),
             'nilai' => floatval($detail['total_raw']),
             'sumber_transaksi' => 'retur_pembelian',
-            'id_transaksi' => $idReturPembelian
+            'id_transaksi' => $idReturPembelian,
+            'nota' => $headerData['nota']
         ];
 
         // Insert mutasi stok baru

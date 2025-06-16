@@ -49,4 +49,29 @@ class ModelStock extends Model
             ->where(['stock1.id_stock' => $id])
             ->first();
     }
+
+    public function getStockWithSatuanRelations()
+    {
+        return $this->select('
+                    stock1.id_stock, 
+                    stock1.kode, 
+                    stock1.nama_barang, 
+                    stock1.conv_factor, 
+                    satuan1.kode_satuan as kode_satuan,
+                    satuan2.kode_satuan as kode_satuan2')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left')
+            ->findAll();
+    }
+
+    public function getStockById($id)
+    {
+        return $this->select('
+        stock1.id_stock,
+        stock1.kode,
+                          stock1.nama_barang, 
+                          stock1.conv_factor')
+            ->where(['stock1.id_stock' => $id])
+            ->first();
+    }
 }

@@ -208,7 +208,8 @@ class PembelianService
             'qty2' => floatval($detail['qty2']),
             'nilai' => floatval($detail['total_raw']),
             'sumber_transaksi' => 'pembelian',
-            'id_transaksi' => $idPembelian
+            'id_transaksi' => $idPembelian,
+            'nota' => $headerData['nota']
         ];
 
         // Insert mutasi stok baru
