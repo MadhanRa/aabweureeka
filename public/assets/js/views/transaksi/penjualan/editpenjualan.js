@@ -409,9 +409,14 @@ function activateAutocomplete() {
     $(SELECTORS.kodeInput).each(function () {
         if ($(this).hasClass('ui-autocomplete-input')) return;
 
+
         $(this).autocomplete({
             source: function (req, res) {
-                $.get(url, { term: req.term }, data => {
+                const locationId = $('select[name="id_lokasi"]').val();
+                $.get(url, {
+                    term: req.term,
+                    location_id: locationId,
+                }, data => {
                     if (!data || !data.length) return res([]);
 
                     // Transform the data for display

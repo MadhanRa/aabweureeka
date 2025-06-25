@@ -377,6 +377,14 @@ $routes->get('/laporankartustock', 'LaporanStockKartu::index');
 $routes->get('/laporankartustock/cari-stock/(:any)', 'LaporanStockKartu::getStockData/$1');
 $routes->get('/laporankartustock/printPDF', 'LaporanStockKartu::printPDF');
 
+//laporan daftar stock rp
+$routes->get('/laporandaftarstock_rp', 'LaporanStockDaftarRP::index');
+$routes->get('/laporandaftarstock_rp/printPDF', 'LaporanStockDaftarRP::printPDF');
+
+//laporan daftar stock qty
+$routes->get('/laporandaftarstock_qty', 'LaporanStockDaftarQTY::index');
+$routes->get('/laporandaftarstock_qty/printPDF', 'LaporanStockDaftarQTY::printPDF');
+
 
 
 //laporanjurnalumum

@@ -1,7 +1,7 @@
 <?= $this->extend("layout/backend") ?>
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Laporan Karu Stock</title>
+<title>Akuntansi Eureeka &mdash; Laporan Kartu Stock</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
@@ -24,15 +24,15 @@
         <div class="row">
           <div class="col-md-3">
             <label for="tglawal">Tanggal Awal</label>
-            <input type="date" name="tglawal" class="form-control" value="<?= $tglawal ?>">
+            <input type="date" id="tglawal" name="tglawal" class="form-control" value="<?= $tglawal ?>">
           </div>
           <div class="col-md-3">
             <label for="tglakhir">Tanggal Akhir</label>
-            <input type="date" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
+            <input type="date" id="tglakhir" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
           </div>
           <div class="col-md-3">
             <label for="lokasi">Lokasi</label>
-            <select name="lokasi" class="form-control">
+            <select id="lokasi" name="lokasi" class="form-control">
               <option value="">Semua Lokasi</option>
               <?php foreach ($dtlokasi as $lok): ?>
                 <option value="<?= $lok->id_lokasi ?>" <?= $lok->id_lokasi == $lokasi ? 'selected' : '' ?>><?= $lok->nama_lokasi ?></option>

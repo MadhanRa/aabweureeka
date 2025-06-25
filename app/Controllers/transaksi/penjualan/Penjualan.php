@@ -326,6 +326,8 @@ class Penjualan extends ResourceController
     public function lookupStock()
     {
         $term = $this->request->getGet('term');
+        $location_id = $this->request->getGet('location_id');
+        log_message('info', "Lookup stock with term: {$term} and location_id: {$location_id}");
 
         $results = $this->objStock
             ->select("stock1.id_stock, stock1.kode, stock1.nama_barang, stock1.id_satuan, stock1.id_satuan2, stock1.conv_factor,
@@ -337,6 +339,8 @@ class Penjualan extends ResourceController
             ->join('satuan1 sat1', 'stock1.id_satuan = sat1.id_satuan', 'left')
             ->join('satuan1 sat2', 'stock1.id_satuan2 = sat2.id_satuan', 'left')
             ->join('harga1', 'stock1.id_stock = harga1.id_stock', 'left')
+            ->join('stock1_gudang sg', 'stock1.id_stock = sg.id_stock', 'left')
+            ->where('sg.id_lokasi', $location_id)
             ->groupStart()
             ->like('stock1.nama_barang', $term)
             ->orLike('stock1.kode', $term)
