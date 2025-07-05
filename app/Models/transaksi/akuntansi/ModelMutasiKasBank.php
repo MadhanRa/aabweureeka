@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi\akuntansi;
 
 use CodeIgniter\Model;
 

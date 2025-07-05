@@ -3,24 +3,24 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use App\Models\ModelBahanSablon;
-use App\Models\ModelHasilProduksi;
-use App\Models\ModelHasilSablon;
-use App\Models\ModelJurnalUmum;
-use App\Models\ModelKasKecil;
-use App\Models\ModelLunasSalesman;
-use App\Models\ModelMutasiKasBank;
-use App\Models\ModelPelunasanHutang;
-use App\Models\ModelPemakaianBahan;
-use App\Models\ModelPembelian;
-use App\Models\ModelPenjualan;
-use App\Models\ModelPenyesuaianStock;
-use App\Models\ModelPindahLokasi;
-use App\Models\ModelPiutangUsaha;
-use App\Models\ModelReturPembelian;
-use App\Models\ModelReturPenjualan;
-use App\Models\ModelStockOpname;
-use App\Models\PeriodsModels;
+use App\Models\transaksi\ModelBahanSablon;
+use App\Models\transaksi\ModelHasilProduksi;
+use App\Models\transaksi\ModelHasilSablon;
+use App\Models\transaksi\akuntansi\ModelJurnalUmum;
+use App\Models\transaksi\akuntansi\ModelKasKecil;
+use App\Models\transaksi\ModelLunasSalesman;
+use App\Models\transaksi\akuntansi\ModelMutasiKasBank;
+use App\Models\transaksi\ModelPelunasanHutang;
+use App\Models\transaksi\ModelPemakaianBahan;
+use App\Models\transaksi\pembelian\ModelPembelian;
+use App\Models\transaksi\penjualan\ModelPenjualan;
+use App\Models\transaksi\ModelPenyesuaianStock;
+use App\Models\transaksi\ModelPindahLokasi;
+use App\Models\transaksi\ModelPiutangUsaha;
+use App\Models\transaksi\pembelian\ModelReturPembelian;
+use App\Models\transaksi\penjualan\ModelReturPenjualan;
+use App\Models\transaksi\ModelStockOpname;
+use App\Models\transaksi\PeriodsModels;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
@@ -80,51 +80,51 @@ class PeriodsController extends BaseController
 
     public function report($id)
     {
-        $data_periods = $this->db->table('closed_periods')->where('id',$id)->get();
+        $data_periods = $this->db->table('closed_periods')->where('id', $id)->get();
         $cek_data = $data_periods->getRowArray();
         $month = $cek_data['month'];
         $year = $cek_data['year'];
 
-        $pembelian = $this->objPembelian->getByMonthAndYear($month,$year);
-        $penjualan = $this->objPenjualan->getByMonthAndYear($month,$year);
-        $retur_pembelian = $this->ReturPembelian->getByMonthAndYear($month,$year);
-        $retur_penjualan = $this->ReturPenjualan->getByMonthAndYear($month,$year);
-        $penyesuian_stok = $this->PenyesuianStok->getByMonthAndYear($month,$year);
-        $pindah_lokasi = $this->PindahLokasi->getByMonthAndYear($month,$year);
-        $bahan_sablon = $this->BahanSablon->getByMonthAndYear($month,$year);
-        $hasil_sablon = $this->HasilSablon->getByMonthAndYear($month,$year);
-        $pemakaian_bahan = $this->PemakaianBahan->getByMonthAndYear($month,$year);
-        $hasil_produksi = $this->HasilProduksi->getByMonthAndYear($month,$year);
-        $piutang_usaha = $this->PiutangUsaha->getByMonthAndYear($month,$year);
-        $piutang_salesman = $this->PiutangSalesman->getByMonthAndYear($month,$year);
-        $hutang = $this->Hutang->getByMonthAndYear($month,$year);
-        $mutasi_kasbank = $this->MutasiKasbank->getByMonthAndYear($month,$year);
-        $jurnal_umum = $this->JurnalUmum->getByMonthAndYear($month,$year);
-        $kas_kecil = $this->Kaskecil->getByMonthAndYear($month,$year);
-        $stock_opname = $this->StockOpname->getByMonthAndYear($month,$year);
+        $pembelian = $this->objPembelian->getByMonthAndYear($month, $year);
+        $penjualan = $this->objPenjualan->getByMonthAndYear($month, $year);
+        $retur_pembelian = $this->ReturPembelian->getByMonthAndYear($month, $year);
+        $retur_penjualan = $this->ReturPenjualan->getByMonthAndYear($month, $year);
+        $penyesuian_stok = $this->PenyesuianStok->getByMonthAndYear($month, $year);
+        $pindah_lokasi = $this->PindahLokasi->getByMonthAndYear($month, $year);
+        $bahan_sablon = $this->BahanSablon->getByMonthAndYear($month, $year);
+        $hasil_sablon = $this->HasilSablon->getByMonthAndYear($month, $year);
+        $pemakaian_bahan = $this->PemakaianBahan->getByMonthAndYear($month, $year);
+        $hasil_produksi = $this->HasilProduksi->getByMonthAndYear($month, $year);
+        $piutang_usaha = $this->PiutangUsaha->getByMonthAndYear($month, $year);
+        $piutang_salesman = $this->PiutangSalesman->getByMonthAndYear($month, $year);
+        $hutang = $this->Hutang->getByMonthAndYear($month, $year);
+        $mutasi_kasbank = $this->MutasiKasbank->getByMonthAndYear($month, $year);
+        $jurnal_umum = $this->JurnalUmum->getByMonthAndYear($month, $year);
+        $kas_kecil = $this->Kaskecil->getByMonthAndYear($month, $year);
+        $stock_opname = $this->StockOpname->getByMonthAndYear($month, $year);
 
         $data['data_pembelian'] = $pembelian['data'];  // data pembelian
         $data['grandtotal_pembelian'] = $pembelian['grandtotal']; // grandtotal data pembelian
         $data['data_penjualan'] = $penjualan['data']; // data penjualan
         $data['grandtotal_penjualan'] = $penjualan['grandtotal']; // grandtotal data penjualan
-        $data['retur_penjualan'] = $retur_penjualan['data']; 
-        $data['grandtotal_returpenjualan'] = $retur_penjualan['grandtotal']; 
-        $data['retur_pembelian'] = $retur_pembelian['data']; 
-        $data['grandtotal_returpembelian'] = $retur_pembelian['grandtotal']; 
-        $data['penyesuian_stok'] = $penyesuian_stok['data'];         
-        $data['pindah_lokasi'] = $pindah_lokasi['data']; 
-        $data['bahan_sablon'] = $bahan_sablon['data']; 
-        $data['hasil_sablon'] = $hasil_sablon['data']; 
-        $data['pemakaian_bahan'] = $pemakaian_bahan['data'];         
-        $data['hasil_produksi'] = $hasil_produksi['data']; 
-        $data['piutang_usaha'] = $piutang_usaha['data']; 
-        $data['piutang_salesman'] = $piutang_salesman['data'];         
-        $data['hutang'] = $hutang['data']; 
-        $data['mutasi_kasbank'] = $mutasi_kasbank['data']; 
-        $data['jurnal_umum'] = $jurnal_umum['data']; 
-        $data['kas_kecil'] = $kas_kecil['data']; 
-        $data['grandtotal_kas_kecil'] = $kas_kecil['grandtotal']; 
-        $data['stock_opname'] = $stock_opname['data']; 
+        $data['retur_penjualan'] = $retur_penjualan['data'];
+        $data['grandtotal_returpenjualan'] = $retur_penjualan['grandtotal'];
+        $data['retur_pembelian'] = $retur_pembelian['data'];
+        $data['grandtotal_returpembelian'] = $retur_pembelian['grandtotal'];
+        $data['penyesuian_stok'] = $penyesuian_stok['data'];
+        $data['pindah_lokasi'] = $pindah_lokasi['data'];
+        $data['bahan_sablon'] = $bahan_sablon['data'];
+        $data['hasil_sablon'] = $hasil_sablon['data'];
+        $data['pemakaian_bahan'] = $pemakaian_bahan['data'];
+        $data['hasil_produksi'] = $hasil_produksi['data'];
+        $data['piutang_usaha'] = $piutang_usaha['data'];
+        $data['piutang_salesman'] = $piutang_salesman['data'];
+        $data['hutang'] = $hutang['data'];
+        $data['mutasi_kasbank'] = $mutasi_kasbank['data'];
+        $data['jurnal_umum'] = $jurnal_umum['data'];
+        $data['kas_kecil'] = $kas_kecil['data'];
+        $data['grandtotal_kas_kecil'] = $kas_kecil['grandtotal'];
+        $data['stock_opname'] = $stock_opname['data'];
         $data['id'] = $id;
         $total_kas_kecil = $kas_kecil['grandtotal'];
         $total_penjualan = $penjualan['grandtotal'];
@@ -139,51 +139,51 @@ class PeriodsController extends BaseController
 
     public function printPDF($id)
     {
-        $data_periods = $this->db->table('closed_periods')->where('id',$id)->get();
+        $data_periods = $this->db->table('closed_periods')->where('id', $id)->get();
         $cek_data = $data_periods->getRowArray();
         $month = $cek_data['month'];
         $year = $cek_data['year'];
 
-        $pembelian = $this->objPembelian->getByMonthAndYear($month,$year);
-        $penjualan = $this->objPenjualan->getByMonthAndYear($month,$year);
-        $retur_pembelian = $this->ReturPembelian->getByMonthAndYear($month,$year);
-        $retur_penjualan = $this->ReturPenjualan->getByMonthAndYear($month,$year);
-        $penyesuian_stok = $this->PenyesuianStok->getByMonthAndYear($month,$year);
-        $pindah_lokasi = $this->PindahLokasi->getByMonthAndYear($month,$year);
-        $bahan_sablon = $this->BahanSablon->getByMonthAndYear($month,$year);
-        $hasil_sablon = $this->HasilSablon->getByMonthAndYear($month,$year);
-        $pemakaian_bahan = $this->PemakaianBahan->getByMonthAndYear($month,$year);
-        $hasil_produksi = $this->HasilProduksi->getByMonthAndYear($month,$year);
-        $piutang_usaha = $this->PiutangUsaha->getByMonthAndYear($month,$year);
-        $piutang_salesman = $this->PiutangSalesman->getByMonthAndYear($month,$year);
-        $hutang = $this->Hutang->getByMonthAndYear($month,$year);
-        $mutasi_kasbank = $this->MutasiKasbank->getByMonthAndYear($month,$year);
-        $jurnal_umum = $this->JurnalUmum->getByMonthAndYear($month,$year);
-        $kas_kecil = $this->Kaskecil->getByMonthAndYear($month,$year);
-        $stock_opname = $this->StockOpname->getByMonthAndYear($month,$year);
+        $pembelian = $this->objPembelian->getByMonthAndYear($month, $year);
+        $penjualan = $this->objPenjualan->getByMonthAndYear($month, $year);
+        $retur_pembelian = $this->ReturPembelian->getByMonthAndYear($month, $year);
+        $retur_penjualan = $this->ReturPenjualan->getByMonthAndYear($month, $year);
+        $penyesuian_stok = $this->PenyesuianStok->getByMonthAndYear($month, $year);
+        $pindah_lokasi = $this->PindahLokasi->getByMonthAndYear($month, $year);
+        $bahan_sablon = $this->BahanSablon->getByMonthAndYear($month, $year);
+        $hasil_sablon = $this->HasilSablon->getByMonthAndYear($month, $year);
+        $pemakaian_bahan = $this->PemakaianBahan->getByMonthAndYear($month, $year);
+        $hasil_produksi = $this->HasilProduksi->getByMonthAndYear($month, $year);
+        $piutang_usaha = $this->PiutangUsaha->getByMonthAndYear($month, $year);
+        $piutang_salesman = $this->PiutangSalesman->getByMonthAndYear($month, $year);
+        $hutang = $this->Hutang->getByMonthAndYear($month, $year);
+        $mutasi_kasbank = $this->MutasiKasbank->getByMonthAndYear($month, $year);
+        $jurnal_umum = $this->JurnalUmum->getByMonthAndYear($month, $year);
+        $kas_kecil = $this->Kaskecil->getByMonthAndYear($month, $year);
+        $stock_opname = $this->StockOpname->getByMonthAndYear($month, $year);
 
         $data['data_pembelian'] = $pembelian['data'];  // data pembelian
         $data['grandtotal_pembelian'] = $pembelian['grandtotal']; // grandtotal data pembelian
         $data['data_penjualan'] = $penjualan['data']; // data penjualan
         $data['grandtotal_penjualan'] = $penjualan['grandtotal']; // grandtotal data penjualan
-        $data['retur_penjualan'] = $retur_penjualan['data']; 
-        $data['grandtotal_returpenjualan'] = $retur_penjualan['grandtotal']; 
-        $data['retur_pembelian'] = $retur_pembelian['data']; 
-        $data['grandtotal_returpembelian'] = $retur_pembelian['grandtotal']; 
-        $data['penyesuian_stok'] = $penyesuian_stok['data'];         
-        $data['pindah_lokasi'] = $pindah_lokasi['data']; 
-        $data['bahan_sablon'] = $bahan_sablon['data']; 
-        $data['hasil_sablon'] = $hasil_sablon['data']; 
-        $data['pemakaian_bahan'] = $pemakaian_bahan['data'];         
-        $data['hasil_produksi'] = $hasil_produksi['data']; 
-        $data['piutang_usaha'] = $piutang_usaha['data']; 
-        $data['piutang_salesman'] = $piutang_salesman['data'];         
-        $data['hutang'] = $hutang['data']; 
-        $data['mutasi_kasbank'] = $mutasi_kasbank['data']; 
-        $data['jurnal_umum'] = $jurnal_umum['data']; 
-        $data['kas_kecil'] = $kas_kecil['data']; 
-        $data['grandtotal_kas_kecil'] = $kas_kecil['grandtotal']; 
-        $data['stock_opname'] = $stock_opname['data']; 
+        $data['retur_penjualan'] = $retur_penjualan['data'];
+        $data['grandtotal_returpenjualan'] = $retur_penjualan['grandtotal'];
+        $data['retur_pembelian'] = $retur_pembelian['data'];
+        $data['grandtotal_returpembelian'] = $retur_pembelian['grandtotal'];
+        $data['penyesuian_stok'] = $penyesuian_stok['data'];
+        $data['pindah_lokasi'] = $pindah_lokasi['data'];
+        $data['bahan_sablon'] = $bahan_sablon['data'];
+        $data['hasil_sablon'] = $hasil_sablon['data'];
+        $data['pemakaian_bahan'] = $pemakaian_bahan['data'];
+        $data['hasil_produksi'] = $hasil_produksi['data'];
+        $data['piutang_usaha'] = $piutang_usaha['data'];
+        $data['piutang_salesman'] = $piutang_salesman['data'];
+        $data['hutang'] = $hutang['data'];
+        $data['mutasi_kasbank'] = $mutasi_kasbank['data'];
+        $data['jurnal_umum'] = $jurnal_umum['data'];
+        $data['kas_kecil'] = $kas_kecil['data'];
+        $data['grandtotal_kas_kecil'] = $kas_kecil['grandtotal'];
+        $data['stock_opname'] = $stock_opname['data'];
         $total_kas_kecil = $kas_kecil['grandtotal'];
         $total_penjualan = $penjualan['grandtotal'];
         $total_retur_penjualan = $retur_penjualan['grandtotal'];
@@ -217,7 +217,7 @@ class PeriodsController extends BaseController
         $pdf->Output('laporan_final_tutup_buku.pdf', 'I');
     }
 
-    
+
     public function add()
     {
         return view('periods/add');
@@ -238,34 +238,34 @@ class PeriodsController extends BaseController
         } else {
             $data = array(
                 'month' => $monthNumber,
-                'year' => $year, 
+                'year' => $year,
                 'is_closed' => 1,
             );
             $this->db->table('closed_periods')->insert($data);
 
             // if ($status == 1) {
-                // Buka periode berikutnya
-                $nextPeriod = strtotime("+1 month", strtotime("$year-$monthNumber"));
-                $nextMonth = date('m', $nextPeriod); // Nama bulan periode berikutnya
-                $nextYear  = date('Y', $nextPeriod); // Tahun periode berikutnya
+            // Buka periode berikutnya
+            $nextPeriod = strtotime("+1 month", strtotime("$year-$monthNumber"));
+            $nextMonth = date('m', $nextPeriod); // Nama bulan periode berikutnya
+            $nextYear  = date('Y', $nextPeriod); // Tahun periode berikutnya
 
-                $nextQuery = $this->db->table('closed_periods')
-                    ->where('month', $nextMonth)
-                    ->where('year', $nextYear)
-                    ->get();
+            $nextQuery = $this->db->table('closed_periods')
+                ->where('month', $nextMonth)
+                ->where('year', $nextYear)
+                ->get();
 
-                if ($nextQuery->getNumRows() === 0) {
-                    // Jika periode belum ada, tambahkan dengan status "open"
-                    $nextData = [
-                        'month' => $nextMonth,
-                        'year'  => $nextYear,
-                        'is_closed'  => 0,
-                        'created_at' => date('Y-m-d H:i:s'),
-                    ];
-                    $this->db->table('closed_periods')->insert($nextData);
-                }
+            if ($nextQuery->getNumRows() === 0) {
+                // Jika periode belum ada, tambahkan dengan status "open"
+                $nextData = [
+                    'month' => $nextMonth,
+                    'year'  => $nextYear,
+                    'is_closed'  => 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $this->db->table('closed_periods')->insert($nextData);
+            }
 
-                return redirect()->to(site_url('close-period'))->with('Sukses', 'Data Berhasil Disimpan');
+            return redirect()->to(site_url('close-period'))->with('Sukses', 'Data Berhasil Disimpan');
             // } else {
             //     return redirect()->to(site_url('close-period'))->with('Sukses', 'Data Berhasil Disimpan');
             // }

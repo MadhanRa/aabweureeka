@@ -58,9 +58,9 @@
                     <td><?= $value->tanggal ?></td>
                     <td><?= $value->nota ?></td>
                     <td><?= $value->nama_lokasi ?></td>
-                    <td><?= $value->nama_setupuser ?></td>
-                    <td><?= $value->nama_stock ?></td>
-                    <td><?= $value->kode_satuan ?></td>
+                    <td><?= $value->nama_user ?></td>
+                    <td><?= $value->nama_barang ?></td>
+                    <td><?= $value->satuan ?></td>
                     <td><?= $value->qty_1 ?></td>
                     <td><?= $value->qty_2 ?></td>
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\transaksi\akuntansi;
 
 use CodeIgniter\Model;
 
@@ -12,7 +12,7 @@ class ModelJurnalUmum extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal','nota','rekening','b_pembantu','nama_rekening', 'nama_bpembantu','no_ref','debet','kredit','tgl_nota','keterangan'];
+    protected $allowedFields    = ['tanggal', 'nota', 'rekening', 'b_pembantu', 'nama_rekening', 'nama_bpembantu', 'no_ref', 'debet', 'kredit', 'tgl_nota', 'keterangan'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -31,10 +31,10 @@ class ModelJurnalUmum extends Model
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('jurnalumum1 p');
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan hasil query sebagai array objek
         return $query->getResult();
 
@@ -48,53 +48,53 @@ class ModelJurnalUmum extends Model
             ->findAll();
 
 
-            return [
-                'data' => $data,           // Semua data
-            ];
+        return [
+            'data' => $data,           // Semua data
+        ];
     }
     function getById($id)
     {
         // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
         $builder = $this->db->table('jurnalumum1 p');
-        
+
         // Tambahkan kondisi where untuk id_lunashusaha
         $builder->where('p.id_jurnalumum', $id);
-        
+
         // Eksekusi query
         $query = $builder->get();
-        
+
         // Mengembalikan satu baris sebagai objek
         return $query->getRow();
     }
 
     public function get_laporan($tglawal, $tglakhir = null)
-{
-    $builder = $this->db->table('jurnalumum1 p');
+    {
+        $builder = $this->db->table('jurnalumum1 p');
 
-    // Filter berdasarkan tanggal awal dan akhir
-    if (!empty($tglawal)) {
-        $builder->where('p.tanggal >=', $tglawal);
+        // Filter berdasarkan tanggal awal dan akhir
+        if (!empty($tglawal)) {
+            $builder->where('p.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('p.tanggal <=', $tglakhir);
+        }
+
+        $data = $builder->get()->getResult();
+
+        // Hitung total debit dan kredit
+        $totalDebet = 0;
+        $totalKredit = 0;
+        foreach ($data as $row) {
+            $totalDebet += floatval($row->debet);
+            $totalKredit += floatval($row->kredit);
+        }
+
+        return [
+            'data' => $data,                 // Data laporan
+            'total_debet' => $totalDebet,    // Total debit
+            'total_kredit' => $totalKredit,  // Total kredit
+        ];
     }
-    if (!empty($tglakhir)) {
-        $builder->where('p.tanggal <=', $tglakhir);
-    }
-
-    $data = $builder->get()->getResult();
-
-    // Hitung total debit dan kredit
-    $totalDebet = 0;
-    $totalKredit = 0;
-    foreach ($data as $row) {
-        $totalDebet += floatval($row->debet);
-        $totalKredit += floatval($row->kredit);
-    }
-
-    return [
-        'data' => $data,                 // Data laporan
-        'total_debet' => $totalDebet,    // Total debit
-        'total_kredit' => $totalKredit,  // Total kredit
-    ];
-}
 
     // // Validation
     // protected $validationRules      = [];

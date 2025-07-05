@@ -124,10 +124,10 @@
     <li><a class="nav-link text-dark" href="<?= site_url('laporankartustock') ?>">Kartu Stock</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarstock_rp') ?>">Daftar Stock (Rp)</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarstock_qty') ?>">Daftar Stock (Qty)</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Stock Akhir Kosong</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Stock Akhir Minimal</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Stock Opname</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Perbandingan Stock Opname</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarstock_kosong') ?>">Daftar Stock Akhir Kosong</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporandaftarstock_minimal') ?>">Daftar Stock Akhir Minimal</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanstock_opname') ?>">Stock Opname</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporanstock_opname_perbandingan') ?>">Perbandingan Stock Opname</a></li>
   </ul>
 </li>
 

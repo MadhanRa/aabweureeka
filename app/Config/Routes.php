@@ -243,19 +243,14 @@ $routes->put('/kaskecil/(:segment)', 'KasKecil::update/$1', ['filter' => 'role:a
 $routes->put('/kaskecil/(:segment)/edit', 'KasKecil::edit/$1', ['filter' => 'role:admin']);
 
 //routes stockopname
-$routes->get('/stockopname/new', 'StockOpname::new');
-// $routes->get('/stockopname/(:segment)/new', 'StockOpname::edit/$1');
-$routes->resource('stockopname');
-$routes->post('/stockopname', 'StockOpname::create');
-$routes->post('/stockopname/(:any)', 'StockOpname::delete/$1');
-// $routes->put('/stockopname/(:segment)/edit', 'StockOpname::edit/$1');
-$routes->get('stockopname', 'StockOpname::index');
+$routes->get('stockopname/autocomplete', 'StockOpname::autocomplete');
 $routes->get('stockopname/printPDF/(:num)', 'StockOpname::printPDF/$1');
 $routes->get('StockOpname/printPDF/(:num)', 'StockOpname::printPDF/$1');
 $routes->get('stockopname/printPDF', 'StockOpname::printPDF');
 $routes->get('StockOpname/printPDF', 'StockOpname::printPDF');
 $routes->put('/stockopname/(:segment)', 'StockOpname::update/$1', ['filter' => 'role:admin']);
 $routes->put('/stokopname/(:segment)/edit', 'StockOpname::edit/$1', ['filter' => 'role:admin']);
+$routes->resource('stockopname');
 
 //routes posting dan tutup buku
 $routes->get('/transaksi/posting', 'TransaksiController::posting');
@@ -384,6 +379,24 @@ $routes->get('/laporandaftarstock_rp/printPDF', 'LaporanStockDaftarRP::printPDF'
 //laporan daftar stock qty
 $routes->get('/laporandaftarstock_qty', 'LaporanStockDaftarQTY::index');
 $routes->get('/laporandaftarstock_qty/printPDF', 'LaporanStockDaftarQTY::printPDF');
+
+//laporan daftar stock kosong
+$routes->get('/laporandaftarstock_kosong', 'LaporanStockDaftarKosong::index');
+$routes->get('/laporandaftarstock_kosong/printPDF', 'LaporanStockDaftarKosong::printPDF');
+
+//laporan daftar stock minimal
+$routes->get('/laporandaftarstock_minimal', 'LaporanStockDaftarMinimal::index');
+$routes->get('/laporandaftarstock_minimal/printPDF', 'LaporanStockDaftarMinimal::printPDF');
+
+//laporan Stock opname
+$routes->get('/laporanstock_opname', 'LaporanStockOpname::index');
+$routes->get('/laporanstock_opname/printPDF', 'LaporanStockOpname::printPDF');
+
+//laporan Perbandingan Stock opname
+$routes->get('/laporanstock_opname_perbandingan', 'LaporanStockOpnamePerbandingan::index');
+$routes->get('/laporanstock_opname_perbandingan/printPDF', 'LaporanStockOpnamePerbandingan::printPDF');
+$routes->get('/laporanstock_opname_perbandingan/cari-nota/(:any)', 'LaporanStockOpnamePerbandingan::cariNotaOpname/$1');
+
 
 
 
