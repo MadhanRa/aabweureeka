@@ -20,7 +20,7 @@
             <form method="post" action="<?= site_url('setup/biaya') ?>">
               <?= csrf_field() ?>
               <div class="form-group">
-                <label>Rekening Bank</label>
+                <label>Rekening</label>
                 <!-- Kalau Data rekening kosong -->
                 <select class="form-control" name="id_setupbuku" required>
                   <option value="" hidden>--Pilih Rekening--</option>

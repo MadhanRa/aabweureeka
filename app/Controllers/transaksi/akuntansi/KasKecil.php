@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi\akuntansi;
 
-use App\Models\ModelAntarmuka;
-use App\Models\ModelKasKecil;
-use App\Models\ModelKelompokproduksi;
+use App\Models\setup\ModelAntarmuka;
+use App\Models\setup\ModelSetupBuku;
+use App\Models\transaksi\akuntansi\ModelKasKecil;
+use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -13,18 +14,19 @@ class KasKecil extends ResourceController
     protected $objKelompokproduksi;
     protected $objKasKecil;
     protected $objAntarmuka;
+    protected $objSetupBuku;
     protected $db;
-    
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objKasKecil = new ModelKasKecil();
-       $this->objKelompokproduksi = new ModelKelompokproduksi();
-       $this->objAntarmuka = new ModelAntarmuka();
-       $this->db = \Config\Database::connect();
-       
-   }
-    
+    function __construct()
+    {
+        $this->objKasKecil = new ModelKasKecil();
+        $this->objKelompokproduksi = new ModelKelompokproduksi();
+        $this->objAntarmuka = new ModelAntarmuka();
+        $this->objSetupBuku = new ModelSetupBuku();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -44,13 +46,11 @@ class KasKecil extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
         $data['dtkaskecil'] = $this->objKasKecil->getAll();
-        $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
-        $data['dtantarmuka'] = $this->objAntarmuka->findAll();
-        return view('kaskecil/index', $data);
+        return view('transaksi/akuntansi/kaskecil/index', $data);
     }
 
     /**
@@ -72,10 +72,15 @@ class KasKecil extends ResourceController
      */
     public function new()
     {
-        $data['dtkaskecil'] = $this->objKasKecil->getAll();
+        // Ambil kode kas setara di interface
+        $kodekas = $this->objAntarmuka->getKodeKas();
+        // pisah kode kas berdasar koma
+        $kodekasArray = explode(',', $kodekas);
+        // Ambil data rekening kas dan setara kas
+        $data['dtrekkas'] = $this->objSetupBuku->getRekeningKas($kodekasArray);
+
         $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
-        $data['dtantarmuka'] = $this->objAntarmuka->findAll();
-        return view('kaskecil/new', $data);
+        return view('transaksi/akuntansi/kaskecil/new', $data);
     }
 
     /**
@@ -90,7 +95,7 @@ class KasKecil extends ResourceController
             'id_kaskecil'    => $this->request->getVar('id_kaskecil'),
             'tanggal'           => $this->request->getVar('tanggal'),
             'nota'              => $this->request->getVar('nota'),
-            'id_interface'      => $this->request->getVar('id_interface'),
+            'id_setupbuku'      => $this->request->getVar('id_setupbuku'),
             'id_kelproduksi'      => $this->request->getVar('id_kelproduksi'),
             'rekening'             => $this->request->getVar('rekening'),
             'b_pembantu'   => $this->request->getVar('b_pembantu'),
@@ -98,8 +103,8 @@ class KasKecil extends ResourceController
             'nama_bpembantu'              => $this->request->getVar('nama_bpembantu'),
             'rp'              => $this->request->getVar('rp'),
             'keterangan'        => $this->request->getVar('keterangan'),
-            
-            
+
+
         ];
         $this->db->table('kaskecil1')->insert($data);
 
@@ -128,12 +133,17 @@ class KasKecil extends ResourceController
             return redirect()->to(site_url('kaskecil'))->with('error', 'Data tidak ditemukan');
         }
 
+        // Ambil kode kas setara di interface
+        $kodekas = $this->objAntarmuka->getKodeKas();
+        // pisah kode kas berdasar koma
+        $kodekasArray = explode(',', $kodekas);
+        // Ambil data rekening kas dan setara kas
+        $data['dtrekkas'] = $this->objSetupBuku->getRekeningKas($kodekasArray);
 
         // Lanjutkan jika semua pengecekan berhasil
         $data['dtkaskecil'] = $dtkaskecil;
         $data['dtkelompokproduksi'] = $this->objKelompokproduksi->findAll();
-        $data['dtantarmuka'] = $this->objAntarmuka->findAll();
-        return view('kaskecil/edit', $data);
+        return view('transaksi/akuntansi/kaskecil/edit', $data);
     }
 
     /**
@@ -146,19 +156,19 @@ class KasKecil extends ResourceController
     public function update($id = null)
     {
         // Cek apakah pengguna memiliki peran admin
-    if (!in_groups('admin')) {
-        return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
-    }
+        if (!in_groups('admin')) {
+            return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
+        }
 
-    // Cek apakah data dengan ID yang diberikan ada di database
-    $existingData = $this->objKasKecil->find($id);
-    if (!$existingData) {
-        return redirect()->to(site_url('kaskecil'))->with('error', 'Data tidak ditemukan');
-    }
+        // Cek apakah data dengan ID yang diberikan ada di database
+        $existingData = $this->objKasKecil->find($id);
+        if (!$existingData) {
+            return redirect()->to(site_url('kaskecil'))->with('error', 'Data tidak ditemukan');
+        }
 
-    // Ambil data yang diinputkan dari form
-    $data = [
-        'id_kaskecil'    => $this->request->getVar('id_kaskecil'),
+        // Ambil data yang diinputkan dari form
+        $data = [
+            'id_kaskecil'    => $this->request->getVar('id_kaskecil'),
             'tanggal'           => $this->request->getVar('tanggal'),
             'nota'              => $this->request->getVar('nota'),
             'id_interface'      => $this->request->getVar('id_interface'),
@@ -169,12 +179,12 @@ class KasKecil extends ResourceController
             'nama_bpembantu'              => $this->request->getVar('nama_bpembantu'),
             'rp'              => $this->request->getVar('rp'),
             'keterangan'        => $this->request->getVar('keterangan'),
-    ];
+        ];
 
-    // Update data berdasarkan ID
-    $this->objKasKecil->update($id, $data);
+        // Update data berdasarkan ID
+        $this->objKasKecil->update($id, $data);
 
-    return redirect()->to(site_url('kaskecil'))->with('success', 'Data berhasil diupdate.');
+        return redirect()->to(site_url('kaskecil'))->with('success', 'Data berhasil diupdate.');
     }
 
     /**

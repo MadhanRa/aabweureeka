@@ -360,7 +360,6 @@ class PembelianService
      */
     protected function setPerubahanBukuBesar(array $headerData, int $idPembelian, float $tunai): void
     {
-        log_message('debug', 'setPerubahanBukuBesar called with headerData: ' . json_encode($headerData) . ', idPembelian: ' . $idPembelian . ', tunai: ' . $tunai);
 
         // Validasi data rekening
         $dt_rekening = $this->bukuBesar->find($headerData['id_setupbuku']);

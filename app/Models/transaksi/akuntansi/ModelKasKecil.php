@@ -12,7 +12,7 @@ class ModelKasKecil extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'nota', 'id_interface', 'id_kelproduksi', 'rekening', 'b_pembantu', 'nama_rekening', 'nama_bpembantu', 'rp', 'keterangan'];
+    protected $allowedFields    = ['tanggal', 'nota', 'id_setupbuku', 'id_kelproduksi', 'rekening', 'b_pembantu', 'nama_rekening', 'nama_bpembantu', 'rp', 'keterangan'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -35,12 +35,12 @@ class ModelKasKecil extends Model
         // Memilih kolom yang diperlukan dengan alias yang sesuai
         $builder->select('
             p.*, 
-            sp.kas_setara AS kas_setara, 
+            sp.nama_setupbuku, 
             sb.nama_kelproduksi AS nama_kelproduksi
         ');
 
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
 
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
@@ -62,7 +62,7 @@ class ModelKasKecil extends Model
             sp.kas_interface AS kas_interface, 
             sb.nama_kelproduksi AS nama_kelproduksi
         ');
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
         $builder->where('MONTH(p.tanggal)', $bulan);
         $builder->where('YEAR(p.tanggal)', $tahun);
@@ -92,7 +92,7 @@ class ModelKasKecil extends Model
         $builder->select('p.*, sp.kas_interface AS kas_interface, sb.nama_kelproduksi AS nama_kelproduksi');
 
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
 
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
@@ -113,12 +113,12 @@ class ModelKasKecil extends Model
 
         $builder->select('
             p.*, 
-            sp.kas_interface AS kas_interface, 
-            sb.nama_kelproduksi AS nama_kelproduksi
+            si.nama_setupbuku, 
+            sb.nama_kelproduksi
         ');
 
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 si', 'p.id_setupbuku = si.id_setupbuku', 'left');
 
         // Melakukan JOIN dengan tabel 'setupbank1' untuk mendapatkan nama bank
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
@@ -133,7 +133,7 @@ class ModelKasKecil extends Model
         }
         // Filter supplier (jika ada)
         if (!empty($rekeningkas)) {
-            $builder->where('p.id_interface', $rekeningkas);
+            $builder->where('p.id_setupbuku', $rekeningkas);
         }
         // Filter Kelompok Produksi (jika ada)
         if (!empty($kelproduksi)) {

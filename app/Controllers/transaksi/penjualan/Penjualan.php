@@ -109,7 +109,6 @@ class Penjualan extends ResourceController
             if (empty($data['dtpenjualan'])) {
                 return redirect()->back()->with('error', 'Data tidak ditemukan.');
             }
-            log_message("info", "Data penjualan dengan ID {$id} memiliki data: " . json_encode($data['dtpenjualan']));
             $data['dtdetail'] = $this->objPenjualanDetail->select('*')
                 ->where('id_penjualan', $id)
                 ->findAll();
@@ -327,7 +326,6 @@ class Penjualan extends ResourceController
     {
         $term = $this->request->getGet('term');
         $location_id = $this->request->getGet('location_id');
-        log_message('info', "Lookup stock with term: {$term} and location_id: {$location_id}");
 
         $results = $this->objStock
             ->select("stock1.id_stock, stock1.kode, stock1.nama_barang, stock1.id_satuan, stock1.id_satuan2, stock1.conv_factor,

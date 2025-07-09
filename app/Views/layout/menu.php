@@ -79,7 +79,7 @@
     <li><a class="nav-link text-dark" href="<?= site_url('laporanhasilsablon') ?>">Hasil Sablon</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanpemakaianbahan') ?>">Pemakaian Bahan</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanhasilproduksi') ?>">Hasil Produksi</a></li>
-    <li><a class="nav-link text-dark" href="layout-top-navigation.html">Kas Keluar</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_kas_keluar') ?>">Kas Keluar</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporankaskecil') ?>">Pengeluaran Kas Kecil</a></li>
     <li><a class="nav-link text-dark" href="<?= site_url('laporanjurnalumum') ?>">Jurnal Umum</a></li>
   </ul>
@@ -134,12 +134,12 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link text-dark has-dropdown"><i class="fas fa-fire"></i><span>Keuangan</span></a>
   <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="index-0.html">Daftar Biaya</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Kartu Biaya</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Buku Besar</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Neraca Lajur</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Neraca</a></li>
-    <li><a class="nav-link text-dark" href="index-0.html">Rugi Laba</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_biaya_daftar') ?>">Daftar Biaya</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_biaya_kartu') ?>">Kartu Biaya</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_buku_besar') ?>">Buku Besar</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_neraca_lajur') ?>">Neraca Lajur</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_neraca') ?>">Neraca</a></li>
+    <li><a class="nav-link text-dark" href="<?= site_url('laporan_rugi_laba') ?>">Rugi Laba</a></li>
   </ul>
 </li>
 

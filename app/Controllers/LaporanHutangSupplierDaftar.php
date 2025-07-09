@@ -28,10 +28,6 @@ class LaporanHutangSupplierDaftar extends BaseController
         $riwayat_hutang = $this->objRiwayatHutang->get_laporan_daftar($tglawal, $tglakhir);
         $riwayat_hutang_summary = $this->objRiwayatHutang->get_laporan_summary_daftar($tglawal, $tglakhir);
 
-        // cek data
-        log_message('info', 'Riwayat Piutang: ' . print_r($riwayat_hutang, true));
-        log_message('info', 'Riwayat Piutang Summary: ' . print_r($riwayat_hutang_summary, true));
-
         $saldo_awal_total = 0;
         $debit_total = 0;
         $kredit_total = 0;

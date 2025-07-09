@@ -29,10 +29,6 @@ class LaporanPiutangUsahaKartu extends BaseController
         $riwayat_piutang = $this->objRiwayatPiutang->get_laporan($tglawal, $tglakhir, $pelanggan);
         $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary($tglawal, $tglakhir, $pelanggan);
 
-        // cek data
-        log_message('info', 'Riwayat Piutang: ' . print_r($riwayat_piutang, true));
-        log_message('info', 'Riwayat Piutang Summary: ' . print_r($riwayat_piutang_summary, true));
-
         $saldo_awal_total = 0;
         $debit_total = 0;
         $kredit_total = 0;

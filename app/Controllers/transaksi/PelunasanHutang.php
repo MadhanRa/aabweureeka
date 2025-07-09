@@ -140,7 +140,6 @@ class PelunasanHutang extends ResourceController
         $this->db->transBegin();
 
         try {
-            log_message('info', 'Pelunasan Hutang: Memulai proses penyimpanan data');
             // Ambil nilai dari form dan pastikan menjadi angka
             $saldo = floatval($this->request->getVar('saldo'));
             $nilai_pelunasan = floatval($this->request->getVar('nilai_pelunasan'));

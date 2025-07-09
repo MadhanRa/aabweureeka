@@ -17,6 +17,53 @@ class ModelRiwayatTransaksi extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
+    public function getLaporanNeraca($tglawal = '', $tglakhir = '')
+    {
+        $builder = $this->db->table('riwayat_transaksi_rekening rw');
+        $builder->select('sb.kode_setupbuku, sb.nama_setupbuku, 
+                          SUM(CASE WHEN rw.debit > 0 THEN rw.debit ELSE 0 END) AS awal_debit,
+                          SUM(CASE WHEN rw.kredit > 0 THEN rw.kredit ELSE 0 END) AS awal_kredit,
+                          SUM(rw.debit) AS debit, 
+                          SUM(rw.kredit) AS kredit,
+                          SUM(CASE WHEN rw.debit > 0 THEN rw.debit ELSE 0 END) - SUM(CASE WHEN rw.kredit > 0 THEN rw.kredit ELSE 0 END) AS saldo_debit,
+                          SUM(CASE WHEN rw.kredit > 0 THEN rw.kredit ELSE 0 END) - SUM(CASE WHEN rw.debit > 0 THEN rw.debit ELSE 0 END) AS saldo_kredit');
+
+        $builder->join('setupbuku1 AS sb', 'rw.id_setupbuku = sb.id_setupbuku', 'inner');
+
+        // Filter tanggal
+        if (!empty($tglawal)) {
+            $builder->where('rw.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('rw.tanggal <=', $tglakhir);
+        }
+
+        $builder->groupBy('sb.kode_setupbuku, sb.nama_setupbuku');
+        return $builder->get()->getResult();
+    }
+
+    public function getLaporanBuku($tglawal = '', $tglakhir = '', $id_setupbuku = '')
+    {
+        $builder = $this->db->table('riwayat_transaksi_rekening rw');
+        $builder->select('rw.id, rw.tanggal, rw.nota, rw.deskripsi, rw.debit, rw.kredit, rw.saldo_setelah, sb.nama_setupbuku');
+
+        $builder->join('setupbuku1 AS sb', 'rw.id_setupbuku = sb.id_setupbuku', 'inner');
+
+        // Filter tanggal
+        if (!empty($tglawal)) {
+            $builder->where('rw.tanggal >=', $tglawal);
+        }
+        if (!empty($tglakhir)) {
+            $builder->where('rw.tanggal <=', $tglakhir);
+        }
+        // Filter rekening
+        if (!empty($id_setupbuku)) {
+            $builder->where('rw.id_setupbuku', $id_setupbuku);
+        }
+        $builder->orderBy('rw.tanggal', 'ASC');
+        return $builder->get()->getResult();
+    }
+
     public function get_laporan($tglawal = '', $tglakhir = '', $bank = '')
     {
         $builder = $this->db->table('riwayat_transaksi_rekening rw');

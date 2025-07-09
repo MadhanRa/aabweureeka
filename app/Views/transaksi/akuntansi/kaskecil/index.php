@@ -59,7 +59,7 @@
                     <td><?= $key + 1 ?></td>
                     <td><?= $value->tanggal ?></td>
                     <td><?= $value->nota ?></td>
-                    <td><?= $value->kas_interface ?></td>
+                    <td><?= $value->nama_setupbuku ?></td>
                     <td><?= $value->nama_kelproduksi ?></td>
                     <td><?= $value->rekening ?></td>
                     <td><?= $value->b_pembantu ?></td>

@@ -78,4 +78,33 @@ class ModelSetupBuku extends Model
             ->orderBy('setupbuku1.kode_setupbuku', 'ASC')
             ->findAll();
     }
+
+    public function getBukuById($id_setupbuku)
+    {
+        return $this->select('setupbuku1.id_setupbuku, setupbuku1.kode_setupbuku, setupbuku1.nama_setupbuku, pos_neraca.nama_posneraca')
+            ->join('pos_neraca', 'setupbuku1.id_posneraca = pos_neraca.id_posneraca')
+            ->where('setupbuku1.id_setupbuku', $id_setupbuku)
+            ->first();
+    }
+
+    public function getNeraca($pertanggal)
+    {
+        $builder = $this->db->table('setupbuku1 sb')
+            ->select('
+                pn.nama_posneraca, 
+                pn.kode_posneraca, 
+                SUM(sb.saldo_awal) as total_saldo_awal, 
+                SUM(sb.saldo_berjalan) as total_saldo_berjalan')
+            ->join('pos_neraca pn', 'sb.id_posneraca = pn.id_posneraca')
+            ->groupBy('pn.nama_posneraca, pn.kode_posneraca')
+            ->orderBy('pn.kode_posneraca', 'ASC');
+
+        if ($pertanggal) {
+            $builder->where('sb.tanggal_awal_saldo <=', $pertanggal);
+        }
+
+        $query = $builder->get();
+
+        return $query->getResult();
+    }
 }

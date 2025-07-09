@@ -59,22 +59,22 @@ class SetupBiaya extends ResourceController
      */
     public function new()
     {
-        // Ambil nilai biaya dari tabel interface
-        $kode_biaya = $this->modelAntarmuka->findAll()[0]->biaya;
-        $id_klasifikasi = $this->modelKlasifikasi->where('kode_klasifikasi', $kode_biaya)->first()->id_klasifikasi;
-        // Ambil data posneraca berdasarkan kode_biaya
-        $data_posneraca = $this->modelPosneraca->where('id_klasifikasi', $id_klasifikasi)->findAll();
-        $id_posneraca = [];
+        // // Ambil nilai biaya dari tabel interface
+        // $kode_biaya = $this->modelAntarmuka->findAll()[0]->biaya;
+        // $id_klasifikasi = $this->modelKlasifikasi->where('kode_klasifikasi', $kode_biaya)->first()->id_klasifikasi;
+        // // Ambil data posneraca berdasarkan kode_biaya
+        // $data_posneraca = $this->modelPosneraca->where('id_klasifikasi', $id_klasifikasi)->findAll();
+        // $id_posneraca = [];
 
-        foreach ($data_posneraca as $posneraca) {
-            $id_posneraca[] = $posneraca->id_posneraca;
-        }
+        // foreach ($data_posneraca as $posneraca) {
+        //     $id_posneraca[] = $posneraca->id_posneraca;
+        // }
         // Ambil data buku besar yang sesuai posneraca
-        if (!empty($id_posneraca)) {
-            $data['dtrekening'] = $this->modelSetupBuku->whereIn('id_posneraca', $id_posneraca)->findAll();
-        } else {
-            $data['dtrekening'] = []; // No matching records
-        }
+        // if (!empty($id_posneraca)) {
+        // } else {
+        //     $data['dtrekening'] = []; // No matching records
+        // }
+        $data['dtrekening'] = $this->modelSetupBuku->findAll();
 
         return view('setup/biaya/new', $data);
     }

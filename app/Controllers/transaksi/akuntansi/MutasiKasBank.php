@@ -1,27 +1,30 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi\akuntansi;
 
-use App\Models\ModelAntarmuka;
-use App\Models\ModelMutasiKasBank;
+use App\Models\setup\ModelAntarmuka;
+use App\Models\setup\ModelSetupBuku;
+
+use App\Models\transaksi\akuntansi\ModelMutasiKasBank;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class MutasiKasBank extends ResourceController
 {
     protected $objMutasiKasBank;
+    protected $objSetupBuku;
     protected $objAntarmuka;
     protected $db;
-    
+
     //  INISIALISASI OBJECT DATA
-   function __construct()
-   {
-       $this->objMutasiKasBank = new ModelMutasiKasBank();
-       $this->objAntarmuka = new ModelAntarmuka();
-       $this->db = \Config\Database::connect();
-       
-   }
-    
+    function __construct()
+    {
+        $this->objMutasiKasBank = new ModelMutasiKasBank();
+        $this->objAntarmuka = new ModelAntarmuka();
+        $this->objSetupBuku = new ModelSetupBuku();
+        $this->db = \Config\Database::connect();
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -41,12 +44,12 @@ class MutasiKasBank extends ResourceController
             } else {
                 $data['is_closed'] = 'FALSE';
             }
-        }else{
+        } else {
             $data['is_closed'] = 'FALSE';
         }
+
         $data['dtmutasikasbank'] = $this->objMutasiKasBank->getAll();
-        $data['dtinterface'] = $this->objAntarmuka->findAll();
-        return view('mutasikasbank/index', $data);
+        return view('transaksi/akuntansi/mutasikasbank/index', $data);
     }
 
     /**
@@ -68,9 +71,14 @@ class MutasiKasBank extends ResourceController
      */
     public function new()
     {
+        // Ambil kode kas dari interface
+        $kodeKas = $this->objAntarmuka->getKodeKas();
+        // Pisah kode kas berdasarkan koma
+        $kodeKas = explode(',', $kodeKas);
+        // Ambil data rekening kas berdasarkan kode kas
+        $data['dtrekkas'] = $this->objSetupBuku->getRekeningKas($kodeKas);
         $data['dtmutasikasbank'] = $this->objMutasiKasBank->getAll();
-        $data['dtinterface'] = $this->objAntarmuka->findAll();
-        return view('mutasikasbank/new', $data);
+        return view('transaksi/akuntansi/mutasikasbank/new', $data);
     }
 
     /**
@@ -85,7 +93,7 @@ class MutasiKasBank extends ResourceController
             'id_mutasikasbank'    => $this->request->getVar('id_mutasikasbank'),
             'tanggal'           => $this->request->getVar('tanggal'),
             'nota'              => $this->request->getVar('nota'),
-            'id_interface'      => $this->request->getVar('id_interface'),
+            'id_setupbuku'      => $this->request->getVar('id_setupbuku'),
             'rekening'      => $this->request->getVar('rekening'),
             'b_pembantu'      => $this->request->getVar('b_pembantu'),
             'nama_rekening'             => $this->request->getVar('nama_rekening'),
@@ -96,8 +104,8 @@ class MutasiKasBank extends ResourceController
             'mutasi'             => $this->request->getVar('mutasi'),
             'tgl_nota'           => $this->request->getVar('tgl_nota'),
             'keterangan'        => $this->request->getVar('keterangan'),
-            
-            
+
+
         ];
         $this->db->table('mutasikasbank1')->insert($data);
 
@@ -126,11 +134,15 @@ class MutasiKasBank extends ResourceController
             return redirect()->to(site_url('mutasikasbank'))->with('error', 'Data tidak ditemukan');
         }
 
-
+        // Ambil kode kas dari interface
+        $kodeKas = $this->objAntarmuka->getKodeKas();
+        // Pisah kode kas berdasarkan koma
+        $kodeKas = explode(',', $kodeKas);
+        // Ambil data rekening kas berdasarkan kode kas
+        $data['dtrekkas'] = $this->objSetupBuku->getRekeningKas($kodeKas);
         // Lanjutkan jika semua pengecekan berhasil
         $data['dtmutasikasbank'] = $dtmutasikasbank;
-        $data['dtinterface'] = $this->objAntarmuka->findAll();
-        return view('mutasikasbank/edit', $data);
+        return view('transaksi/akuntansi/mutasikasbank/edit', $data);
     }
 
     /**
@@ -142,8 +154,8 @@ class MutasiKasBank extends ResourceController
      */
     public function update($id = null)
     {
-         // Cek apakah pengguna memiliki peran admin
-         if (!in_groups('admin')) {
+        // Cek apakah pengguna memiliki peran admin
+        if (!in_groups('admin')) {
             return redirect()->to('/')->with('error', 'Anda tidak memiliki akses');
         }
 
@@ -158,7 +170,7 @@ class MutasiKasBank extends ResourceController
             'id_mutasikasbank'    => $this->request->getVar('id_mutasikasbank'),
             'tanggal'           => $this->request->getVar('tanggal'),
             'nota'              => $this->request->getVar('nota'),
-            'id_interface'      => $this->request->getVar('id_interface'),
+            'id_setupbuku'      => $this->request->getVar('id_setupbuku'),
             'rekening'      => $this->request->getVar('rekening'),
             'b_pembantu'      => $this->request->getVar('b_pembantu'),
             'nama_rekening'             => $this->request->getVar('nama_rekening'),

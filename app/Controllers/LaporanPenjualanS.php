@@ -38,9 +38,6 @@ class LaporanPenjualanS extends BaseController
 
         $penjualan_summary = $this->objPenjualan->get_laporan_summary_s($tglawal, $tglakhir);
 
-        // cek data
-        log_message('debug', 'Data Penjualan: ' . print_r($penjualan, true));
-        log_message('debug', 'Data Penjualan Summary: ' . print_r($penjualan_summary, true));
 
         // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
         $jml_harga = 0;

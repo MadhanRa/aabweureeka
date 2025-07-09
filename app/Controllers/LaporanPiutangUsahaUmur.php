@@ -35,8 +35,6 @@ class LaporanPiutangUsahaUmur extends BaseController
         $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar_umur($tglawal, $tglakhir, $salesman);
         $dataTerkategori = $this->kategorisasiUmurPiutang($riwayat_piutang);
 
-        // cek data
-        log_message('info', 'Riwayat Piutang: ' . print_r($riwayat_piutang, true));
 
         // Ambil data tambahan untuk dropdown filter
         $data = [

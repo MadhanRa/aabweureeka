@@ -24,18 +24,6 @@
     </div>
   </div>
 
-  <!-- Menampilkan Pesan Sukses -->
-  <?php if (session()->getFlashdata('Sukses')) : ?>
-    <div class="alert alert-success alert-dismissible show fade">
-      <div class="alert-body">
-        <button class="close" data-dismiss="alert">
-          <span>&times;</span>
-        </button>
-        <?= session()->getFlashdata('Sukses') ?>
-      </div>
-    </div>
-  <?php endif; ?>
-
   <!-- Tabel Data -->
   <div class="section-body">
     <div class="card-body">
@@ -94,19 +82,18 @@
                 </tr>
               <?php endforeach; ?>
             </tbody>
-            <tfoot>
-              <tr>
-                <th colspan="11" style="text-align: right;">Total Debet:</th>
-                <th><?= "Rp " . number_format($total_debet, 0, ',', '.') ?></th>
-                <th colspan="3"></th>
-              </tr>
-              <tr>
-                <th colspan="11" style="text-align: right;">Total Kredit:</th>
-                <th><?= "Rp " . number_format($total_kredit, 0, ',', '.') ?></th>
-                <th colspan="3"></th>
-              </tr>
-            </tfoot>
+
           </table>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <label>Total Debet</label>
+            <input class="form-control" type="text" value="<?= "Rp " . number_format($total_debet, 0, ',', '.') ?>" readonly>
+          </div>
+          <div class="col">
+            <label>Total Kredit</label>
+            <input class="form-control" type="text" value="<?= "Rp " . number_format($total_kredit, 0, ',', '.') ?>" readonly>
+          </div>
         </div>
       </div>
     </div>

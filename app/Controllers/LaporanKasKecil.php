@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\transaksi\akuntansi\ModelKasKecil;
 use App\Models\setup\ModelAntarmuka;
+use App\Models\setup\ModelSetupBuku;
 use App\Controllers\BaseController;
 use App\Models\setup\ModelKelompokproduksi;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -15,6 +16,7 @@ class LaporanKasKecil extends BaseController
         $objKasKecil,
         $objAntarmuka,
         $objKelompokproduksi,
+        $modelSetupBuku,
         $db;
     //  INISIALISASI OBJECT DATA
     function __construct()
@@ -22,6 +24,7 @@ class LaporanKasKecil extends BaseController
         $this->objKasKecil = new ModelKasKecil();
         $this->objAntarmuka = new ModelAntarmuka();
         $this->objKelompokproduksi = new ModelKelompokproduksi();
+        $this->modelSetupBuku = new ModelSetupBuku();
         $this->db = \Config\Database::connect();
     }
 
@@ -33,7 +36,10 @@ class LaporanKasKecil extends BaseController
         $kelproduksi = $this->request->getVar('kelproduksi') ? $this->request->getVar('kelproduksi') : '';
 
         // Ambil data untuk dropdown filter
-        $dataRekeningKas = $this->objAntarmuka->findAll(); // Data rekening kas
+        $kodeRekeningKas = $this->objAntarmuka->getKodeKas(); // Ambil kode rekening kas
+        // pisah kode rekening kas berdasarkan koma
+        $kodeRekeningKas = explode(',', $kodeRekeningKas);
+        $dataRekeningKas = $this->modelSetupBuku->getRekeningKas($kodeRekeningKas); // Data rekening kas
         $dataKelompokProduksi = $this->objKelompokproduksi->findAll(); // Data kelompok produksi
 
         // Panggil model untuk mendapatkan data laporan

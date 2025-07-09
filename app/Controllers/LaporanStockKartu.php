@@ -39,10 +39,6 @@ class LaporanStockKartu extends BaseController
 
         $dataTerkategori = $this->kategorisasiMutasi($riwayat_mutasi);
 
-        // cek data
-        log_message('info', 'Riwayat mutasi: ' . print_r($riwayat_mutasi, true));
-        log_message('info', 'Riwayat mutasi Summary: ' . print_r($riwayat_mutasi_summary, true));
-
         $masuk_total_q1 = 0;
         $masuk_total_q2 = 0;
         $masuk_total_r = 0;

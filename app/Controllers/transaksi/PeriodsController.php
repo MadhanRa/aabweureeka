@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\transaksi;
 
 use App\Controllers\BaseController;
 use App\Models\transaksi\ModelBahanSablon;
@@ -75,7 +75,7 @@ class PeriodsController extends BaseController
     {
         // echo "Debug: Masuk ke controller";
         $data['periods'] = $this->PeriodsModels->findAll();
-        return view('periods/index', $data);
+        return view('transaksi/periods/index', $data);
     }
 
     public function report($id)
@@ -134,7 +134,7 @@ class PeriodsController extends BaseController
         $data['grandtotal_pengeluaran'] = ($total_pembelian - $total_retur_pembelian) + $total_kas_kecil;
         $data['grandtotal_pemasukan'] = $total_penjualan - $total_retur_penjualan;
 
-        return view('periods/report', $data);
+        return view('transaksi/periods/report', $data);
     }
 
     public function printPDF($id)
@@ -192,7 +192,7 @@ class PeriodsController extends BaseController
         $data['grandtotal_pengeluaran'] = ($total_pembelian - $total_retur_pembelian) + $total_kas_kecil;
         $data['grandtotal_pemasukan'] = $total_penjualan - $total_retur_penjualan;
         // Debugging: Tampilkan konten HTML sebelum PDF
-        $html = view('periods/printPDF', $data);
+        $html = view('transaksi/periods/printPDF', $data);
         // echo $html;
         // exit; // Jika perlu debugging
 
@@ -220,7 +220,7 @@ class PeriodsController extends BaseController
 
     public function add()
     {
-        return view('periods/add');
+        return view('transaksi/periods/add');
     }
 
     public function close()

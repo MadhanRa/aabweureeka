@@ -1,14 +1,14 @@
 <?= $this->extend("layout/backend") ?>
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Laporan Pembelian</title>
+<title>Akuntansi Eureeka &mdash; Laporan Kas Kecil</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
 
 <section class="section">
   <div class="section-header">
-    <h1>Laporan Pembelian</h1>
+    <h1>Laporan Kas Kecil</h1>
   </div>
 
   <!-- Tombol Print All -->
@@ -23,16 +23,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Menampilkan Pesan Sukses -->
-  <?php if (session()->getFlashdata('Sukses')) : ?>
-    <div class="alert alert-success alert-dismissible fade show">
-      <button class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      <?= esc(session()->getFlashdata('Sukses')) ?>
-    </div>
-  <?php endif; ?>
 
   <!-- Filter Form -->
   <div class="section-body">
@@ -50,9 +40,9 @@
             <div class="col-md-3">
               <select name="rekeningkas" class="form-control">
                 <option value="">-- Semua Rekening Kas --</option>
-                <?php foreach ($dataRekeningKas as $kas) : ?>
-                  <option value="<?= esc($kas->id_interface) ?>" <?= isset($filter['rekeningkas']) && $filter['rekeningkas'] == $kas->id_interface ? 'selected' : '' ?>>
-                    <?= esc($kas->kas_interface) ?>
+                <?php foreach ($dataRekeningKas as $rekkas) : ?>
+                  <option value="<?= esc($rekkas->id_setupbuku) ?>" <?= isset($filter['rekeningkas']) && $filter['rekeningkas'] == $rekkas->id_setupbuku ? 'selected' : '' ?>>
+                    <?= esc($rekkas->nama_setupbuku) ?>
                   </option>
                 <?php endforeach; ?>
               </select>

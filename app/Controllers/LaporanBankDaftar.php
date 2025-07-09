@@ -29,9 +29,6 @@ class LaporanBankDaftar extends BaseController
         $riwayat_transaksi_bank = $this->objRiwayatTransaksi->get_laporan_daftar($tglawal, $tglakhir, $bank);
         $riwayat_tb_summary = $this->objRiwayatTransaksi->get_laporan_summary_daftar($tglawal, $tglakhir, $bank);
 
-        // cek data
-        log_message('info', 'Riwayat Transaksi Bank: ' . print_r($riwayat_transaksi_bank, true));
-        log_message('info', 'Riwayat Transaksi Bank Summary: ' . print_r($riwayat_tb_summary, true));
 
         $saldo_awal_total = 0;
         $debit_total = 0;

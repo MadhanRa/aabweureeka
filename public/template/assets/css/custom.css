@@ -57,3 +57,21 @@ div.table-wrapper-medium {
     max-height: 400px;
     overflow: auto;
 }
+
+.neraca .table th,
+.neraca .table td {
+    vertical-align: middle;
+}
+
+.neraca .bg-header {
+    background-color: #dff0d8;
+}
+
+.neraca .text-bold {
+    font-weight: bold;
+}
+
+.neraca .table-total {
+    background-color: #f8d7da;
+    font-weight: bold;
+}

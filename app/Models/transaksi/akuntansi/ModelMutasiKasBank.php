@@ -12,7 +12,7 @@ class ModelMutasiKasBank extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'nota', 'id_klasifikasi', 'rekening', 'b_pembantu', 'nama_rekening', 'nama_bpembantu', 'no_ref', 'debet', 'kredit', 'mutasi', 'tgl_nota', 'keterangan'];
+    protected $allowedFields    = ['tanggal', 'nota', 'id_setupbuku', 'rekening', 'b_pembantu', 'nama_rekening', 'nama_bpembantu', 'no_ref', 'debet', 'kredit', 'mutasi', 'tgl_nota', 'keterangan'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -30,17 +30,16 @@ class ModelMutasiKasBank extends Model
 
     function getAll()
     {
-        // Memulai builder untuk tabel 'tutangusaha1' dengan alias 'p'
-        $builder = $this->db->table('mutasikasbank1 p');
+        $builder = $this->db->table('mutasikasbank1 m');
 
         // Memilih kolom yang diperlukan dengan alias yang sesuai
         $builder->select('
-            p.*, 
-            sp.kas_interface AS kas_interface 
+            m.*, 
+            sp.nama_setupbuku 
         ');
 
         // Melakukan JOIN dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 sp', 'm.id_setupbuku = sp.id_setupbuku', 'left');
 
 
         // Eksekusi query
@@ -57,9 +56,9 @@ class ModelMutasiKasBank extends Model
         $builder = $this->db->table('mutasikasbank1 p');
         $builder->select('
              p.*, 
-             sp.kas_interface AS kas_interface 
+             sp.nama_setupbuku 
          ');
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
         $builder->where('MONTH(p.tanggal)', $bulan);
         $builder->where('YEAR(p.tanggal)', $tahun);
         $query = $builder->get();
@@ -75,10 +74,10 @@ class ModelMutasiKasBank extends Model
         $builder = $this->db->table('mutasikasbank1 p');
 
         // Pilih kolom yang diperlukan, dengan join yang sesuai
-        $builder->select('p.*, sp.kas_interface AS kas_interface, sp.nama AS nama, sb.nama_setupbank AS nama_setupbank');
+        $builder->select('p.*, sp.nama_setupbuku, sp.nama AS nama, sb.nama_setupbank AS nama_setupbank');
 
-        // Melakukan JOIN dengan tabel 'interface1' untuk mendapatkan kas_interface
-        $builder->join('interface1 sp', 'p.id_interface = sp.id_interface', 'left');
+        // Melakukan JOIN dengan tabel 'setupbuku1' untuk mendapatkan kas_setara
+        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
 
         // Tambahkan kondisi where untuk id_lunashusaha
         $builder->where('p.id_mutasikasbank', $id);

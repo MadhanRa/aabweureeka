@@ -197,50 +197,52 @@ $routes->group('', ['namespace' => 'App\Controllers\transaksi'], function ($rout
     $routes->resource('pelunasanhutang');
 });
 
-//routes jurnalumum
-$routes->get('/jurnalumum/new', 'JurnalUmum::new');
-// $routes->get('/jurnalumum/(:segment)/new', 'JurnalUmum::edit/$1');
-$routes->resource('jurnalumum');
-$routes->post('/jurnalumum', 'JurnalUmum::create');
-$routes->post('/jurnalumum/(:any)', 'JurnalUmum::delete/$1');
-// $routes->put('/jurnalumum/(:segment)/edit', 'JurnalUmum::edit/$1');
-$routes->get('jurnalumum', 'JurnalUmum::index');
-$routes->get('jurnalumum/printPDF/(:num)', 'JurnalUmum::printPDF/$1');
-$routes->get('JurnalUmum/printPDF/(:num)', 'JurnalUmum::printPDF/$1');
-$routes->get('jurnalumum/printPDF', 'JurnalUmum::printPDF');
-$routes->get('JurnalUmum/printPDF', 'JurnalUmum::printPDF');
-$routes->put('/jurnalumum/(:segment)', 'JurnalUmum::update/$1', ['filter' => 'role:admin']);
-$routes->put('/jurnalumum/(:segment)/edit', 'JurnalUmum::edit/$1', ['filter' => 'role:admin']);
+$routes->group('', ['namespace' => 'App\Controllers\transaksi\akuntansi'], function ($routes) {
+    //routes jurnalumum
+    $routes->get('/jurnalumum/new', 'JurnalUmum::new');
+    // $routes->get('/jurnalumum/(:segment)/new', 'JurnalUmum::edit/$1');
+    $routes->resource('jurnalumum');
+    $routes->post('/jurnalumum', 'JurnalUmum::create');
+    $routes->post('/jurnalumum/(:any)', 'JurnalUmum::delete/$1');
+    // $routes->put('/jurnalumum/(:segment)/edit', 'JurnalUmum::edit/$1');
+    $routes->get('jurnalumum', 'JurnalUmum::index');
+    $routes->get('jurnalumum/printPDF/(:num)', 'JurnalUmum::printPDF/$1');
+    $routes->get('JurnalUmum/printPDF/(:num)', 'JurnalUmum::printPDF/$1');
+    $routes->get('jurnalumum/printPDF', 'JurnalUmum::printPDF');
+    $routes->get('JurnalUmum/printPDF', 'JurnalUmum::printPDF');
+    $routes->put('/jurnalumum/(:segment)', 'JurnalUmum::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/jurnalumum/(:segment)/edit', 'JurnalUmum::edit/$1', ['filter' => 'role:admin']);
 
-//routes mutasikasbank
-$routes->get('/mutasikasbank/new', 'MutasiKasBank::new');
-// $routes->get('/mutasikasbank/(:segment)/new', 'MutasiKasBank::edit/$1');
-$routes->resource('mutasikasbank');
-$routes->post('/mutasikasbank', 'MutasiKasBank::create');
-$routes->post('/mutasikasbank/(:any)', 'MutasiKasBank::delete/$1');
-// $routes->put('/mutasikasbank/(:segment)/edit', 'MutasiKasBank::edit/$1');
-$routes->get('mutasikasbank', 'MutasiKasBank::index');
-$routes->get('mutasikasbank/printPDF/(:num)', 'MutasiKasBank::printPDF/$1');
-$routes->get('MutasiKasBank/printPDF/(:num)', 'MutasiKasBank::printPDF/$1');
-$routes->get('mutasikasbank/printPDF', 'MutasiKasBank::printPDF');
-$routes->get('MutasiKasBank/printPDF', 'MutasiKasBank::printPDF');
-$routes->put('/mutasiKasBank/(:segment)', 'MutasiKasBank::update/$1', ['filter' => 'role:admin']);
-$routes->put('/mutasiKasBank/(:segment)/edit', 'MutasiKasBank::edit/$1', ['filter' => 'role:admin']);
+    //routes mutasikasbank
+    $routes->get('/mutasikasbank/new', 'MutasiKasBank::new');
+    // $routes->get('/mutasikasbank/(:segment)/new', 'MutasiKasBank::edit/$1');
+    $routes->resource('mutasikasbank');
+    $routes->post('/mutasikasbank', 'MutasiKasBank::create');
+    $routes->post('/mutasikasbank/(:any)', 'MutasiKasBank::delete/$1');
+    // $routes->put('/mutasikasbank/(:segment)/edit', 'MutasiKasBank::edit/$1');
+    $routes->get('mutasikasbank', 'MutasiKasBank::index');
+    $routes->get('mutasikasbank/printPDF/(:num)', 'MutasiKasBank::printPDF/$1');
+    $routes->get('MutasiKasBank/printPDF/(:num)', 'MutasiKasBank::printPDF/$1');
+    $routes->get('mutasikasbank/printPDF', 'MutasiKasBank::printPDF');
+    $routes->get('MutasiKasBank/printPDF', 'MutasiKasBank::printPDF');
+    $routes->put('/mutasiKasBank/(:segment)', 'MutasiKasBank::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/mutasiKasBank/(:segment)/edit', 'MutasiKasBank::edit/$1', ['filter' => 'role:admin']);
 
-//routes kaskecil
-$routes->get('/kaskecil/new', 'KasKecil::new');
-// $routes->get('/kaskecil/(:segment)/new', 'KasKecil::edit/$1');
-$routes->resource('kaskecil');
-$routes->post('/kaskecil', 'KasKecil::create');
-$routes->post('/kaskecil/(:any)', 'KasKecil::delete/$1');
-// $routes->put('/kaskecil/(:segment)/edit', 'KasKecil::edit/$1');
-$routes->get('kaskecil', 'KasKecil::index');
-$routes->get('kaskecil/printPDF/(:num)', 'KasKecil::printPDF/$1');
-$routes->get('KasKecil/printPDF/(:num)', 'KasKecil::printPDF/$1');
-$routes->get('kaskecil/printPDF', 'KasKecil::printPDF');
-$routes->get('KasKecil/printPDF', 'KasKecil::printPDF');
-$routes->put('/kaskecil/(:segment)', 'KasKecil::update/$1', ['filter' => 'role:admin']);
-$routes->put('/kaskecil/(:segment)/edit', 'KasKecil::edit/$1', ['filter' => 'role:admin']);
+    //routes kaskecil
+    $routes->get('/kaskecil/new', 'KasKecil::new');
+    // $routes->get('/kaskecil/(:segment)/new', 'KasKecil::edit/$1');
+    $routes->resource('kaskecil');
+    $routes->post('/kaskecil', 'KasKecil::create');
+    $routes->post('/kaskecil/(:any)', 'KasKecil::delete/$1');
+    // $routes->put('/kaskecil/(:segment)/edit', 'KasKecil::edit/$1');
+    $routes->get('kaskecil', 'KasKecil::index');
+    $routes->get('kaskecil/printPDF/(:num)', 'KasKecil::printPDF/$1');
+    $routes->get('KasKecil/printPDF/(:num)', 'KasKecil::printPDF/$1');
+    $routes->get('kaskecil/printPDF', 'KasKecil::printPDF');
+    $routes->get('KasKecil/printPDF', 'KasKecil::printPDF');
+    $routes->put('/kaskecil/(:segment)', 'KasKecil::update/$1', ['filter' => 'role:admin']);
+    $routes->put('/kaskecil/(:segment)/edit', 'KasKecil::edit/$1', ['filter' => 'role:admin']);
+});
 
 //routes stockopname
 $routes->get('stockopname/autocomplete', 'StockOpname::autocomplete');
@@ -274,15 +276,16 @@ $routes->get('accounting/closeBook', 'Accounting::index');
 // Route untuk menjalankan proses penutupan periode
 $routes->post('accounting/closeBook/closePeriod', 'Accounting::closePeriod');
 
-
-$routes->get('close-period', 'PeriodsController::index');
-$routes->get('period-add', 'PeriodsController::add');
-$routes->post('/close-period/close', 'PeriodsController::close');
-$routes->post('/close-period/open/(:num)', 'PeriodsController::open/$1', ['filter' => 'role:admin']);
-$routes->get('close-period/close_book/(:num)', 'PeriodsController::closeBook/$1');
-$routes->get('close-period/report/(:num)', 'PeriodsController::report/$1');
-$routes->get('close-period/print/(:num)', 'PeriodsController::printPDF/$1');
-$routes->delete('close-period/(:num)', 'PeriodsController::delete/$1');
+$routes->group('', ['namespace' => 'App\Controllers\transaksi'], function ($routes) {
+    $routes->get('close-period', 'PeriodsController::index');
+    $routes->get('period-add', 'PeriodsController::add');
+    $routes->post('/close-period/close', 'PeriodsController::close');
+    $routes->post('/close-period/open/(:num)', 'PeriodsController::open/$1', ['filter' => 'role:admin']);
+    $routes->get('close-period/close_book/(:num)', 'PeriodsController::closeBook/$1');
+    $routes->get('close-period/report/(:num)', 'PeriodsController::report/$1');
+    $routes->get('close-period/print/(:num)', 'PeriodsController::printPDF/$1');
+    $routes->delete('close-period/(:num)', 'PeriodsController::delete/$1');
+});
 
 //routes untuk laporanpembelian
 $routes->get('/laporanpembelian', 'LaporanPembelian::index');
@@ -397,6 +400,32 @@ $routes->get('/laporanstock_opname_perbandingan', 'LaporanStockOpnamePerbandinga
 $routes->get('/laporanstock_opname_perbandingan/printPDF', 'LaporanStockOpnamePerbandingan::printPDF');
 $routes->get('/laporanstock_opname_perbandingan/cari-nota/(:any)', 'LaporanStockOpnamePerbandingan::cariNotaOpname/$1');
 
+// ROUTES UNTUK LAPORAN KEUANGAN
+//laporan Daftar Biaya Pendapatan
+$routes->get('/laporan_biaya_daftar', 'LaporanBiayaDaftar::index');
+$routes->get('/laporan_biaya_daftar/printPDF', 'LaporanBiayaDaftar::printPDF');
+
+//laporan Kartu Biaya Pendapatan
+$routes->get('/laporan_biaya_kartu', 'LaporanBiayaKartu::index');
+$routes->get('/laporan_biaya_kartu/printPDF', 'LaporanBiayaKartu::printPDF');
+$routes->get('/laporan_biaya_kartu/cari-biaya/(:any)', 'LaporanBiayaKartu::cariBiaya/$1');
+
+//laporan Buku Besar
+$routes->get('/laporan_buku_besar', 'LaporanBukuBesar::index');
+$routes->get('/laporan_buku_besar/printPDF', 'LaporanBukuBesar::printPDF');
+$routes->get('/laporan_buku_besar/cari-buku/(:any)', 'LaporanBukuBesar::cariBuku/$1');
+
+//laporan Neraca Lajur
+$routes->get('/laporan_neraca_lajur', 'LaporanNeracaLajur::index');
+$routes->get('/laporan_neraca_lajur/printPDF', 'LaporanNeracaLajur::printPDF');
+
+//laporan Neraca
+$routes->get('/laporan_neraca', 'LaporanNeraca::index');
+$routes->get('/laporan_neraca/printPDF', 'LaporanNeraca::printPDF');
+
+//laporan Rugi Laba
+$routes->get('/laporan_rugi_laba', 'LaporanRugiLaba::index');
+$routes->get('/laporan_rugi_laba/printPDF', 'LaporanRugiLaba::printPDF');
 
 
 
@@ -489,3 +518,7 @@ $routes->get('laporanpenjualan_sb/printPDF', 'LaporanPenjualanSB::printPDF');
 //laporanreturpenjualan
 $routes->get('/laporanreturpenjualan', 'LaporanReturPenjualan::index');
 $routes->get('/laporanreturpenjualan/printPDF', 'LaporanReturPenjualan::printPDF');
+
+//laporan kas keluar
+$routes->get('/laporan_kas_keluar', 'LaporanKasKeluar::index');
+$routes->get('/laporan_kas_keluar/printPDF', 'LaporanKasKeluar::printPDF');

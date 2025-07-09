@@ -33,9 +33,6 @@ class LaporanReturPenjualan extends BaseController
         $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
         $lokasi = $this->request->getVar('lokasi') ? $this->request->getVar('lokasi') : '';
 
-        // ceck input
-        log_message('debug', 'Input Salesman: ' . $salesman);
-        log_message('debug', 'Input Lokasi: ' . $lokasi);
 
         // Panggil model untuk mendapatkan data laporan
         $returpenjualan = $this->objReturPenjualan->get_laporan($tglawal, $tglakhir, $salesman, $lokasi);
@@ -43,9 +40,6 @@ class LaporanReturPenjualan extends BaseController
 
         $returpenjualan_summary = $this->objReturPenjualan->get_laporan_summary($tglawal, $tglakhir, $salesman, $lokasi);
 
-        //cek data
-        log_message('debug', 'Data returpenjualan: ' . print_r($returpenjualan, true));
-        log_message('debug', 'Data returpenjualan_summary: ' . print_r($returpenjualan_summary, true));
 
         // Hitung jumlah harga, subtotal, discount cash, DPP, PPN, total, HPP, dan laba
         $jml_harga = 0;

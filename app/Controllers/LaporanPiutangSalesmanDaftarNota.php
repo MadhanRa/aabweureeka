@@ -28,9 +28,6 @@ class LaporanPiutangSalesmanDaftarNota extends BaseController
         $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar_nota_salesman($tglawal, $tglakhir);
         $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary_daftar_nota_salesman($tglawal, $tglakhir);
 
-        // cek data
-        log_message('info', 'Riwayat Piutang: ' . print_r($riwayat_piutang, true));
-        log_message('info', 'Riwayat Piutang Summary: ' . print_r($riwayat_piutang_summary, true));
 
         $saldo_awal_total = 0;
         $debit_total = 0;

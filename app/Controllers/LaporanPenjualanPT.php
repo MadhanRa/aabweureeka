@@ -78,9 +78,6 @@ class LaporanPenjualanPT extends BaseController
             }
         }
 
-        // cek data yang diambil
-        log_message('debug', 'Data Penjualan: ' . print_r($penjualan, true));
-
         // Ambil data tambahan untuk dropdown filter
         $data = [
             'dtpenjualan'    => $penjualan,
