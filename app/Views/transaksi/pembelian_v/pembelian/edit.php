@@ -15,28 +15,33 @@
     <div class="card">
       <div class="card-header">
         <h4>Edit Pembelian</h4>
+        <div class="card-header-action">
+          <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalLookupPembelian">Lookup</button>
+        </div>
       </div>
       <div class="card-body">
-        <form id="formPembelian" method="post" action="<?= site_url('transaksi/pembelian/pembelian/' . $dtheader->id_pembelian) ?>">
+        <form id="formPembelian" method="post" action="<?= site_url('transaksi/pembelian/pembelian/' . $dtheader->id_pembelian) ?>" data-stock-url="<?= site_url('setup_persediaan/stock/pilihItem') ?>">
           <input type="hidden" name="_method" value="PUT">
-          <?= csrf_field() ?>
+          <input type="hidden" id="main_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
           <div class="row">
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- Tanggal -->
                 <label>Tanggal</label>
-                <input type="date" class="form-control form-control-sm" name="tanggal" value="<?= $dtheader->tanggal ?>" required>
+                <input type="date" class="form-control form-control" name="tanggal" value="<?= $dtheader->tanggal ?>" required>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="form-group">
                 <!-- Supplier -->
                 <label>Supplier</label>
-                <select class="form-control form-control-sm" name="id_setupsupplier" required>
+                <select class="form-control form-control" name="id_setupsupplier" id="id_setupsupplier" required>
                   <option value="" hidden>-- Pilih Supplier --</option>
                   <?php foreach ($dtsetupsupplier as $key => $value) : ?>
-                    <option value="<?= esc($value->id_setupsupplier) ?>" <?= $dtheader->id_setupsupplier == $value->id_setupsupplier ? 'selected' : '' ?>>
+                    <option value="<?= esc($value->id_setupsupplier) ?>"
+                      data-ppn="<?= esc($value->tipe) ?>"
+                      <?= $dtheader->id_setupsupplier == $value->id_setupsupplier ? 'selected' : '' ?>>
                       <?= esc($value->kode . ' - ' . $value->nama) ?>
                     </option>
                   <?php endforeach; ?>
@@ -47,28 +52,28 @@
               <div class="form-group">
                 <!-- TOP -->
                 <label>TOP</label>
-                <input type="text" class="form-control form-control-sm" name="TOP" value="<?= $dtheader->TOP ?>" required>
+                <input type="text" class="form-control form-control" name="TOP" value="<?= $dtheader->TOP ?>" required>
               </div>
             </div>
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- Tanggal Jatuh Tempo -->
                 <label>Tanggal Jatuh Tempo</label>
-                <input type="date" class="form-control form-control-sm" name="tgl_jatuhtempo" value="<?= $dtheader->tgl_jatuhtempo ?>" readonly>
+                <input type="date" class="form-control form-control" name="tgl_jatuhtempo" value="<?= $dtheader->tgl_jatuhtempo ?>" readonly>
               </div>
             </div>
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- Tanggal Invoice -->
                 <label>Tanggal Invoice</label>
-                <input type="date" class="form-control form-control-sm" name="tgl_invoice" value="<?= $dtheader->tgl_invoice ?>" required>
+                <input type="date" class="form-control form-control" name="tgl_invoice" value="<?= $dtheader->tgl_invoice ?>" required>
               </div>
             </div>
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- No Invoice -->
                 <label>No Invoice</label>
-                <input type="text" class="form-control form-control-sm" name="no_invoice" value="<?= $dtheader->no_invoice ?>" required>
+                <input type="text" class="form-control form-control" name="no_invoice" value="<?= $dtheader->no_invoice ?>" required>
               </div>
             </div>
           </div>
@@ -76,13 +81,13 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label>Nota</label>
-                <input type="text" class="form-control form-control-sm" name="nota" value="<?= $dtheader->nota ?>" required>
+                <input type="text" class="form-control form-control" name="nota" value="<?= $dtheader->nota ?>" required>
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label>Lokasi</label>
-                <select class="form-control form-control-sm" name="id_lokasi" required>
+                <select class="form-control form-control" name="id_lokasi" required>
                   <option value="" hidden>-- Pilih Lokasi --</option>
                   <?php foreach ($dtlokasi as $key => $value) : ?>
                     <option value="<?= esc($value->id_lokasi) ?>" <?= $dtheader->id_lokasi == $value->id_lokasi ? 'selected' : '' ?>>
@@ -94,6 +99,7 @@
             </div>
           </div>
           <div class="row mt-3">
+            <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddItem" data-toggle="modal" data-target="#modalTambahItem">Tambah Item</button>
             <div class="responsive-table" style="width: 100%; overflow-x: auto;">
               <table class="table table-bordered table-sm w-100" id="tabelDetail">
                 <thead>
@@ -101,9 +107,9 @@
                     <th style="width: 100px;">Stock#</th>
                     <th style="width: auto; min-width: 200px;">Nama Stock</th>
                     <th style="width: 100px;">Satuan</th>
+                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 60px;">Qty1</th>
                     <th style="width: 60px;">Qty2</th>
-                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 160px;">Jml.Harga</th>
                     <th style="width: 60px;">Dis.1(%)</th>
                     <th style="width: 160px;">Dis.1(Rp.)</th>
@@ -119,14 +125,14 @@
                       <td>
                         <input name="detail[<?= $key ?>][id_detail]" value="<?= $value->id ?>" hidden>
                         <input name="detail[<?= $key ?>][id_stock]" value="<?= $value->id_stock ?>" hidden>
-                        <input name="detail[<?= $key ?>][kode]" class="form-control form-control-sm" value="<?= $value->kode ?>">
+                        <input name="detail[<?= $key ?>][kode]" class="form-control form-control-sm" value="<?= $value->kode ?>" readonly>
                         <input name="detail[<?= $key ?>][conv_factor]" hidden class="form-control form-control-sm" value="<?= $value->conv_factor ?>">
                       </td>
                       <td><input name="detail[<?= $key ?>][nama_barang]" class="form-control form-control-sm" value="<?= $value->nama_barang ?>" readonly></td>
+                      <td><input name="detail[<?= $key ?>][harga_satuan]" class="form-control form-control-sm" value="<?= $value->harga_satuan ?>"></td>
                       <td><input name="detail[<?= $key ?>][satuan]" class="form-control form-control-sm" value="<?= $value->satuan ?>" readonly></td>
                       <td><input name="detail[<?= $key ?>][qty1]" class="form-control form-control-sm" value="<?= $value->qty1 ?>"></td>
                       <td><input name="detail[<?= $key ?>][qty2]" class="form-control form-control-sm" value="<?= $value->qty2 ?>"></td>
-                      <td><input name="detail[<?= $key ?>][harga_satuan]" class="form-control form-control-sm" value="<?= $value->harga_satuan ?>" readonly></td>
                       <td><input name="detail[<?= $key ?>][jml_harga]" class="form-control form-control-sm" value="<?= $value->jml_harga ?>" readonly></td>
                       <td><input name="detail[<?= $key ?>][disc_1_perc]" class="form-control form-control-sm" value="<?= $value->disc_1_perc ?>"></td>
                       <td><input name="detail[<?= $key ?>][disc_1_rp]" class="form-control form-control-sm" value="<?= $value->disc_1_rp ?>"></td>
@@ -138,7 +144,6 @@
                   <?php endforeach ?>
                 </tbody>
               </table>
-              <button type="button" class="btn btn-sm btn-primary" id="btnAddRow">Tambah Baris</button>
             </div>
           </div>
           <div class="row mt-3 justify-content-between">
@@ -162,10 +167,12 @@
               </div>
               <div class="form-row">
                 <div class="form-group col-lg-6">
+                  <label>Disc Cash %</label>
                   <input type="number" id="disc_cash" class="form-control form-control-sm " name="disc_cash" placeholder="Discount cash %" value="<?= $dtheader->disc_cash  ?>">
                 </div>
                 <div class="form-group col-lg-6">
-                  <input type="text" class="form-control form-control-sm" id="disc_cash_amount" name="disc_cash_amount" readonly>
+                  <label>Disc</label>
+                  <input type="text" class="form-control form-control-sm" id="disc_cash_rp" name="disc_cash_rp" readonly>
                 </div>
               </div>
               <div class="form-group">
@@ -218,6 +225,74 @@
     </div>
   </div>
 </section>
+
+<!-- Tempat modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalTambahItem" data-item-url="<?= site_url('setup_persediaan/stock/lookup-stock') ?>">
+  <input type="hidden" id="modal_item_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Item Pembelian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableItem" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Kode</th>
+                <th>Nama Barang</th>
+                <th>Group</th>
+                <th>Kelompok</th>
+                <th>Satuan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tempat modal lookup -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLookupPembelian" data-lookup-url="<?= site_url('transaksi/pembelian/pembelian/lookup-pembelian') ?>">
+  <input type="hidden" id="modal_lookup_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Lookup Pembelian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableLookup" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Tanggal</th>
+                <th>Nota</th>
+                <th>Supplier</th>
+                <th>Tgl. Jatuh Tempo</th>
+                <th>Tgl. Invoice</th>
+                <th>No. Invoice</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <?= $this->endSection(); ?>
 

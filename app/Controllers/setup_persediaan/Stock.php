@@ -257,4 +257,45 @@ class Stock extends ResourceController
             return $this->response->setStatusCode(404)->setJSON(['message' => 'Halaman Tidak Ditemukan']);
         }
     }
+
+    public function lookupStock()
+    {
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
+        $param['supplier_id'] = isset($_REQUEST['supplier_id']) ? $_REQUEST['supplier_id'] : null;
+
+        $results = $this->objStock->searchAndDisplay(
+            $param['search_value'],
+            $param['start'],
+            $param['length'],
+            $param['supplier_id']
+        );
+        $total_count = $this->objStock->searchAndDisplay(
+            $param['search_value']
+        );
+
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
+    }
+
+    function pilihItem($id_stock)
+    {
+        if ($this->request->isAJAX()) {
+            $data = $this->objStock->getStockById($id_stock);
+            $msg = [
+                'sukses' => true,
+                'data' => $data
+            ];
+            return $this->response->setJSON($msg);
+        }
+    }
 }

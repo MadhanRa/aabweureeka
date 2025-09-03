@@ -2941,7 +2941,8 @@ body {
   background-color: #f4f6f9;
   font-size: 14px;
   font-weight: 400;
-  font-family: "Nunito", "Segoe UI", arial;
+  /* font-family: "Nunito", "Segoe UI", arial;  */
+  font-family: arial;
   color: #6c757d;
 }
 
@@ -4062,15 +4063,15 @@ body.layout-3 .main-footer {
 
 .main-sidebar .sidebar-menu li.menu-header {
   padding: 3px 15px;
-  color: #a1a8ae;
-  font-size: 10px;
+  color: #565757;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 1.3px;
   font-weight: 600;
 }
 
 .main-sidebar .sidebar-menu li.menu-header:not(:first-child) {
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .main-sidebar .sidebar-menu li a {
@@ -4100,6 +4101,7 @@ body.layout-3 .main-footer {
 .main-sidebar .sidebar-menu li a span {
   margin-top: 3px;
   width: 100%;
+  font-size: 15;
 }
 
 .main-sidebar .sidebar-menu li a:hover {

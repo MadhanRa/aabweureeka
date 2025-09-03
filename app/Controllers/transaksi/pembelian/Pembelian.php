@@ -333,27 +333,30 @@ class Pembelian extends ResourceController
         return redirect()->to(site_url('transaksi/pembelian'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 
-    public function lookupStock()
+    public function lookupPembelian()
     {
-        $term = $this->request->getGet('term');
-        $id_supplier = $this->request->getGet('supplier');
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
 
-        $results = $this->objStock
-            ->select('stock1.id_stock, stock1.kode, stock1.nama_barang, stock1.id_satuan, stock1.id_satuan2, stock1.conv_factor,
-            sat1.kode_satuan as satuan_1,
-            sat2.kode_satuan as satuan_2,
-            harga1.harga_beli')
-            ->join('satuan1 sat1', 'stock1.id_satuan = sat1.id_satuan', 'left')
-            ->join('satuan1 sat2', 'stock1.id_satuan2 = sat2.id_satuan', 'left')
-            ->join('harga1', 'stock1.id_stock = harga1.id_stock', 'left')
-            ->where('stock1.id_setupsupplier', $id_supplier)
-            ->groupStart()
-            ->like('stock1.nama_barang', $term)
-            ->orLike('stock1.kode', $term)
-            ->groupEnd()
-            ->limit(5)
-            ->findAll();
+        $results = $this->objPembelian->searchAndDisplay(
+            $param['search_value'],
+            $param['start'],
+            $param['length']
+        );
+        $total_count = $this->objPembelian->searchAndDisplay(
+            $param['search_value']
+        );
 
-        return $this->response->setJSON($results);
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
     }
 }

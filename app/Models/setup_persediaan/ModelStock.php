@@ -66,12 +66,51 @@ class ModelStock extends Model
 
     public function getStockById($id)
     {
-        return $this->select('
-        stock1.id_stock,
-        stock1.kode,
-                          stock1.nama_barang, 
-                          stock1.conv_factor')
+        return $this->select('stock1.*, 
+                          satuan1.kode_satuan as satuan_1,
+                          satuan2.kode_satuan as satuan_2,
+                          harga1.harga_beli')
+            ->join('harga1', 'harga1.id_stock = stock1.id_stock', 'left')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left')
             ->where(['stock1.id_stock' => $id])
             ->first();
+    }
+
+    public function searchAndDisplay($keyword = null, $start = 0, $length = 0, $supplierId = null)
+    {
+        $builder = $this->select('stock1.*, 
+                          group1.nama_group, 
+                          kelompok1.nama_kelompok, 
+                          satuan1.kode_satuan as kode_satuan,
+                          satuan2.kode_satuan as kode_satuan2')
+            ->join('group1', 'group1.id_group = stock1.id_group', 'left')
+            ->join('kelompok1', 'kelompok1.id_kelompok = stock1.id_kelompok', 'left')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left');
+
+        if ($supplierId) {
+            $builder->where('stock1.id_setupsupplier', $supplierId);
+        }
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('stock1.nama_barang', $arr_keywords[$i]);
+                $builder->orLike('stock1.kode', $arr_keywords[$i]);
+                $builder->orLike('group1.nama_group', $arr_keywords[$i]);
+                $builder->orLike('kelompok1.nama_kelompok', $arr_keywords[$i]);
+                $builder->orLike('satuan1.kode_satuan', $arr_keywords[$i]);
+                $builder->orLike('satuan2.kode_satuan', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('stock1.nama_barang', 'ASC')->get()->getResult();
     }
 }

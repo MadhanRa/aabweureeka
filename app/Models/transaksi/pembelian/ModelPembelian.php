@@ -81,7 +81,7 @@ class ModelPembelian extends Model
             ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left')
             ->join('lokasi1', 'pembelian1.id_lokasi = lokasi1.id_lokasi', 'left')
             ->join('setupbuku1', 'pembelian1.id_setupbuku = setupbuku1.id_setupbuku', 'left')
-            ->orderBy('pembelian1.id_pembelian', 'asc')
+            ->orderBy('pembelian1.id_pembelian', 'desc')
             ->findAll(); // Mengambil semua data dari tabel pembelian1
     }
 
@@ -182,6 +182,38 @@ class ModelPembelian extends Model
         $builder->orderBy('p.tanggal');
 
         return $builder->get()->getResult();
+    }
+
+    public function searchAndDisplay($keyword = null, $start = 0, $length = 0)
+    {
+        $builder = $this->select('
+            pembelian1.tanggal, 
+            pembelian1.nota, 
+            pembelian1.tgl_jatuhtempo, 
+            pembelian1.tgl_invoice,
+            no_invoice,
+            setupsupplier1.nama AS nama_supplier')
+            ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left');
+
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('pembelian1.nota', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.tgl_jatuhtempo', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.tgl_invoice', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.no_invoice', $arr_keywords[$i]);
+                $builder->orlike('setupsupplier1.nama', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('pembelian1.tanggal', 'DESC')->get()->getResult();
     }
 }
 
