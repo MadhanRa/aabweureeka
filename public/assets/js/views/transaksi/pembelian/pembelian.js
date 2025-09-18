@@ -190,6 +190,7 @@ function initDataTablesItem() {
             { "data": "nama_barang" },
             { "data": "nama_group" },
             { "data": "nama_kelompok" },
+            { "data": "nama_supplier" },
             {
                 "data": null, "render": function (data, type, row) {
                     return row.kode_satuan + ' / ' + row.kode_satuan2;
@@ -281,7 +282,6 @@ function initFormHandlers() {
 
     $(SELECTORS.supplierDropdown).on('change', function () {
         const supplierSelected = $(this).val() ? true : false;
-        toggleKodeInputs(supplierSelected);
         const ppnType = $(this).find('option:selected').data('ppn') || 'exclude';
 
         // Mengubah radio button sesuai dengan jenis PPN supplier
@@ -328,10 +328,6 @@ function attachCalculationEvents() {
         'input[name$="[disc_2_rp]"]',
     ];
 
-    const discCashFields = [
-        '#disc_cash',
-    ]
-
     // Use event delegation for all calculation fields
     $(document).on('blur', calculationFields.join(', '), function () {
         const row = $(this).closest('tr');
@@ -339,7 +335,7 @@ function attachCalculationEvents() {
         updateTotals();
     });
 
-    $(document).on('blur', discCashFields.join(', '), () => updateTotals());
+    $(document).on('blur', $('#disc_cash'), () => updateTotals());
 }
 
 function setupTunaiInput() {
@@ -600,16 +596,6 @@ function handleAjaxResponse(response, form) {
     }
 }
 
-/**
- * Enable or disable all kode inputs based on supplier selection
- * @param {boolean} enable - Whether to enable the inputs
- */
-function toggleKodeInputs(enable) {
-
-    // Also disable add row button if no supplier selected
-    $('#btnAddItem').prop('disabled', !enable);
-}
-
 function fillFields(row, item) {
     row.find('input[name$="[id_stock]"]').val(item.id_stock);
     row.find('input[name$="[kode]"]').val(item.kode);
@@ -624,4 +610,7 @@ function fillFields(row, item) {
     // Clear quantity fields
     row.find('input[name$="[qty1]"]').val(0);
     row.find('input[name$="[qty2]"]').val(0);
+
+    // Set supplier dropdown selection
+    $(SELECTORS.supplierDropdown).val(item.id_setupsupplier).trigger('change');
 }

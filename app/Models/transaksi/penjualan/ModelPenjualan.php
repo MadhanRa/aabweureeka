@@ -109,6 +109,42 @@ class ModelPenjualan extends Model
         return $builder->get()->getRow();
     }
 
+    public function searchAndDisplay($keyword = null, $start = 0, $length = 0)
+    {
+        $builder = $this->select(
+            '
+            penjualan1.tanggal, 
+            penjualan1.nota, 
+            penjualan1.tgl_jatuhtempo, 
+            setuppelanggan1.nama_pelanggan,
+            setupsalesman1.nama_salesman,
+            lokasi1.nama_lokasi'
+        )
+            ->join('setuppelanggan1', 'penjualan1.id_pelanggan = setuppelanggan1.id_pelanggan', 'left')
+            ->join('setupsalesman1', 'penjualan1.id_salesman = setupsalesman1.id_salesman', 'left')
+            ->join('lokasi1', 'penjualan1.id_lokasi = lokasi1.id_lokasi', 'left');
+
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('penjualan1.nota', $arr_keywords[$i]);
+                $builder->orlike('penjualan1.tgl_jatuhtempo', $arr_keywords[$i]);
+                $builder->orlike('setuppelanggan1.nama_pelanggan', $arr_keywords[$i]);
+                $builder->orlike('setupsalesman1.nama_salesman', $arr_keywords[$i]);
+                $builder->orlike('lokasi1.nama_lokasi', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('penjualan1.tanggal', 'DESC')->get()->getResult();
+    }
+
     public function get_laporan($tglawal, $tglakhir, $salesman, $lokasi = null)
     {
         $builder = $this->db->table('penjualan1 p');

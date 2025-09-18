@@ -322,6 +322,33 @@ class Penjualan extends ResourceController
         return redirect()->to(site_url('transaksi/penjualan_v/penjualan'))->with('Sukses', 'Data Berhasil Dihapus');
     }
 
+    public function lookupPenjualan()
+    {
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
+
+        $results = $this->objPenjualan->searchAndDisplay(
+            $param['search_value'],
+            $param['start'],
+            $param['length']
+        );
+        $total_count = $this->objPenjualan->searchAndDisplay(
+            $param['search_value']
+        );
+
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
+    }
+
     public function lookupStock()
     {
         $term = $this->request->getGet('term');

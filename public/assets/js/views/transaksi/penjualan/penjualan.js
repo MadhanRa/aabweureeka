@@ -1,10 +1,42 @@
 $(document).ready(function () {
     // Initialize form components
     initFormHandlers();
-    activateAutocomplete();
     initializeDateHandling();
     initPpnOptionHandling();
+
+    setupModalDataTable('#modalLookupPenjualan', '#myTableLookup', initDataTablesLookup);
+
+    setupModalDataTable('#modalTambahItem', '#myTableItem', initDataTablesItem);
+
+    // Setup global AJAX untuk menyinkronkan token CSRF
+    $(document).ajaxSuccess(function (event, xhr, settings) {
+        // Jika respons mengandung token baru, perbarui semua input CSRF
+        if (xhr.responseJSON && xhr.responseJSON.token) {
+            syncAllCsrfTokens(xhr.responseJSON.token);
+        }
+    });
 });
+
+let rowCounter = 0;
+let selectedItems = []; // Array untuk menyimpan ID item yang sudah dipilih
+
+function setupModalDataTable(modalSelector, tableSelector, initFunction) {
+    $(modalSelector).on('show.bs.modal', function () {
+        // Pastikan token sinkron sebelum modal muncul
+        const mainToken = $('#main_csrf').val();
+        syncAllCsrfTokens(mainToken);
+    });
+
+    $(modalSelector).on('shown.bs.modal', function () {
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+        }
+
+        // Re-initialize the DataTable
+        initFunction();
+    });
+}
 
 const SELECTORS = {
     ppnOption: 'input[name="ppn_option"]',
@@ -100,13 +132,149 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
+function syncAllCsrfTokens(newToken) {
+    // Perbarui semua input CSRF
+    $('#main_csrf, #modal_item_csrf, #modal_lookup_csrf').val(newToken);
+}
+
+function initDataTablesLookup() {
+    $('#myTableLookup').DataTable({
+        'processing': true,
+        'serverSide': true,
+        'serverMethod': 'POST',
+        "ajax": {
+            "url": $('#modalLookupPenjualan').data('lookup-url'),
+            "data": function (data) {
+                const csrfName = $('#modal_lookup_csrf').attr('name'); // CSRF Token name
+                const csrfHash = $('#modal_lookup_csrf').val(); // CSRF hash
+
+                // Add CSRF token directly to data object
+                data[csrfName] = csrfHash;
+
+                return data; // Return the modified data object
+            },
+            dataSrc: function (data) {
+
+                // Update semua token jika server mengembalikan token baru
+                if (data.token) {
+                    syncAllCsrfTokens(data.token);
+                }
+
+                // Datatable data
+                return data.data_items;
+            }
+        },
+        "columns": [
+            { "data": "tanggal" },
+            { "data": "nota" },
+            { "data": "nama_pelanggan" },
+            { "data": "nama_salesman" },
+            { "data": "nama_lokasi" },
+            { "data": "tgl_jatuhtempo" },
+        ]
+    });
+}
+
+function initDataTablesItem() {
+    $('#myTableItem').DataTable({
+        'processing': true,
+        'serverSide': true,
+        'serverMethod': 'POST',
+        "ajax": {
+            "url": $('#modalTambahItem').data('item-url'),
+            "data": function (data) {
+                const csrfName = $('#modal_item_csrf').attr('name'); // CSRF Token name
+                const csrfHash = $('#modal_item_csrf').val(); // CSRF hash
+
+                // Add supplier ID to filter the data
+                data.supplier_id = $(SELECTORS.supplierDropdown).val();
+                // Add CSRF token directly to data object
+                data[csrfName] = csrfHash;
+
+                // kirim data item yang sudah terpilih
+                // data.selected_items = selectedItems;
+
+                return data; // Return the modified data object
+            },
+            dataSrc: function (data) {
+
+                // Update semua token jika server mengembalikan token baru
+                if (data.token) {
+                    syncAllCsrfTokens(data.token);
+                }
+
+                // Datatable data
+                return data.data_items;
+            }
+        },
+        "columns": [
+            { "data": "kode" },
+            { "data": "nama_barang" },
+            { "data": "nama_group" },
+            { "data": "nama_kelompok" },
+            { "data": "nama_supplier" },
+            {
+                "data": null, "render": function (data, type, row) {
+                    return row.kode_satuan + ' / ' + row.kode_satuan2;
+                }
+            },
+            {
+                "data": null, "render": function (data, type, row) {
+                    // Cek apakah item sudah dipilih
+                    if (selectedItems.some(id => id == row.id_stock)) {
+                        return '<button class="btn btn-secondary" disabled>Terpilih</button>';
+                    }
+                    return '<button class="btn btn-primary" onclick="pilihItem(' + row.id_stock + ')">Pilih</button>';
+                }
+            }
+        ]
+    });
+}
+
+function pilihItem(id_stock) {
+    selectedItems.push(id_stock);
+
+    addNewRow(rowCounter++);
+
+    $.ajax({
+        url: $('#formPenjualan').data('stock-url') + '/' + id_stock,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response.sukses) {
+                // Find the last row in the table
+                const row = $('#tabelDetail tbody tr:last');
+
+                const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
+
+                fillFields(row, response.data, ppnOption);
+
+                // Tambahkan ID item ke row untuk referensi
+                row.attr('data-item-id', id_stock);
+
+                // Close modal
+                $('#modalTambahItem').modal('hide');
+            } else {
+                // Remove from selected items if failed
+                selectedItems = selectedItems.filter(id => id !== id_stock);
+
+                // Close modal
+                $('#modalTambahItem').modal('hide');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX error:", status, error);
+
+            // Remove from selected items if failed
+            selectedItems = selectedItems.filter(id => id !== id_stock);
+        }
+    });
+}
+
 /**
  * Set up form event handlers
  */
 function initFormHandlers() {
-    // Row counter for dynamic rows
-    let rowCounter = 1;
-    $('#btnAddRow').click(() => addNewRow(rowCounter++));
 
     // Remove row button handler (using event delegation)
     $(document).on('click', '.btnRemove', function () {
@@ -120,6 +288,15 @@ function initFormHandlers() {
         submitForm($(this));
     });
 
+    // Reset button handler
+    $('button[type="reset"]').on('click', function () {
+        // Reset selected items array
+        selectedItems = [];
+        // Clear table
+        $(SELECTORS.tabelDetail).empty();
+        updateTotals();
+    });
+
     attachCalculationEvents();
 }
 
@@ -128,6 +305,7 @@ function initFormHandlers() {
  */
 function attachCalculationEvents() {
     const calculationFields = [
+        'input[name$="[harga_satuan]"]',
         'input[name$="[qty1]"]',
         'input[name$="[qty2]"]',
         'input[name$="[disc_1_perc]"]',
@@ -156,9 +334,9 @@ function parseCurrencyValue(value) {
  * Calculate totals for a specific row
  */
 function calculateRowTotal(row) {
+    const hargaSatuan = parseCurrencyValue(row.find('input[name$="[harga_satuan]"]').val()) || 0;
     const qty1 = parseFloat(row.find('input[name$="[qty1]"]').val()) || 0;
     const qty2 = parseFloat(row.find('input[name$="[qty2]"]').val()) || 0;
-    const hargaSatuan = parseFloat(row.find('input[name$="[harga_satuan]"]').attr('data-raw-value')) || 0;
 
     // Calculate initial amount
     let jumlahHarga = qty1 * hargaSatuan;
@@ -215,7 +393,7 @@ function computeDiscount(row, num, base) {
  */
 function formatNumericFields(row) {
     // Format currency display fields but keep raw values for calculations
-    ['[jml_harga]', '[disc_1_rp]',
+    ['[harga_satuan]', '[harga_satuan_include]', '[harga_satuan_exclude]', '[jml_harga]', '[disc_1_rp]',
         '[disc_2_rp]', '[total]'
     ].forEach(suffix => {
         const field = row.find(`input[name$="${suffix}"]`);
@@ -260,8 +438,6 @@ function updateTotals() {
     const discCashAmount = (discCashPerc / 100) * subTotal;
     $('#disc_cash_rp').val(formatCurrency(discCashAmount)).attr('data-raw-value', discCashAmount);
 
-    handleDiscountExclusivity();
-
     // Calculate Netto (base for tax)
     const netto = subTotal - discCashAmount;
     $('input[name="netto"]').attr('data-raw-value', netto).val(formatCurrency(netto));
@@ -279,37 +455,24 @@ function updateTotals() {
 }
 
 /**
- * Handle exclusivity between percentage and rupiah discount inputs
- */
-function handleDiscountExclusivity() {
-    const discCashPerc = parseFloat($('#disc_cash').val()) || 0;
-    const discCashRp = ($('#disc_cash_rp').val().includes('Rp')) ? parseCurrencyValue($('#disc_cash_rp').val() || 0) : parseFloat($('#disc_cash_rp').val() || 0);
-
-    if (discCashPerc == 0 && discCashRp == 0) {
-        $('#disc_cash').val(0);
-        $('#disc_cash_rp').val(0).attr('data-raw-value', 0);
-    }
-}
-
-/**
  * Add a new row to the table
  */
 function addNewRow(rowIndex) {
-    const tr = `<tr>
+    const tr = `<tr data-item-id="">
             <td>
                 <input name="detail[${rowIndex}][id_stock]" hidden>
-                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm">
+                <input name="detail[${rowIndex}][kode]" class="form-control form-control-sm" readonly>
                 <input name="detail[${rowIndex}][conv_factor]" hidden>
             </td>
             <td><input name="detail[${rowIndex}][nama_barang]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][satuan]" class="form-control form-control-sm" readonly></td>
-            <td><input name="detail[${rowIndex}][qty1]" class="form-control form-control-sm"></td>
-            <td><input name="detail[${rowIndex}][qty2]" class="form-control form-control-sm"></td>
             <td>
-            <input name="detail[${rowIndex}][harga_satuan]" class="form-control form-control-sm" readonly>
+                <input name="detail[${rowIndex}][harga_satuan]" class="form-control form-control-sm">
                 <input name="detail[${rowIndex}][harga_satuan_include]" type="hidden">
                 <input name="detail[${rowIndex}][harga_satuan_exclude]" type="hidden">
             </td>
+            <td><input name="detail[${rowIndex}][qty1]" class="form-control form-control-sm"></td>
+            <td><input name="detail[${rowIndex}][qty2]" class="form-control form-control-sm"></td>
             <td><input name="detail[${rowIndex}][jml_harga]" class="form-control form-control-sm" readonly></td>
             <td><input name="detail[${rowIndex}][disc_1_perc]" class="form-control form-control-sm"></td>
             <td><input name="detail[${rowIndex}][disc_1_rp]" class="form-control form-control-sm"></td>
@@ -319,7 +482,6 @@ function addNewRow(rowIndex) {
             <td><button type="button" class="btn btn-danger btnRemove">X</button></td>
         </tr>`;
     $(SELECTORS.tabelDetail).append(tr);
-    activateAutocomplete();
 }
 
 /**
@@ -400,61 +562,7 @@ function handleAjaxResponse(response, form) {
 }
 
 
-/**
- * Activate autocomplete on stock code inputs
- */
-function activateAutocomplete() {
-    const url = $(SELECTORS.form).data('stock-url');
-
-    $(SELECTORS.kodeInput).each(function () {
-        if ($(this).hasClass('ui-autocomplete-input')) return;
-        $(this).autocomplete({
-            source: function (req, res) {
-                let locationId = $("select[name='id_lokasi']").val();
-                console.log('Location ID:', locationId);
-                $.get(url, {
-                    term: req.term,
-                    location_id: locationId,
-                }, data => {
-                    if (!data || !data.length) return res([]);
-
-                    // Transform the data for display
-                    res(data.map(item => ({
-                        label: `${item.kode} - ${item.nama_barang}`,
-                        value: item.kode,
-                        item: item
-                    })));
-                }).fail(() => res([]));
-            },
-            minLength: 2,
-            select: function (event, ui) {
-                if (!ui.item) return false;
-                const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
-                // Fill the form fields with the selected item's data
-                const row = $(this).closest('tr');
-                fillAutoCompleteFields(row, ui.item.item, ppnOption);
-                calculateRowTotal(row);
-                updateTotals();
-                return false; // Prevent default behavior
-            }
-        }).autocomplete("instance")._renderItem = (ul, item) => {
-            const ppnOption = $(SELECTORS.ppnOption + ':checked').val();
-            let hargaJual = item.item.harga_jualexc
-            if (ppnOption === 'include') {
-                hargaJual = item.item.harga_jualinc;
-            }
-
-            return $("<li>")
-                .append(`
-                <div><strong>${item.item.kode}</strong> - ${item.item.nama_barang} <br>
-                <small>Satuan: ${item.item.satuan_1}${item.item.satuan_2 ? '/' + item.item.satuan_2 : ''},
-                Harga: ${formatCurrency(hargaJual)}</small></div>`)
-                .appendTo(ul);
-        }
-    });
-}
-
-function fillAutoCompleteFields(row, item, ppnOption) {
+function fillFields(row, item, ppnOption) {
     row.find('input[name$="[harga_satuan_include]"]').val(item.harga_jualinc || 0);
     row.find('input[name$="[harga_satuan_exclude]"]').val(item.harga_jualexc || 0);
 

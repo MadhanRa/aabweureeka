@@ -15,6 +15,9 @@
     <div class="card">
       <div class="card-header">
         <h4>Return Pembelian</h4>
+        <div class="card-header-action">
+          <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalLookupReturPembelian">Lookup</button>
+        </div>
       </div>
       <div class="card-body">
         <form id="formReturPembelian" action="<?= site_url('transaksi/pembelian/returpembelian') ?>" data-stock-url="<?= site_url('transaksi/pembelian/pembelian/lookup-stock') ?>">
@@ -63,6 +66,7 @@
             </div>
           </div>
           <div class="row mt-3">
+            <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddItem" data-toggle="modal" data-target="#modalTambahItem">Tambah Item</button>
             <div class="responsive-table" style="width: 100%; overflow-x: auto;">
               <table class="table table-bordered table-sm w-100" id="tabelDetail">
                 <thead>
@@ -70,9 +74,9 @@
                     <th style="width: 100px;">Stock#</th>
                     <th style="width: auto; min-width: 200px;">Nama Stock</th>
                     <th style="width: 100px;">Satuan</th>
+                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 60px;">Qty1</th>
                     <th style="width: 60px;">Qty2</th>
-                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 160px;">Jml.Harga</th>
                     <th style="width: 60px;">Dis.1(%)</th>
                     <th style="width: 160px;">Dis.1(Rp.)</th>
@@ -83,28 +87,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>
-                      <input name="detail[0][id_stock]" hidden>
-                      <input name="detail[0][kode]" class="form-control form-control-sm">
-                      <input name="detail[0][conv_factor]" hidden class="form-control form-control-sm">
-                    </td>
-                    <td><input name="detail[0][nama_barang]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][satuan]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][qty1]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][qty2]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][harga_satuan]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][jml_harga]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][disc_1_perc]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_1_rp]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_2_perc]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_2_rp]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][total]" class="form-control form-control-sm" readonly></td>
-                    <td><button type="button" class="btn btn-danger btnRemove">X</button></td>
-                  </tr>
                 </tbody>
               </table>
-              <button type="button" class="btn btn-sm btn-primary" id="btnAddRow">Tambah Baris</button>
             </div>
           </div>
           <div class="row mt-5 justify-content-between">
@@ -232,6 +216,75 @@
       </div>
       <div class="modal-footer bg-whitesmoke br">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tempat modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalTambahItem" data-item-url="<?= site_url('setup_persediaan/stock/lookup-stock') ?>">
+  <input type="hidden" id="modal_item_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Item Pembelian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableItem" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Kode</th>
+                <th>Nama Barang</th>
+                <th>Group</th>
+                <th>Kelompok</th>
+                <th>Supplier</th>
+                <th>Satuan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tempat modal lookup -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLookupReturPembelian" data-lookup-url="<?= site_url('transaksi/pembelian/pembelian/lookup-pembelian') ?>">
+  <input type="hidden" id="modal_lookup_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Lookup Pembelian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableLookup" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Tanggal</th>
+                <th>Nota</th>
+                <th>Supplier</th>
+                <th>Tgl. Jatuh Tempo</th>
+                <th>Tgl. Invoice</th>
+                <th>No. Invoice</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
       </div>
     </div>
   </div>

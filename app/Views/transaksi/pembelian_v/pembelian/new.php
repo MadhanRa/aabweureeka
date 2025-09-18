@@ -222,6 +222,7 @@
                 <th>Nama Barang</th>
                 <th>Group</th>
                 <th>Kelompok</th>
+                <th>Supplier</th>
                 <th>Satuan</th>
                 <th>Aksi</th>
               </tr>

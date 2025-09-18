@@ -15,23 +15,26 @@
     <div class="card">
       <div class="card-header">
         <h4>Transaksi Penjualan</h4>
+        <div class="card-header-action">
+          <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalLookupPenjualan">Lookup</button>
+        </div>
       </div>
       <div class="card-body">
-        <form id="formPenjualan" action="<?= site_url('transaksi/penjualan/penjualan') ?>" data-stock-url="<?= site_url('transaksi/penjualan/penjualan/lookup-stock') ?>" method="POST">
-          <?= csrf_field() ?>
+        <form id="formPenjualan" action="<?= site_url('transaksi/penjualan/penjualan') ?>" data-stock-url="<?= site_url('setup_persediaan/stock/pilihItem') ?>" method="POST">
+          <input type="hidden" id="main_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
           <div class="row">
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- Tanggal -->
                 <label>Tanggal</label>
-                <input type="date" class="form-control form-control-sm" name="tanggal" value="<?= old('tanggal') ?>" required>
+                <input type="date" class="form-control form-control" name="tanggal" value="<?= old('tanggal') ?>" required>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="form-group">
                 <label>Pelanggan</label>
-                <select class="form-control form-control-sm" name="id_pelanggan" id="id_pelanggan" required>
+                <select class="form-control form-control" name="id_pelanggan" id="id_pelanggan" required>
                   <option value="" hidden>-- Pilih Pelanggan --</option>
                   <?php foreach ($dtpelanggan as $key => $value) : ?>
                     <option value="<?= esc($value->id_pelanggan) ?>" <?= old('id_pelanggan') == $value->id_pelanggan ? 'selected' : '' ?>>
@@ -45,20 +48,20 @@
               <div class="form-group">
                 <!-- TOP -->
                 <label>TOP</label>
-                <input type="text" class="form-control form-control-sm" name="TOP" value="<?= old('TOP') ?>" required>
+                <input type="text" class="form-control form-control" name="TOP" value="<?= old('TOP') ?>" required>
               </div>
             </div>
             <div class="col-lg-2">
               <div class="form-group">
                 <!-- Tanggal Jatuh Tempo -->
                 <label>Tanggal Jatuh Tempo</label>
-                <input type="date" class="form-control form-control-sm" name="tgl_jatuhtempo" value="<?= old('tgl_jatuhtempo') ?>" readonly>
+                <input type="date" class="form-control form-control" name="tgl_jatuhtempo" value="<?= old('tgl_jatuhtempo') ?>" readonly>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="form-group">
                 <label>Salesman</label>
-                <select class="form-control form-control-sm" name="id_salesman" id="id_salesman" required>
+                <select class="form-control form-control" name="id_salesman" id="id_salesman" required>
                   <option value="" hidden>-- Pilih Salesman --</option>
                   <?php foreach ($dtsalesman as $key => $value) : ?>
                     <option value="<?= esc($value->id_salesman) ?>" <?= old('id_salesman') == $value->id_salesman ? 'selected' : '' ?>>
@@ -73,13 +76,13 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label>Nota</label>
-                <input type="text" class="form-control form-control-sm" name="nota" value="<?= old('nota') ?>" required>
+                <input type="text" class="form-control form-control" name="nota" value="<?= old('nota') ?>" required>
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label>Lokasi</label>
-                <select class="form-control form-control-sm" name="id_lokasi" required>
+                <select class="form-control form-control" name="id_lokasi" required>
                   <option value="" hidden>-- Pilih Lokasi --</option>
                   <?php foreach ($dtlokasi as $key => $value) : ?>
                     <option value="<?= esc($value->id_lokasi) ?>" <?= old('id_lokasi') == $value->id_lokasi ? 'selected' : '' ?>>
@@ -108,11 +111,12 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label>No. FP</label>
-                <input type="text" class="form-control form-control-sm" name="no_fp" value="<?= old('no_fp') ?>">
+                <input type="text" class="form-control form-control" name="no_fp" value="<?= old('no_fp') ?>">
               </div>
             </div>
           </div>
           <div class="row mt-3">
+            <button type="button" class="btn btn-sm btn-primary mb-3" id="btnAddItem" data-toggle="modal" data-target="#modalTambahItem">Tambah Item</button>
             <div class="responsive-table" style="width: 100%; overflow-x: auto;">
               <table class="table table-bordered table-sm w-100" id="tabelDetail">
                 <thead>
@@ -120,9 +124,9 @@
                     <th style="width: 100px;">Stock#</th>
                     <th style="width: auto; min-width: 200px;">Nama Stock</th>
                     <th style="width: 100px;">Satuan</th>
+                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 60px;">Qty1</th>
                     <th style="width: 60px;">Qty2</th>
-                    <th style="width: 160px;">Hrg.Sat</th>
                     <th style="width: 160px;">Jml.Harga</th>
                     <th style="width: 60px;">Dis.1(%)</th>
                     <th style="width: 160px;">Dis.1(Rp.)</th>
@@ -133,32 +137,9 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>
-                      <input name="detail[0][id_stock]" hidden>
-                      <input name="detail[0][kode]" class="form-control form-control-sm">
-                      <input name="detail[0][conv_factor]" hidden class="form-control form-control-sm">
-                    </td>
-                    <td><input name="detail[0][nama_barang]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][satuan]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][qty1]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][qty2]" class="form-control form-control-sm"></td>
-                    <td>
-                      <input name="detail[0][harga_satuan]" class="form-control form-control-sm" readonly>
-                      <input name="detail[${rowIndex}][harga_satuan_include]" type="hidden">
-                      <input name="detail[${rowIndex}][harga_satuan_exclude]" type="hidden">
-                    </td>
-                    <td><input name="detail[0][jml_harga]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][disc_1_perc]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_1_rp]" class="form-control form-control-sm"></td>
-                    <td><input name="detail[0][disc_2_perc]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][disc_2_rp]" class="form-control form-control-sm" readonly></td>
-                    <td><input name="detail[0][total]" class="form-control form-control-sm" readonly></td>
-                    <td><button type="button" class="btn btn-danger btnRemove">X</button></td>
-                  </tr>
+
                 </tbody>
               </table>
-              <button type="button" class="btn btn-sm btn-primary" id="btnAddRow">Tambah Baris</button>
             </div>
           </div>
           <div class="row mt-3 justify-content-between">
@@ -214,6 +195,75 @@
     </div>
   </div>
 </section>
+
+<!-- Tempat modal lookup -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLookupPenjualan" data-lookup-url="<?= site_url('transaksi/penjualan/penjualan/lookup-penjualan') ?>">
+  <input type="hidden" id="modal_lookup_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Lookup Penjualan</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableLookup" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Tanggal</th>
+                <th>Nota</th>
+                <th>Pelanggan</th>
+                <th>Salesman</th>
+                <th>Lokasi</th>
+                <th>Tgl. Jatuh Tempo</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tempat modal lookup stock -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modalTambahItem" data-item-url="<?= site_url('setup_persediaan/stock/lookup-stock') ?>">
+  <input type="hidden" id="modal_item_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Item Penjualan</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-md" id="myTableItem" width="100%">
+            <thead>
+              <tr class="eureeka-table-header">
+                <th>Kode</th>
+                <th>Nama Barang</th>
+                <th>Group</th>
+                <th>Kelompok</th>
+                <th>Supplier</th>
+                <th>Satuan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <?= $this->endSection(); ?>
 

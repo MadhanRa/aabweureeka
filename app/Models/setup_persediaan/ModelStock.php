@@ -81,9 +81,11 @@ class ModelStock extends Model
     {
         $builder = $this->select('stock1.*, 
                           group1.nama_group, 
-                          kelompok1.nama_kelompok, 
+                          kelompok1.nama_kelompok,  
                           satuan1.kode_satuan as kode_satuan,
-                          satuan2.kode_satuan as kode_satuan2')
+                          satuan2.kode_satuan as kode_satuan2,
+                          setupsupplier1.nama as nama_supplier')
+            ->join('setupsupplier1', 'setupsupplier1.id_setupsupplier = stock1.id_setupsupplier', 'left')
             ->join('group1', 'group1.id_group = stock1.id_group', 'left')
             ->join('kelompok1', 'kelompok1.id_kelompok = stock1.id_kelompok', 'left')
             ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')

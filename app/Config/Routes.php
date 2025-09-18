@@ -104,7 +104,7 @@ $routes->group('transaksi', static function ($routes) {
     });
 
     $routes->group('penjualan', ['namespace' => 'App\Controllers\transaksi\penjualan'], static function ($routes) {
-
+        $routes->post('penjualan/lookup-penjualan', 'Penjualan::lookupPenjualan');
         $routes->get('penjualan/lookup-stock', 'Penjualan::lookupStock');
         $routes->get('penjualan/printPDF/(:num)', 'Penjualan::printPDF/$1');
         $routes->get('penjualan/printPDF', 'Penjualan::printPDF');
