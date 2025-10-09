@@ -143,16 +143,4 @@
   </ul>
 </li>
 
-<!-- DASHBOARD SUPERVISOR -->
-<li class="menu-header">Dashboard Supervisor</li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link text-dark has-dropdown"><i class="far fa-file-alt"></i> <span>Supervisor</span></a>
-  <ul class="dropdown-menu">
-    <li><a class="nav-link text-dark" href="forms-advanced-form.html">Advanced Form</a></li>
-    <li><a class="nav-link text-dark" href="forms-editor.html">Editor</a></li>
-    <li><a class="nav-link text-dark" href="forms-validation.html">Validation</a></li>
-  </ul>
-</li>
-</li>
-
 <li><a class="nav-link text-dark" href="<?= site_url('user') ?>"><i class="fas fa-users"></i> <span>User</span></a></li>
