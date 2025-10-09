@@ -12,11 +12,35 @@ class ModelSetupsupplier extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode', 'nama', 'alamat', 'telepon', 'contact_person', 'npwp', 'tanggal', 'saldo', 'tipe'];
+    protected $allowedFields    = ['kode', 'nama', 'alamat', 'telepon', 'contact_person', 'npwp', 'tanggal', 'tipe'];
 
     public function getAll()
     {
-        return $this->findAll(); // Mengambil semua data dari tabel lokasi1
+        return $this->findAll();
+    }
+
+    public function getAllSupplier()
+    {
+        // Mengambil semua data supplier dari tabel setupsupplier1 dan hutang
+        $builder = $this->db->table('setupsupplier1 s');
+        $builder->select('s.*, IFNULL(SUM(h.saldo), 0) AS saldo');
+        $builder->join('hutang h', 's.id_setupsupplier = h.id_setupsupplier', 'left');
+        $builder->groupBy('s.id_setupsupplier');
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    public function getSupplierById($id)
+    {
+        // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
+        $builder = $this->db->table('setupsupplier1 s');
+        $builder->select('s.*, IFNULL(SUM(h.saldo), 0)
+                    AS saldo');
+        $builder->join('hutang h', 's.id_setupsupplier = h.id_setupsupplier', 'left');
+        $builder->where('s.id_setupsupplier', $id);
+        $builder->groupBy('s.id_setupsupplier');
+        $query = $builder->get();
+        return $query->getRow();
     }
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;

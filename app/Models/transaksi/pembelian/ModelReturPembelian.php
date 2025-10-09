@@ -18,6 +18,7 @@ class ModelReturPembelian extends Model
         'id_setupsupplier',
         'id_lokasi',
         'opsi_return',
+        'id_setupbuku',
         'id_pembelian',
         'sub_total',
         'disc_cash',
@@ -158,6 +159,33 @@ class ModelReturPembelian extends Model
         $builder->orderBy('rp.id_pembelian, rpd.id');
 
         return $builder->get()->getResult();
+    }
+
+    public function searchAndDisplay($keyword = null, $start = 0, $length = 0)
+    {
+        $builder = $this->select('
+            returpembelian1.tanggal,
+            returpembelian1.nota,
+            setupsupplier1.nama AS nama_supplier
+            ')
+            ->join('setupsupplier1', 'returpembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left');
+
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('returpembelian1.nota', $arr_keywords[$i]);
+                $builder->orlike('setupsupplier1.nama', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('returpembelian1.tanggal', 'DESC')->get()->getResult();
     }
 
 

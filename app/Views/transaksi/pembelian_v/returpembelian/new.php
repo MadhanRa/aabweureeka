@@ -20,8 +20,8 @@
         </div>
       </div>
       <div class="card-body">
-        <form id="formReturPembelian" action="<?= site_url('transaksi/pembelian/returpembelian') ?>" data-stock-url="<?= site_url('transaksi/pembelian/pembelian/lookup-stock') ?>">
-          <?= csrf_field() ?>
+        <form id="formReturPembelian" action="<?= site_url('transaksi/pembelian/returpembelian') ?>" data-stock-url="<?= site_url('setup_persediaan/stock/pilihItem') ?>">
+          <input type="hidden" id="main_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
           <input type="hidden" name="id_pembelian">
           <div class="row">
             <div class="col-lg-2">
@@ -35,7 +35,7 @@
               <div class="form-group">
                 <!-- Supplier -->
                 <label>Supplier</label>
-                <select class="form-control" name="id_setupsupplier" required>
+                <select class="form-control" name="id_setupsupplier" id="id_setupsupplier" required>
                   <option value="" hidden>-- Pilih Supplier --</option>
                   <?php foreach ($dtsetupsupplier as $key => $value) : ?>
                     <option value="<?= esc($value->id_setupsupplier) ?>" <?= old('id_setupsupplier') == $value->id_setupsupplier ? 'selected' : '' ?>>
@@ -95,7 +95,7 @@
             <div class="col-md-4">
               <div class="form-group p-3 w-50 border">
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="opsi_return" id="inlineRadio1" value="kredit">
+                  <input class="form-check-input" type="radio" name="opsi_return" id="inlineRadio1" value="kredit" checked>
                   <label class="form-check-label" for="inlineRadio1">Kredit</label>
                 </div>
                 <div class="form-check form-check-inline">
@@ -175,6 +175,7 @@
 </section>
 <!-- Tempat modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="modalNotaPembelian" data-nota-url="<?= site_url('transaksi/pembelian/pembelian/') ?>">
+  <input type="hidden" id="modal_nota_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -185,32 +186,18 @@
       </div>
       <div class="modal-body">
         <div class="table-responsive">
-          <table class="table table-striped table-md" id="myTable">
+          <table class="table table-striped table-md" id="myTableNotaPembelian">
             <thead>
               <tr class="eureeka-table-header">
-                <th>No</th>
                 <th>Tanggal</th>
                 <th>Nota</th>
                 <th>Supplier</th>
                 <th>Tgl. Jatuh Tempo</th>
                 <th>No. Invoice</th>
+                <th>Hutang</th>
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody id="tabelNotaPembelian">
-              <!-- Data akan diisi dengan AJAX -->
-              <?php foreach ($dtpembelian as $key => $value) : ?>
-                <tr>
-                  <td><?= $key + 1 ?></td>
-                  <td><?= $value->tanggal ?></td>
-                  <td><?= $value->nota ?></td>
-                  <td><?= $value->nama_supplier ?></td>
-                  <td><?= $value->tgl_jatuhtempo ?></td>
-                  <td><?= $value->no_invoice ?></td>
-                  <td><button class="btn btn-primary" onclick="pilihNota(<?= $value->id_pembelian ?>)">Pilih</button></td>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
           </table>
         </div>
       </div>
@@ -257,12 +244,12 @@
 </div>
 
 <!-- Tempat modal lookup -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modalLookupReturPembelian" data-lookup-url="<?= site_url('transaksi/pembelian/pembelian/lookup-pembelian') ?>">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalLookupReturPembelian" data-lookup-url="<?= site_url('transaksi/pembelian/returpembelian/lookup-returpembelian') ?>">
   <input type="hidden" id="modal_lookup_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Lookup Pembelian</h5>
+        <h5 class="modal-title">Lookup Retur Pembelian</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -275,9 +262,6 @@
                 <th>Tanggal</th>
                 <th>Nota</th>
                 <th>Supplier</th>
-                <th>Tgl. Jatuh Tempo</th>
-                <th>Tgl. Invoice</th>
-                <th>No. Invoice</th>
               </tr>
             </thead>
           </table>

@@ -8,8 +8,8 @@ use App\Models\transaksi\pembelian\ModelPembelianDetail;
 use App\Models\transaksi\pembelian\ModelReturPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
+use App\Models\transaksi\ModelHutang;
 use App\Models\transaksi\ModelMutasiStock;
-use App\Models\setup\ModelHutangPiutang;
 use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup_persediaan\ModelStock;
@@ -66,9 +66,9 @@ class ReturPembelian extends ResourceController
             $this->objSetupBuku,
             $this->objRiwayatTransaksi,
             new ModelRiwayatHutang(),
+            new ModelHutang(),
             new ModelMutasiStock(),
             $this->objSetupsupplier,
-            new ModelHutangPiutang(),
             $this->db
         );
     }
@@ -162,12 +162,19 @@ class ReturPembelian extends ResourceController
      */
     public function new()
     {
+        // Ambil kode kas dan setara di interface
+        $kodeKas = $this->objAntarmuka->getKodeKas();
+
+        if ($kodeKas) {
+            // pisah kodekas dengan koma
+            $kodeKas = explode(',', $kodeKas);
+        }
 
 
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
         $data['dtlokasi'] = $this->objLokasi->getAll();
         $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
-        $data['dtpembelian'] = $this->objPembelian->getAll();
+        $data['dtrekening'] = $this->objSetupBuku->getRekeningKas($kodeKas);
 
         return view('transaksi/pembelian_v/returpembelian/new', $data);
     }
@@ -297,5 +304,32 @@ class ReturPembelian extends ResourceController
     {
         $this->db->table('returpembelian1')->where(['id_returpembelian' => $id])->delete();
         return redirect()->to(site_url('returpembelian'))->with('Sukses', 'Data Berhasil Dihapus');
+    }
+
+    public function lookupReturPembelian()
+    {
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
+
+        $results = $this->objReturPembelian->searchAndDisplay(
+            $param['search_value'],
+            $param['start'],
+            $param['length']
+        );
+        $total_count = $this->objReturPembelian->searchAndDisplay(
+            $param['search_value']
+        );
+
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
     }
 }

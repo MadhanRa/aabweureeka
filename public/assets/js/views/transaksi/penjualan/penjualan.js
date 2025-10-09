@@ -43,6 +43,8 @@ const SELECTORS = {
     kodeInput: 'input[name$="[kode]"]',
     form: '#formPenjualan',
     tabelDetail: '#tabelDetail tbody',
+    salesmanDropdown: 'select[name="id_salesman"]',
+    lokasiDropdown: 'select[name="id_lokasi"]',
 };
 
 /**
@@ -186,8 +188,11 @@ function initDataTablesItem() {
                 const csrfName = $('#modal_item_csrf').attr('name'); // CSRF Token name
                 const csrfHash = $('#modal_item_csrf').val(); // CSRF hash
 
-                // Add supplier ID to filter the data
-                data.supplier_id = $(SELECTORS.supplierDropdown).val();
+                // Add salesman ID to filter the data
+                data.id_salesman = $(SELECTORS.salesmanDropdown).val();
+
+                // Add lokasi ID to filter the data
+                data.id_lokasi = $(SELECTORS.lokasiDropdown).val();
                 // Add CSRF token directly to data object
                 data[csrfName] = csrfHash;
 

@@ -273,7 +273,10 @@ class Stock extends ResourceController
             $param['supplier_id']
         );
         $total_count = $this->objStock->searchAndDisplay(
-            $param['search_value']
+            $param['search_value'],
+            null,
+            null,
+            $param['supplier_id']
         );
 
         $json_data = array(

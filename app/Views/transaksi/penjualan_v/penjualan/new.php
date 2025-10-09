@@ -231,7 +231,7 @@
 </div>
 
 <!-- Tempat modal lookup stock -->
-<div class="modal fade" tabindex="-1" role="dialog" id="modalTambahItem" data-item-url="<?= site_url('setup_persediaan/stock/lookup-stock') ?>">
+<div class="modal fade" tabindex="-1" role="dialog" id="modalTambahItem" data-item-url="<?= site_url('transaksi/penjualan/penjualan/lookup-stock') ?>">
   <input type="hidden" id="modal_item_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">

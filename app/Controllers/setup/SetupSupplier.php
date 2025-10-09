@@ -4,6 +4,7 @@ namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetupsupplier;
 use App\Models\setup\ModelHutangPiutang;
+use App\Models\transaksi\ModelHutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -11,11 +12,13 @@ class SetupSupplier extends ResourceController
 {
     protected $supplierModel;
     protected $hutangPiutangModel;
+    protected $hutangModel;
     protected $db;
     function __construct()
     {
         $this->supplierModel = new ModelSetupsupplier();
         $this->hutangPiutangModel = new ModelHutangPiutang();
+        $this->hutangModel = new ModelHutang();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -25,7 +28,7 @@ class SetupSupplier extends ResourceController
      */
     public function index()
     {
-        $data['dtsetupsupplier'] = $this->supplierModel->findAll();
+        $data['dtsetupsupplier'] = $this->supplierModel->getAllSupplier();
         return view('setup/supplier/index', $data);
     }
 
@@ -39,7 +42,7 @@ class SetupSupplier extends ResourceController
     public function show($id = null)
     {
         // Ambil data berdasarkan ID
-        $data['data'] = $this->supplierModel->find($id);
+        $data['data'] = $this->supplierModel->getSupplierById($id);
 
         if (!$data) {
             return $this->response->setJSON([
@@ -160,7 +163,7 @@ class SetupSupplier extends ResourceController
 
     public function getHutang($id = null)
     {
-        $data['dthutang'] = $this->hutangPiutangModel->getHutangPiutang($id, 'supplier');
+        $data['dthutang'] = $this->hutangModel->getHutangBySupplier($id);
         if ($this->request->isAJAX()) {
             $msg = [
                 'data' => view('setup/supplier/hutang/data_hutang', $data)
@@ -188,32 +191,35 @@ class SetupSupplier extends ResourceController
             $this->db->transBegin();
 
             try {
-                $saldoHutang = $this->request->getVar('saldo');
 
                 $data = [
-                    'tanggal' => $this->request->getVar('tanggal'),
+                    'id_setupsupplier' => $id,
                     'nota' => $this->request->getVar('nota'),
-                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
-                    'saldo' => $saldoHutang,
-                    'relasi_id' => $id,
-                    'relasi_tipe' => 'supplier',
-                    'jenis' => 'hutang'
+                    'sumber' => 'manual',
+                    'tanggal' => $this->request->getVar('tanggal'),
+                    'tgl_jatuhtempo' => $this->request->getVar('tanggal_jt'),
+                    'nominal' => $this->request->getVar('saldo'),
+                    'saldo' => $this->request->getVar('saldo'),
                 ];
-
+                $idHutang = $this->hutangModel->insert($data);
                 // Masukkan data ke dalam tabel
-                if ($this->hutangPiutangModel->insert($data)) {
-                    // Ambil data supplier yang bersangkutan
-                    $supplier = $this->supplierModel->find($id);
+                if ($idHutang) {
 
-                    if (!$supplier) {
-                        throw new \Exception('Supplier tidak ditemukan');
-                    }
+                    // Simpan data riwayat transaksi hutang
+                    $riwayatData = [
+                        'id_hutang' => $idHutang,
+                        'tanggal' => $this->request->getVar('tanggal'),
+                        'jenis_transaksi' => $this->request->getVar('manual'),
+                        'nota' => $this->request->getVar('nota'),
+                        'nominal' => $this->request->getVar('saldo'),
+                        'saldo_setelah' => $this->request->getVar('saldo'),
+                        'deskripsi' => 'Penambahan hutang manual',
+                    ];
 
-                    // Hitung saldo baru
-                    $updatedSaldo = (float)$supplier->saldo + (float)$saldoHutang;
-                    // Update saldo supplier
-                    $this->supplierModel->update($id, ['saldo' => $updatedSaldo]);
-                    // Commit transaksi jika semua berhasil
+                    $this->db->table('riwayat_transaksi_hutang')->insert($riwayatData);
+
+                    $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($id);
+
                     $this->db->transCommit();
 
                     return $this->response->setJSON([
@@ -244,7 +250,7 @@ class SetupSupplier extends ResourceController
         helper('form');
 
         if ($this->request->isAJAX()) {
-            $data['data'] = $this->hutangPiutangModel->find($hutang_id);
+            $data['data'] = $this->hutangModel->find($hutang_id);
             $msg = [
                 'data' => view('setup/supplier/hutang/edit_hutang', $data)
             ];
@@ -252,40 +258,49 @@ class SetupSupplier extends ResourceController
         }
     }
 
-    public function updateHutang($id_hutang_piutang = null)
+    public function updateHutang($id_hutang = null)
     {
         if ($this->request->isAJAX()) {
             $this->db->transBegin();
 
             try {
                 // Ambil data asli
-                $originalHutang = $this->hutangPiutangModel->find($id_hutang_piutang);
+                $originalHutang = $this->hutangModel->find($id_hutang);
                 $originalAmount = (float)$originalHutang->saldo;
                 $newAmount = (float)$this->request->getVar('saldo');
-                $supplierId = $originalHutang->relasi_id;
+                $supplierId = $originalHutang->id_setupsupplier;
 
                 $data = [
                     'tanggal' => $this->request->getVar('tanggal'),
                     'nota' => $this->request->getVar('nota'),
-                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
+                    'tgl_jatuhtempo' => $this->request->getVar('tanggal_jt'),
+                    'nominal' => $newAmount,
                     'saldo' => $newAmount,
                 ];
 
                 // Update data berdasarkan ID
-                if ($this->hutangPiutangModel->update($id_hutang_piutang, $data)) {
-                    // Ambil data Supplier yang bersangkutan
-                    $supplier = $this->supplierModel->find($supplierId);
+                if ($this->hutangModel->update($id_hutang, $data)) {
+                    // Simpan data riwayat transaksi hutang
 
-                    if (!$supplier) {
-                        throw new \Exception('Supplier tidak ditemukan');
-                    }
+                    $id_riwayat_hutang = $this->db->table('riwayat_transaksi_hutang')
+                        ->where('id_hutang', $id_hutang)
+                        ->get()
+                        ->getRow()
+                        ->id_riwayat_hutang;
 
-                    // Hitung perbedaan saldo dan update
-                    $saldoDifference = $newAmount - $originalAmount;
-                    $updatedSaldo = (float)$supplier->saldo + $saldoDifference;
+                    $riwayatData = [
+                        'id_hutang' => $id_hutang,
+                        'tanggal' => $this->request->getVar('tanggal'),
+                        'jenis_transaksi' => 'update',
+                        'nota' => $this->request->getVar('nota'),
+                        'nominal' => $newAmount - $originalAmount, // Selisih perubahan
+                        'saldo_setelah' => $newAmount,
+                        'deskripsi' => 'Update hutang manual',
+                    ];
+                    $this->db->table('riwayat_transaksi_hutang')->update($id_riwayat_hutang, $riwayatData);
 
-                    // Update saldo Supplier
-                    $this->supplierModel->update($supplierId, ['saldo' => $updatedSaldo]);
+                    $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($supplierId);
+
                     // Commit transaksi jika semua berhasil
                     $this->db->transCommit();
 
@@ -308,29 +323,24 @@ class SetupSupplier extends ResourceController
         }
     }
 
-    public function deleteHutang($id_hutang_piutang = null)
+    public function deleteHutang($id_hutang = null)
     {
         if ($this->request->isAJAX()) {
             $this->db->transBegin();
 
             try {
-                // Ambil data piutang sebelum dihapus
-                $hutang = $this->hutangPiutangModel->find($id_hutang_piutang);
-                $jumlahHutang = (float)$hutang->saldo;
-                $supplierId = $hutang->relasi_id;
+                // hapus riwayat transaksi hutang terkait
+                if ($this->db->table('riwayat_transaksi_hutang')->where('id_hutang', $id_hutang)->delete()) {
 
-                // Hapus data piutang
-                if ($this->hutangPiutangModel->delete($id_hutang_piutang)) {
-                    // Ambil data Supplier
-                    $supplier = $this->supplierModel->find($supplierId);
+                    // Ambil ID supplier sebelum menghapus hutang
+                    $hutang = $this->hutangModel->find($id_hutang);
+                    $supplierId = $hutang->id_setupsupplier;
 
-                    if (!$supplier) {
-                        throw new \Exception('Supplier tidak ditemukan');
-                    }
+                    // Hapus data hutang
+                    $this->hutangModel->delete($id_hutang);
 
-                    // Hitung saldo baru
-                    $updatedSaldo = (float)$supplier->saldo - $jumlahHutang;
-                    $this->supplierModel->update($supplierId, ['saldo' => $updatedSaldo]);
+                    $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($supplierId);
+
 
                     $this->db->transCommit();
                     return $this->response->setJSON([

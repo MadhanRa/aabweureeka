@@ -89,6 +89,7 @@ $routes->group('transaksi', static function ($routes) {
     $routes->group('pembelian', ['namespace' => 'App\Controllers\transaksi\pembelian'], static function ($routes) {
         //routes untuk pembelian
         $routes->post('pembelian/lookup-pembelian', 'Pembelian::lookupPembelian');
+        $routes->post('pembelian/hutang', 'Pembelian::lookupPembelianHutang');
         $routes->get('pembelian/printPDF/(:num)', 'Pembelian::printPDF/$1');
         $routes->get('pembelian/printPDF', 'Pembelian::printPDF');
         $routes->put('pembelian/(:segment)', 'Pembelian::update/$1', ['filter' => 'role:admin']);
@@ -96,6 +97,7 @@ $routes->group('transaksi', static function ($routes) {
         $routes->resource('pembelian');
 
         //routes untuk returpembelian
+        $routes->post('returpembelian/lookup-returpembelian', 'ReturPembelian::lookupReturPembelian');
         $routes->get('returpembelian/printPDF/(:num)', 'ReturPembelian::printPDF/$1');
         $routes->get('returpembelian/printPDF', 'ReturPembelian::printPDF');
         $routes->put('returpembelian/(:segment)', 'ReturPembelian::update/$1', ['filter' => 'role:admin']);

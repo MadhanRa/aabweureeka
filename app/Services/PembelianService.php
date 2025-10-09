@@ -7,6 +7,7 @@ use App\Models\transaksi\pembelian\ModelPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\ModelMutasiStock;
+use App\Models\transaksi\ModelHutang;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
@@ -20,6 +21,7 @@ class PembelianService
     protected $riwayatTransaksi;
     protected $riwayatHutang;
     protected $mutasiStock;
+    protected $hutang;
     protected $pembelian;
     protected $pembelianDetail;
     protected $stockGudang;
@@ -37,10 +39,10 @@ class PembelianService
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
-        ModelRiwayatHutang $hutang,
+        ModelRiwayatHutang $riwayatHutang,
+        ModelHutang $hutang,
         ModelMutasiStock $mutasiStock,
         ModelSetupsupplier $supplier,
-        ModelHutangPiutang $hutangPiutang,
         /**
          * @var \CodeIgniter\Database\BaseConnection
          */
@@ -52,9 +54,9 @@ class PembelianService
         $this->mutasiStock = $mutasiStock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
-        $this->riwayatHutang = $hutang;
+        $this->riwayatHutang = $riwayatHutang;
+        $this->hutang = $hutang;
         $this->supplier = $supplier;
-        $this->riwayatHP = $hutangPiutang;
         $this->db = $db;
     }
 
@@ -434,72 +436,63 @@ class PembelianService
             throw new \Exception('Data supplier tidak ditemukan');
         }
 
-        // Cari data hutang piutang yang sudah ada (jika ada)
-        $dt_hutang_lama = $this->riwayatHP
-            ->where([
-                'id_transaksi' => $idPembelian,
-                'relasi_id' => $headerData['id_setupsupplier'],
-                'relasi_tipe' => 'supplier',
-                'jenis' => 'hutang'
-            ])
-            ->first();
-
-        $data = [
-            'tanggal' => $headerData['tanggal'],
-            'id_transaksi' => $idPembelian,
+        $dataHutang = [
+            'id_setupsupplier' => $headerData['id_setupsupplier'],
+            'id_pembelian' => $idPembelian,
             'nota' => $headerData['nota'],
-            'tanggal_jt' => $headerData['tgl_jatuhtempo'],
+            'sumber' => 'pembelian',
+            'tanggal' => $headerData['tanggal'],
+            'tgl_jatuhtempo' => $headerData['tgl_jatuhtempo'],
+            'nominal' => $hutang,
             'saldo' => $hutang,
-            'relasi_id' => $headerData['id_setupsupplier'],
-            'relasi_tipe' => 'supplier',
-            'jenis' => 'hutang'
         ];
 
-        // Update Saldo Supplier
-        $old_saldo = floatval($dt_supplier->saldo);
-        $current_saldo = $old_saldo;
+        //Cari data hutang yang sudah ada (jika ada)
+        $existingHutang = $this->hutang->where('id_pembelian', $idPembelian)->first();
 
-        if ($dt_hutang_lama) {
-            // Update data hutang piutang yang sudah ada
-            $hutang_masuk_lama = floatval($dt_hutang_lama->saldo);
-            $current_saldo = $old_saldo - $hutang_masuk_lama; // Kembalikan dulu saldo lama
+        // Hitung total saldo hutang supplier sebelum perubahan
+        $totalBeforeObj = $this->hutang
+            ->select('COALESCE(SUM(saldo),0) as total')
+            ->where('id_setupsupplier', $headerData['id_setupsupplier'])
+            ->first();
+        $totalBefore = floatval($totalBeforeObj->total ?? 0);
 
-            $this->riwayatHP->update($dt_hutang_lama->id_hutang_piutang, $data);
+        if ($existingHutang) {
+            // Jika update: kurangi saldo lama dari total sebelum, lalu tambahkan saldo baru
+            $totalExcludingCurrent = $totalBefore - floatval($existingHutang->saldo);
+            $saldoSetelah = $totalExcludingCurrent + floatval($dataHutang['saldo']);
+
+            // Update data hutang yang sudah ada
+            $this->hutang->update($existingHutang->id_hutang, $dataHutang);
+            $idHutang = $existingHutang->id_hutang;
         } else {
-            // Insert data hutang piutang baru
-            $this->riwayatHP->insert($data);
+            // Insert data hutang baru
+            $idHutang = $this->hutang->insert($dataHutang);
+
+            // Jika insert, saldo setelah = total sebelum + saldo baru
+            $saldoSetelah = $totalBefore + floatval($dataHutang['saldo']);
         }
 
-        // tambahkan dengan hutang baru
-        $new_saldo = $current_saldo + $hutang;
-
-        // Update saldo supplier
-        $this->supplier->update($headerData['id_setupsupplier'], [
-            'saldo' => $new_saldo
-        ]);
-
-        // Cari riwayat transaksi hutang yang sudah ada
-        $riwayatHutangLama = $this->riwayatHutang
-            ->where([
-                'id_transaksi' => $idPembelian,
-                'deskripsi' => 'Hutang ke Supplier'
-            ])
-            ->first();
-
         $riwayatHutangData = [
+            'id_hutang' => $idHutang,
             'tanggal' => $headerData['tanggal'],
-            'nota' => $headerData['nota'],
-            'id_transaksi' => $idPembelian,
             'jenis_transaksi' => 'pembelian',
-            'id_setupsupplier' => $headerData['id_setupsupplier'],
-            'debit' => 0,
-            'kredit' => $hutang,
-            'saldo_setelah' => $new_saldo,
+            'nota' => $headerData['nota'],
+            'nominal' => $hutang,
+            'saldo_setelah' => $saldoSetelah,
             'deskripsi' => 'Hutang pembelian'
         ];
 
+        // Cari riwayat hutang yang sudah ada (jika ada)
+        $riwayatHutangLama = $this->riwayatHutang
+            ->where([
+                'id_hutang' => $idHutang,
+                'jenis_transaksi' => 'pembelian',
+            ])
+            ->first();
+
         if ($riwayatHutangLama) {
-            $this->riwayatHutang->update($riwayatHutangLama->id, []);
+            $this->riwayatHutang->update($riwayatHutangLama->id, $riwayatHutangData);
         } else {
             $this->riwayatHutang->insert($riwayatHutangData);
         }

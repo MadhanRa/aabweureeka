@@ -351,28 +351,37 @@ class Penjualan extends ResourceController
 
     public function lookupStock()
     {
-        $term = $this->request->getGet('term');
-        $location_id = $this->request->getGet('location_id');
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
+        $param['id_salesman'] = isset($_REQUEST['id_salesman']) ? $_REQUEST['id_salesman'] : null;
+        $param['id_lokasi'] = isset($_REQUEST['id_lokasi']) ? $_REQUEST['id_lokasi'] : null;
 
-        $results = $this->objStock
-            ->select("stock1.id_stock, stock1.kode, stock1.nama_barang, stock1.id_satuan, stock1.id_satuan2, stock1.conv_factor,
-            sat1.kode_satuan as satuan_1,
-            sat2.kode_satuan as satuan_2,
-            harga1.harga_beli,
-            harga1.harga_jualexc,
-            harga1.harga_jualinc")
-            ->join('satuan1 sat1', 'stock1.id_satuan = sat1.id_satuan', 'left')
-            ->join('satuan1 sat2', 'stock1.id_satuan2 = sat2.id_satuan', 'left')
-            ->join('harga1', 'stock1.id_stock = harga1.id_stock', 'left')
-            ->join('stock1_gudang sg', 'stock1.id_stock = sg.id_stock', 'left')
-            ->where('sg.id_lokasi', $location_id)
-            ->groupStart()
-            ->like('stock1.nama_barang', $term)
-            ->orLike('stock1.kode', $term)
-            ->groupEnd()
-            ->limit(5)
-            ->findAll();
 
-        return $this->response->setJSON($results);
+        $results = $this->objStock->searchAndDisplayStockPenjualan(
+            $param['search_value'],
+            $param['start'],
+            $param['length'],
+            $param['id_salesman'],
+            $param['id_lokasi']
+        );
+        $total_count = $this->objStock->searchAndDisplayStockPenjualan(
+            $param['search_value'],
+            null,
+            null,
+            $param['id_salesman'],
+            $param['id_lokasi']
+        );
+
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
     }
 }

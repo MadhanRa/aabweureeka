@@ -7,6 +7,7 @@ use App\Models\transaksi\pembelian\ModelPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\ModelMutasiStock;
+use App\Models\transaksi\ModelHutang;
 use App\Models\setup_persediaan\ModelSatuan;
 use App\Models\setup_persediaan\ModelStock;
 use App\Models\setup_persediaan\ModelStockGudang;
@@ -14,7 +15,6 @@ use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup\ModelAntarmuka;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
-use App\Models\setup\ModelHutangPiutang;
 use App\Services\PembelianService;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -56,9 +56,9 @@ class Pembelian extends ResourceController
             new ModelSetupBuku(),
             new ModelRiwayatTransaksi(),
             new ModelRiwayatHutang(),
+            new ModelHutang(),
             new ModelMutasiStock(),
             new ModelSetupsupplier(),
-            new ModelHutangPiutang(),
             $this->db
         );
     }
@@ -203,6 +203,11 @@ class Pembelian extends ResourceController
     {
         $data = $this->getCommonData();
 
+        $data['formAction'] = site_url('transaksi/pembelian/pembelian');
+        $data['formMethod'] = '';
+        $data['data'] = null;
+        $data['isEdit'] = false;
+
         return view('transaksi/pembelian_v/pembelian/new', $data);
     }
 
@@ -227,6 +232,7 @@ class Pembelian extends ResourceController
             'sub_total' => floatval($this->request->getVar('sub_total_raw')) ?? 0,
             'grand_total' => floatval($this->request->getVar('grand_total_raw')) ?? 0,
             'hutang' => floatval($this->request->getVar('hutang_raw')) ?? 0,
+            'status_lunas' => (floatval($this->request->getVar('hutang_raw')) == 0) ? 'lunas' : 'belum',
         ];
     }
 
@@ -299,7 +305,11 @@ class Pembelian extends ResourceController
             ->where('pembelian1_detail.id_pembelian', $id)
             ->findAll();
 
-        $data['dtheader'] = $dtpembelian;
+        $data['data'] = $dtpembelian;
+        $data['isEdit'] = true;
+        $data['formAction'] = site_url('transaksi/pembelian/pembelian/' . $id);
+        $data['formMethod'] = '<input type="hidden" name="_method" value="PUT">';
+
         return view('transaksi/pembelian_v/pembelian/edit', $data);
     }
 
@@ -347,6 +357,38 @@ class Pembelian extends ResourceController
         );
         $total_count = $this->objPembelian->searchAndDisplay(
             $param['search_value']
+        );
+
+        $json_data = array(
+            'draw' => intval($param['draw']),
+            'recordsTotal' => count($total_count),
+            'recordsFiltered' => count($total_count),
+            'data_items' => $results,
+            'token' => csrf_hash() // Add the CSRF token to the response
+        );
+
+        echo json_encode($json_data);
+    }
+
+    public function lookupPembelianHutang()
+    {
+        $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
+        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
+        $param['supplier_id'] = isset($_REQUEST['supplier_id']) ? $_REQUEST['supplier_id'] : null;
+
+        $results = $this->objPembelian->searchAndDisplayPembelianHutang(
+            $param['search_value'],
+            $param['start'],
+            $param['length'],
+            $param['supplier_id']
+        );
+        $total_count = $this->objPembelian->searchAndDisplayPembelianHutang(
+            $param['search_value'],
+            null,
+            null,
+            $param['supplier_id']
         );
 
         $json_data = array(

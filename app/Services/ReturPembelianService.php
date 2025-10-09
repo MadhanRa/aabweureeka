@@ -8,10 +8,10 @@ use App\Models\transaksi\pembelian\ModelReturPembelianDetail;
 use App\Models\transaksi\ModelRiwayatTransaksi;
 use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\ModelMutasiStock;
+use App\Models\transaksi\ModelHutang;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
-use App\Models\setup\ModelHutangPiutang;
 use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
@@ -20,13 +20,13 @@ class ReturPembelianService
 {
     protected $riwayatTransaksi;
     protected $riwayatHutang;
+    protected $hutangModel;
     protected $mutasiStock;
     protected $returPembelian;
     protected $returPembelianDetail;
     protected $stockGudang;
     protected $bukuBesar;
     protected $supplier;
-    protected $riwayatHP;
     protected $pembelian;
     /**
      * @var \CodeIgniter\Database\BaseConnection $db
@@ -40,10 +40,10 @@ class ReturPembelianService
         ModelStockGudang $stock,
         ModelSetupBuku $buku,
         ModelRiwayatTransaksi $riwayat,
-        ModelRiwayatHutang $hutang,
+        ModelRiwayatHutang $riwayatHutang,
+        ModelHutang $hutangModel,
         ModelMutasiStock $mutasiStock,
         ModelSetupsupplier $supplier,
-        ModelHutangPiutang $hutangPiutang,
         /**
          * @var \CodeIgniter\Database\BaseConnection
          */
@@ -56,9 +56,9 @@ class ReturPembelianService
         $this->mutasiStock = $mutasiStock;
         $this->bukuBesar = $buku;
         $this->riwayatTransaksi = $riwayat;
-        $this->riwayatHutang = $hutang;
+        $this->riwayatHutang = $riwayatHutang;
+        $this->hutangModel = $hutangModel;
         $this->supplier = $supplier;
-        $this->riwayatHP = $hutangPiutang;
         $this->db = $db;
     }
 
@@ -161,7 +161,7 @@ class ReturPembelianService
         if ($opsi_return === 'tunai') {
             $this->setPerubahanBukuBesar($headerData, $idReturPembelian);
         } else {
-            $this->setHutang($headerData, $idReturPembelian);
+            $this->setPelunasanHutang($headerData, $idReturPembelian);
         }
     }
 
@@ -428,7 +428,7 @@ class ReturPembelianService
      * @param float $hutang Jumlah hutang
      * @return void
      */
-    protected function setHutang(array $headerData, int $idReturPembelian): void
+    protected function setPelunasanHutang(array $headerData, int $idReturPembelian): void
     {
         // Validasi data supplier
         $dt_supplier = $this->supplier->find($headerData['id_setupsupplier']);
@@ -436,74 +436,62 @@ class ReturPembelianService
             throw new \Exception('Data supplier tidak ditemukan');
         }
 
-        // Cari data hutang piutang yang sudah ada (jika ada)
-        $dt_hutang_lama = $this->riwayatHP
+        // Cari data hutang yang sudah ada (jika ada)
+        $dataHutang = $this->hutangModel
             ->where([
-                'id_transaksi' => $idReturPembelian,
-                'relasi_id' => $headerData['id_setupsupplier'],
-                'relasi_tipe' => 'supplier',
-                'jenis' => 'pengurang_hutang'
+                'id_pembelian' => $headerData['id_pembelian'],
+                'id_setupsupplier' => $headerData['id_setupsupplier'],
             ])
             ->first();
 
-        $data = [
-            'tanggal' => $headerData['tanggal'],
-            'id_transaksi' => $idReturPembelian,
-            'nota' => $headerData['nota'],
-            'tanggal_jt' => $headerData['tgl_jatuhtempo'],
-            'saldo' => $headerData['grand_total'],
-            'relasi_id' => $headerData['id_setupsupplier'],
-            'relasi_tipe' => 'supplier',
-            'jenis' => 'pengurang_hutang'
-        ];
-
-        // Update Saldo Supplier
-        $old_saldo = floatval($dt_supplier->saldo);
-        $current_saldo = $old_saldo;
-
-        if ($dt_hutang_lama) {
-            // Update data hutang piutang yang sudah ada
-            $hutang_masuk_lama = floatval($dt_hutang_lama->saldo);
-            $current_saldo = $old_saldo - $hutang_masuk_lama; // Kembalikan dulu saldo lama
-
-            $this->riwayatHP->update($dt_hutang_lama->id_hutang_piutang, $data);
-        } else {
-            // Insert data hutang piutang baru
-            $this->riwayatHP->insert($data);
+        // Validasi data hutang
+        if (!$dataHutang) {
+            throw new \Exception('Data hutang untuk pembelian ini tidak ditemukan');
         }
 
-        // tambahkan dengan hutang baru
-        $new_saldo = $current_saldo - $headerData['grand_total'];
+        $saldo_lama = floatval($dataHutang->saldo);
+        $saldo_baru = $saldo_lama - $headerData['grand_total'];
 
-        // Update saldo supplier
-        $this->supplier->update($headerData['id_setupsupplier'], [
-            'saldo' => $new_saldo
-        ]);
+        // Validasi saldo tidak boleh negatif (opsional)
+        if ($saldo_baru < 0) {
+            throw new \Exception('Nilai retur melebihi saldo hutang yang tersisa');
+        }
 
-        // Cari riwayat transaksi hutang yang sudah ada
-        $riwayatHutangLama = $this->riwayatHutang
+        $dataRiwayat = [
+            'id_hutang' => $dataHutang->id_hutang,
+            'tanggal' => $headerData['tanggal'],
+            'jenis_transaksi' => 'retur pembelian',
+            'nota' => $headerData['nota'],
+            'nominal' => $headerData['grand_total'],
+            'saldo_setelah' => $saldo_baru,
+            'deskripsi' => 'Pengurangan Hutang dari Retur Pembelian'
+        ];
+
+        // cek apakah riwayat hutang sudah ada (edit)
+        $riwayatHutang = $this->riwayatHutang
             ->where([
-                'id_transaksi' => $idReturPembelian,
+                'id_hutang' => $dataHutang->id_hutang,
                 'jenis_transaksi' => 'retur pembelian',
             ])
             ->first();
 
-        $riwayatHutangData = [
-            'tanggal' => $headerData['tanggal'],
-            'nota' => $headerData['nota'],
-            'id_transaksi' => $idReturPembelian,
-            'jenis_transaksi' => 'retur pembelian',
-            'id_setupsupplier' => $headerData['id_setupsupplier'],
-            'debit' => 0,
-            'kredit' => $headerData['grand_total'],
-            'saldo_setelah' => $new_saldo,
-            'deskripsi' => 'Pengurangan Hutang dari Retur Pembelian'
-        ];
+        // Update hutang saldo - do this only once
+        $this->hutangModel->update($dataHutang->id_hutang, [
+            'saldo' => $saldo_baru
+        ]);
 
-        if ($riwayatHutangLama) {
-            $this->riwayatHutang->update($riwayatHutangLama->id, []);
+        if ($riwayatHutang) {
+            // update riwayat hutang
+            $this->riwayatHutang->update($riwayatHutang->id, $dataRiwayat);
         } else {
-            $this->riwayatHutang->insert($riwayatHutangData);
+            // create new riwayat hutang
+            $this->riwayatHutang->insert($dataRiwayat);
         }
+
+        // Update status hutang di tabel pembelian1
+        $status_lunas = $saldo_baru == 0 ? 'lunas' : 'sebagian';
+        $this->pembelian->update($headerData['id_pembelian'], [
+            'status_lunas' => $status_lunas
+        ]);
     }
 }

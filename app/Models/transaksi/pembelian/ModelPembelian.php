@@ -12,7 +12,7 @@ class ModelPembelian extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'nota', 'id_setupsupplier', 'TOP', 'tgl_jatuhtempo', 'tgl_invoice', 'no_invoice', 'id_lokasi', 'id_setupbuku', 'sub_total', 'disc_cash', 'disc_cash_rp', 'dpp', 'ppn_option', 'ppn', 'tunai', 'hutang', 'grand_total'];
+    protected $allowedFields    = ['tanggal', 'nota', 'id_setupsupplier', 'TOP', 'tgl_jatuhtempo', 'tgl_invoice', 'no_invoice', 'id_lokasi', 'id_setupbuku', 'sub_total', 'disc_cash', 'disc_cash_rp', 'dpp', 'ppn_option', 'ppn', 'tunai', 'hutang', 'grand_total', 'status_lunas'];
 
     // protected bool $allowEmptyInserts = false;
     // protected bool $updateOnlyChanged = true;
@@ -194,6 +194,46 @@ class ModelPembelian extends Model
             no_invoice,
             setupsupplier1.nama AS nama_supplier')
             ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left');
+
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('pembelian1.nota', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.tgl_jatuhtempo', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.tgl_invoice', $arr_keywords[$i]);
+                $builder->orlike('pembelian1.no_invoice', $arr_keywords[$i]);
+                $builder->orlike('setupsupplier1.nama', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('pembelian1.tanggal', 'DESC')->get()->getResult();
+    }
+
+    public function searchAndDisplayPembelianHutang($keyword = null, $start = 0, $length = 0, $supplier_id = null)
+    {
+        $builder = $this->select('
+        pembelian1.id_pembelian,
+        pembelian1.nota,
+        pembelian1.tanggal,
+        setupsupplier1.nama AS nama_supplier,
+        pembelian1.tgl_jatuhtempo,
+        pembelian1.no_invoice,
+        hutang.saldo AS hutang,
+        ')
+            ->join('setupsupplier1', 'pembelian1.id_setupsupplier = setupsupplier1.id_setupsupplier', 'left')
+            ->join('hutang', 'pembelian1.id_pembelian = hutang.id_pembelian', 'left')
+            ->whereIn('status_lunas', ['sebagian', 'belum']);
+
+        if ($supplier_id) {
+            $builder->where('pembelian1.id_setupsupplier', $supplier_id);
+        }
 
 
         if ($keyword) {
