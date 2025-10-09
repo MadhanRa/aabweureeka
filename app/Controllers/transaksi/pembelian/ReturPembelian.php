@@ -15,7 +15,7 @@ use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup_persediaan\ModelStock;
 use App\Models\setup_persediaan\ModelLokasi;
 use App\Models\setup\ModelAntarmuka;
-use App\Models\setup\ModelSetupbank;
+use App\Models\setup\ModelSetupBank;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
 use App\Services\ReturPembelianService;
@@ -29,7 +29,7 @@ use TCPDF;
 
 class ReturPembelian extends ResourceController
 {
-    protected $objLokasi, $objSatuan, $objSetupbank, $objPembelian, $objSetupsupplier, $objStock, $db, $objAntarmuka, $objSetupBuku, $objPembelianDetail, $objStockGudang, $objRiwayatTransaksi, $objReturPembelian, $objReturPembelianDetail;
+    protected $objLokasi, $objSatuan, $objSetupBank, $objPembelian, $objSetupsupplier, $objStock, $db, $objAntarmuka, $objSetupBuku, $objPembelianDetail, $objStockGudang, $objRiwayatTransaksi, $objReturPembelian, $objReturPembelianDetail;
 
     protected $returPembelianService;
 
@@ -41,7 +41,7 @@ class ReturPembelian extends ResourceController
         $this->objAntarmuka = new ModelAntarmuka();
         $this->objSetupBuku = new ModelSetupBuku();
         $this->objSetupsupplier = new ModelSetupsupplier();
-        $this->objSetupbank = new ModelSetupbank();
+        $this->objSetupBank = new ModelSetupBank();
 
         // Setup Persediaan
         $this->objLokasi = new ModelLokasi();
