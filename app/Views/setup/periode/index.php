@@ -34,78 +34,60 @@
                 </div>
             <?php endif; ?>
             <div class="card-body">
-                <!-- Tampilkan pesan error -->
-                <?php if (session()->getFlashdata('errors')): ?>
-                    <div class="alert alert-danger">
-                        <ul>
-                            <?php foreach (session()->getFlashdata('errors') as $error): ?>
-                                <li><?= esc($error) ?></li>
-                            <?php endforeach ?>
-                        </ul>
-                    </div>
-                <?php endif ?>
-                <form method="post" action="<?= site_url('setup/periode') ?> ">
-                    <?= csrf_field() ?>
-                    <div class="form-group">
-                        <label>Bulan</label>
-                        <select type="text" class="form-control" name="periode_bulan" required>
-                            <option value="Januari">Januari</option>
-                            <option value="Februari">Februari</option>
-                            <option value="Maret">Maret</option>
-                            <option value="April">April</option>
-                            <option value="Mei">Mei</option>
-                            <option value="Juni">Juni</option>
-                            <option value="Juli">Juli</option>
-                            <option value="Agustus">Agustus</option>
-                            <option value="September">September</option>
-                            <option value="Oktober">Oktober</option>
-                            <option value="November">November</option>
-                            <option value="Desember">Desember</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tahun</label>
-                        <input type="text" class="form-control" name="periode_tahun" required>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Simpan Data</button>
-                        <button type="reset" class="btn btn-danger">Reset</button>
-                    </div>
-                </form>
-                <?php if (empty($dtperiode)) : ?>
-                    <div class="alert alert-danger">
-                        <h4 class="alert-heading">Data Kosong</h4>
-                        <p>Silahkan tambahkan data periode terlebih dahulu.</p>
-                    </div>
-                <?php else : ?>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
-                            <thead>
-                                <tr class="eureeka-table-header">
-                                    <th>No</th>
-                                    <th>Bulan</th>
-                                    <th>Tahun</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($dtperiode as $key => $value) : ?>
-                                    <tr>
-                                        <td><?= $key + 1 ?></td>
-                                        <td><?= $value->periode_bulan ?></td>
-                                        <td><?= $value->periode_tahun ?></td>
-                                        <td><?= $value->status ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-md display nowrap compact eureeka-table" id="myTable">
+                        <thead>
+                            <tr class="eureeka-table-header">
+                                <th>No</th>
+                                <th>Periode Bulan</th>
+                                <th>Periode Tahun</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- TEMPAT FOREACH -->
+                            <?php foreach ($periods as $value) : ?>
+                                <tr>
+                                    <td class="text-center"><?= $value->id ?></td>
+                                    <td class="text-center"><?= $value->month ?></td>
+                                    <td class="text-center"><?= $value->year ?></td>
+                                    <td class="text-center">
+                                        <?php if ($value->is_closed == 1) : ?>
+                                            <span class="badge badge-danger">Closed</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-success">Open</span>
+                                        <?php endif; ?>
+                                    </td>
 
+                                    <td class="text-center">
+                                        <?php if ($value->is_closed == 1) : ?>
+
+                                        <?php else: ?>
+                                            <a href="<?= site_url('close-period/close_book/' . $value->id)  ?>" class="btn btn-primary"><i class="fas fa-eye-alt btn-small"></i> Tutup</a>
+                                        <?php endif; ?>
+                                        <!-- Tombol Edit Data -->
+                                        <a href="<?= site_url('close-period/report/' . $value->id) ?>" class="btn btn-warning"><i class="fas fa-eye-alt btn-small"></i> Detail</a>
+                                        <!-- <input type="hidden" name="_method" value="PUT"> -->
+
+                                        <!-- Tombol Hapus Data -->
+                                        <form action="<?= site_url('close-period/' . $value->id) ?>" method="post" id="del-<?= $value->id ?>" class="d-inline">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button class="btn btn-danger btn-small" data-confirm="Hapus Data....?" data-confirm-yes="hapus(<?= $value->id ?>)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+
+
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-
     </div>
 </section>
 

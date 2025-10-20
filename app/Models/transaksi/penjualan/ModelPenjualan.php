@@ -49,7 +49,6 @@ class ModelPenjualan extends Model
             p.*, 
             l1.nama_lokasi AS lokasi_asal, 
             sp.nama_pelanggan AS nama_pelanggan, 
-            s.kode_satuan AS kode_satuan,
             sm.nama_salesman AS nama_salesman
         ');
 
@@ -59,8 +58,6 @@ class ModelPenjualan extends Model
         // Join dengan tabel 'setuppelanggan1' untuk mendapatkan nama pelanggan
         $builder->join('setuppelanggan1 sp', 'p.id_pelanggan = sp.id_pelanggan', 'left');
 
-        // Join dengan tabel 'satuan1' untuk mendapatkan kode satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
         // Join dengan tabel 'setupsalesman1' untuk mendapatkan nama salesman
         $builder->join('setupsalesman1 sm', 'p.id_salesman = sm.id_salesman', 'left');

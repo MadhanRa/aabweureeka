@@ -43,8 +43,7 @@ class ModelPembelian extends Model
             p.*, 
             l1.nama_lokasi AS lokasi_asal, 
             sp.nama AS nama_supplier, 
-            s.kode_satuan AS kode_satuan,
-            b.nama_setupbank AS nama_setupbank
+            b.nama_setupbuku AS nama_setupbuku
         ');
 
         // Join dengan tabel 'lokasi1' untuk mendapatkan nama lokasi asal
@@ -53,11 +52,9 @@ class ModelPembelian extends Model
         // Join dengan tabel 'setupsupplier1' untuk mendapatkan nama supplier
         $builder->join('setupsupplier1 sp', 'p.id_setupsupplier = sp.id_setupsupplier', 'left');
 
-        // Join dengan tabel 'satuan1' untuk mendapatkan kode satuan
-        $builder->join('satuan1 s', 'p.id_satuan = s.id_satuan', 'left');
 
-        // Join dengan tabel 'setupbank1' untuk mendapatkan nama bank
-        $builder->join('setupbank1 b', 'p.id_setupbank = b.id_setupbank', 'left');
+        // Join dengan tabel 'setupbuku1' untuk mendapatkan nama bank
+        $builder->join('setupbuku1 b', 'p.id_setupbuku = b.id_setupbuku', 'left');
         $builder->where('MONTH(p.tanggal)', $bulan);
         $builder->where('YEAR(p.tanggal)', $tahun);
         $data = $builder->get()->getResult();

@@ -8,7 +8,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Fitur Tutup Buku Per Periode</h1>
+        <h1>Periode Akuntansi</h1>
 
     </div>
 
@@ -40,7 +40,7 @@
         <!-- HALAMAN DINAMIS -->
         <div class="card">
             <div class="card-header">
-                <h4>Close Books Per Periode</h4>
+                <h4>Tutup Buku Periode Akuntansi</h4>
                 <!-- <div class="card-header-form">
                     <form action="<?= site_url('PeriodsController') ?>" method="POST">
                         <?= csrf_field() ?>

@@ -3,18 +3,21 @@
 namespace App\Controllers\setup;
 
 use App\Models\setup\ModelPeriode;
+use App\Models\transaksi\PeriodsModels;
+
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Periode extends ResourceController
 {
     // INISIALISASI OBJECT DATA
-
+    protected $tutupPeriodeModel;
     protected $periodeModel;
     protected $db;
     protected $validation;
     function __construct()
     {
+        $this->tutupPeriodeModel = new PeriodsModels();
         $this->periodeModel = new ModelPeriode();
         $this->db = \Config\Database::connect();
         $this->validation = \Config\Services::validation();
@@ -27,7 +30,7 @@ class Periode extends ResourceController
      */
     public function index()
     {
-        $data['dtperiode'] = $this->periodeModel->findAll();
+        $data['periods'] = $this->tutupPeriodeModel->findAll();
         return view('setup/periode/index', $data);
     }
 

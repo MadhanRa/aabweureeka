@@ -59,10 +59,8 @@ class ModelKasKecil extends Model
         $builder = $this->db->table('kaskecil1 p');
         $builder->select('
             p.*, 
-            sp.kas_interface AS kas_interface, 
             sb.nama_kelproduksi AS nama_kelproduksi
         ');
-        $builder->join('setupbuku1 sp', 'p.id_setupbuku = sp.id_setupbuku', 'left');
         $builder->join('kelompokproduksi1 sb', 'p.id_kelproduksi = sb.id_kelproduksi', 'left');
         $builder->where('MONTH(p.tanggal)', $bulan);
         $builder->where('YEAR(p.tanggal)', $tahun);
