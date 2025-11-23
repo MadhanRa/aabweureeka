@@ -301,4 +301,16 @@ class Stock extends ResourceController
             return $this->response->setJSON($msg);
         }
     }
+
+    function pilihItemGudang($id_stock, $id_lokasi)
+    {
+        if ($this->request->isAJAX()) {
+            $data = $this->objStock->getStockInGudangById($id_stock, $id_lokasi);
+            $msg = [
+                'sukses' => true,
+                'data' => $data
+            ];
+            return $this->response->setJSON($msg);
+        }
+    }
 }

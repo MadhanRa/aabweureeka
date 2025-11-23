@@ -77,6 +77,24 @@ class ModelStock extends Model
             ->first();
     }
 
+    public function getStockInGudangById($id, $idLokasi)
+    {
+        return $this->select('stock1.*, 
+                          satuan1.kode_satuan as satuan_1,
+                          satuan2.kode_satuan as satuan_2,
+                          harga1.harga_jualexc,
+                          harga1.harga_jualinc,
+                          stock1_gudang.id_lokasi,
+                          setupsalesman1.id_salesman')
+            ->join('stock1_gudang', 'stock1_gudang.id_stock = stock1.id_stock', 'inner')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left')
+            ->join('harga1', 'harga1.id_stock = stock1.id_stock', 'left')
+            ->join('setupsalesman1', 'setupsalesman1.id_lokasi = stock1_gudang.id_lokasi', 'left')
+            ->where(['stock1.id_stock' => $id, 'stock1_gudang.id_lokasi' => $idLokasi])
+            ->first();
+    }
+
     public function searchAndDisplay($keyword = null, $start = 0, $length = 0, $supplierId = null)
     {
         $builder = $this->select('stock1.*, 
@@ -93,6 +111,56 @@ class ModelStock extends Model
 
         if ($supplierId) {
             $builder->where('stock1.id_setupsupplier', $supplierId);
+        }
+
+        if ($keyword) {
+            $builder->groupStart();
+            $arr_keywords = explode(" ", $keyword);
+            for ($i = 0; $i < count($arr_keywords); $i++) {
+                $builder->orlike('stock1.nama_barang', $arr_keywords[$i]);
+                $builder->orLike('stock1.kode', $arr_keywords[$i]);
+                $builder->orLike('group1.nama_group', $arr_keywords[$i]);
+                $builder->orLike('kelompok1.nama_kelompok', $arr_keywords[$i]);
+                $builder->orLike('satuan1.kode_satuan', $arr_keywords[$i]);
+                $builder->orLike('satuan2.kode_satuan', $arr_keywords[$i]);
+            }
+            $builder->groupEnd();
+        }
+
+        if ($start != 0 or $length != 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->orderBy('stock1.nama_barang', 'ASC')->get()->getResult();
+    }
+
+    public function searchAndDisplayStockGudang($keyword = null, $start = 0, $length = 0, $idLokasi = null, $idSalesman = null)
+    {
+        $builder = $this->select('stock1.*, 
+                          group1.nama_group, 
+                          kelompok1.nama_kelompok,  
+                          satuan1.kode_satuan as kode_satuan,
+                          satuan2.kode_satuan as kode_satuan2,
+                          setupsupplier1.nama as nama_supplier,
+                          setupsalesman1.id_salesman,
+                          stock1_gudang.id_lokasi,
+                          lokasi1.nama_lokasi')
+            ->join('setupsupplier1', 'setupsupplier1.id_setupsupplier = stock1.id_setupsupplier', 'left')
+            ->join('group1', 'group1.id_group = stock1.id_group', 'left')
+            ->join('kelompok1', 'kelompok1.id_kelompok = stock1.id_kelompok', 'left')
+            ->join('satuan1', 'satuan1.id_satuan = stock1.id_satuan', 'left')
+            ->join('satuan1 as satuan2', 'satuan2.id_satuan = stock1.id_satuan2', 'left')
+            ->join('stock1_gudang', 'stock1_gudang.id_stock = stock1.id_stock', 'inner')
+            ->join('setupsalesman1', 'setupsalesman1.id_lokasi = stock1_gudang.id_lokasi', 'left')
+            ->join('lokasi1', 'lokasi1.id_lokasi = stock1_gudang.id_lokasi', 'left');
+
+
+        if ($idLokasi) {
+            $builder->where('stock1_gudang.id_lokasi', $idLokasi);
+        }
+
+        if ($idSalesman) {
+            $builder->where('setupsalesman1.id_salesman', $idSalesman);
         }
 
         if ($keyword) {

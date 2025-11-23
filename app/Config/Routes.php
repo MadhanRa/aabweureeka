@@ -77,6 +77,7 @@ $routes->group('setup_persediaan', ['namespace' => 'App\Controllers\setup_persed
     $routes->resource('kelompok');
 
     //routes setup stock
+    $routes->get('stock/pilihItemGudang/(:num)/(:num)', 'Stock::pilihItemGudang/$1/$2');
     $routes->get('stock/pilihItem/(:num)', 'Stock::pilihItem/$1');
     $routes->post('stock/lookup-stock', 'Stock::lookupStock');
     $routes->get('stock/getStock', 'Stock::getStock');
@@ -107,7 +108,7 @@ $routes->group('transaksi', static function ($routes) {
 
     $routes->group('penjualan', ['namespace' => 'App\Controllers\transaksi\penjualan'], static function ($routes) {
         $routes->post('penjualan/lookup-penjualan', 'Penjualan::lookupPenjualan');
-        $routes->get('penjualan/lookup-stock', 'Penjualan::lookupStock');
+        $routes->post('penjualan/lookup-stock', 'Penjualan::lookupStock');
         $routes->get('penjualan/printPDF/(:num)', 'Penjualan::printPDF/$1');
         $routes->get('penjualan/printPDF', 'Penjualan::printPDF');
         $routes->put('/penjualan/(:segment)', 'Penjualan::update/$1', ['filter' => 'role:admin']);

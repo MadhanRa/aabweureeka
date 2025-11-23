@@ -15,6 +15,9 @@
         <div class="card">
             <div class="card-header">
                 <h4>Edit Penjualan</h4>
+                <div class="card-header-action">
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalLookupPenjualan">Lookup</button>
+                </div>
             </div>
             <div class="card-body">
                 <form id="formPenjualan" action="<?= site_url('transaksi/penjualan/penjualan/' . $dtheader->id_penjualan) ?>" data-stock-url="<?= site_url('transaksi/penjualan/penjualan/lookup-stock') ?>" method="POST">

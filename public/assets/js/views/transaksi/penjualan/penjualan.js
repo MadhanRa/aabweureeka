@@ -43,8 +43,8 @@ const SELECTORS = {
     kodeInput: 'input[name$="[kode]"]',
     form: '#formPenjualan',
     tabelDetail: '#tabelDetail tbody',
-    salesmanDropdown: 'select[name="id_salesman"]',
-    lokasiDropdown: 'select[name="id_lokasi"]',
+    salesmanDropdown: '#id_salesman',
+    lokasiDropdown: '#id_lokasi',
 };
 
 /**
@@ -223,26 +223,27 @@ function initDataTablesItem() {
                     return row.kode_satuan + ' / ' + row.kode_satuan2;
                 }
             },
+            { "data": "nama_lokasi" },
             {
                 "data": null, "render": function (data, type, row) {
                     // Cek apakah item sudah dipilih
                     if (selectedItems.some(id => id == row.id_stock)) {
                         return '<button class="btn btn-secondary" disabled>Terpilih</button>';
                     }
-                    return '<button class="btn btn-primary" onclick="pilihItem(' + row.id_stock + ')">Pilih</button>';
+                    return '<button class="btn btn-primary" onclick="pilihItem(' + row.id_stock + ', ' + row.id_lokasi + ')">Pilih</button>';
                 }
             }
         ]
     });
 }
 
-function pilihItem(id_stock) {
+function pilihItem(id_stock, id_lokasi) {
     selectedItems.push(id_stock);
 
     addNewRow(rowCounter++);
 
     $.ajax({
-        url: $('#formPenjualan').data('stock-url') + '/' + id_stock,
+        url: $('#formPenjualan').data('stock-url') + '/' + id_stock + '/' + id_lokasi,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -589,4 +590,10 @@ function fillFields(row, item, ppnOption) {
     // Clear quantity fields
     row.find('input[name$="[qty1]"]').val(0);
     row.find('input[name$="[qty2]"]').val(0);
+
+    // Set lokasi dropdown selection
+    $(SELECTORS.lokasiDropdown).val(item.id_lokasi).trigger('change');
+
+    // Set salesman dropdown selection
+    $(SELECTORS.salesmanDropdown).val(item.id_salesman).trigger('change');
 }

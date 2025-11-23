@@ -62,12 +62,11 @@ class Penjualan extends ResourceController
 
     protected function getCommonData()
     {
-        // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsalesman'] = $this->objSetupsalesman->findAll();
-        $data['dtpelanggan'] = $this->objSetuppelanggan->findAll();
-
-        return $data;
+        return [
+            'dtlokasi' => $this->objLokasi->getAll(),
+            'dtsalesman' => $this->objSetupsalesman->findAll(),
+            'dtpelanggan' => $this->objSetuppelanggan->findAll(),
+        ];
     }
 
     /**
@@ -191,6 +190,10 @@ class Penjualan extends ResourceController
     {
         // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
         $data = $this->getCommonData();
+        $data['formAction'] = site_url('transaksi/penjualan/penjualan');
+        $data['formMethod'] = '';
+        $data['data'] = null;
+        $data['isEdit'] = false;
 
         return view('transaksi/penjualan_v/penjualan/new', $data);
     }
@@ -355,23 +358,23 @@ class Penjualan extends ResourceController
         $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
         $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
         $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
-        $param['id_salesman'] = isset($_REQUEST['id_salesman']) ? $_REQUEST['id_salesman'] : null;
         $param['id_lokasi'] = isset($_REQUEST['id_lokasi']) ? $_REQUEST['id_lokasi'] : null;
+        $param['id_salesman'] = isset($_REQUEST['id_salesman']) ? $_REQUEST['id_salesman'] : null;
 
 
-        $results = $this->objStock->searchAndDisplayStockPenjualan(
+        $results = $this->objStock->searchAndDisplayStockGudang(
             $param['search_value'],
             $param['start'],
             $param['length'],
-            $param['id_salesman'],
-            $param['id_lokasi']
+            $param['id_lokasi'],
+            $param['id_salesman']
         );
-        $total_count = $this->objStock->searchAndDisplayStockPenjualan(
+        $total_count = $this->objStock->searchAndDisplayStockGudang(
             $param['search_value'],
             null,
             null,
-            $param['id_salesman'],
-            $param['id_lokasi']
+            $param['id_lokasi'],
+            $param['id_salesman']
         );
 
         $json_data = array(
