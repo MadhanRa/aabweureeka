@@ -191,6 +191,7 @@ class SetupSupplier extends ResourceController
             $this->db->transBegin();
 
             try {
+                $nominalHutang = (float)$this->request->getVar('saldo');
 
                 $data = [
                     'id_setupsupplier' => $id,
@@ -204,21 +205,20 @@ class SetupSupplier extends ResourceController
                 $idHutang = $this->hutangModel->insert($data);
                 // Masukkan data ke dalam tabel
                 if ($idHutang) {
+                    $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($id) + $nominalHutang;
 
                     // Simpan data riwayat transaksi hutang
                     $riwayatData = [
                         'id_hutang' => $idHutang,
                         'tanggal' => $this->request->getVar('tanggal'),
-                        'jenis_transaksi' => $this->request->getVar('manual'),
+                        'jenis_transaksi' => 'manual',
                         'nota' => $this->request->getVar('nota'),
                         'nominal' => $this->request->getVar('saldo'),
-                        'saldo_setelah' => $this->request->getVar('saldo'),
+                        'saldo_setelah' => $updatedSaldo,
                         'deskripsi' => 'Penambahan hutang manual',
                     ];
 
                     $this->db->table('riwayat_transaksi_hutang')->insert($riwayatData);
-
-                    $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($id);
 
                     $this->db->transCommit();
 

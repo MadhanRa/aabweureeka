@@ -26,7 +26,7 @@ class SetupPelanggan extends ResourceController
      */
     public function index()
     {
-        $data['dtsetuppelanggan'] = $this->pelangganModel->findAll();
+        $data['dtsetuppelanggan'] = $this->pelangganModel->getAllPelanggan();
         return view('setup/pelanggan/index', $data);
     }
 
@@ -40,7 +40,7 @@ class SetupPelanggan extends ResourceController
     public function show($id = null)
     {
         // Ambil data berdasarkan ID
-        $data['data'] = $this->pelangganModel->find($id);
+        $data['data'] = $this->pelangganModel->getPelangganById($id);
 
         // Cek jika data tidak ditemukan
         if (!$data) {
@@ -52,7 +52,7 @@ class SetupPelanggan extends ResourceController
         if ($this->request->isAJAX()) {
             $msg = [
                 'success' => true,
-                'data' => view('setup/pelanggan/detail', $data),
+                'data' => view('setup/pelanggan/piutang/detail', $data),
             ];
 
             return $this->response->setJSON($msg);
@@ -188,7 +188,7 @@ class SetupPelanggan extends ResourceController
         if ($this->request->isAJAX()) {
             $data['id'] = $id;
             $msg = [
-                'data' => view('setup/pelanggan/new_piutang', $data)
+                'data' => view('setup/pelanggan/piutang/new_piutang', $data)
             ];
             return $this->response->setJSON($msg);
         }

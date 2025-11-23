@@ -72,6 +72,24 @@ class ReturPembelian extends ResourceController
             $this->db
         );
     }
+
+    private function getCommonData(): array
+    {
+        // Ambil kode kas dan setara di interface
+        $kodeKas = $this->objAntarmuka->getKodeKas();
+
+        if ($kodeKas) {
+            // pisah kodekas dengan koma
+            $kodeKas = explode(',', $kodeKas);
+        }
+
+        return [
+            'dtlokasi' => $this->objLokasi->getAll(),
+            'dtsetupsupplier' => $this->objSetupsupplier->getAll(),
+            'dtrekening' => $this->objSetupBuku->getRekeningKas($kodeKas),
+        ];
+    }
+
     /**
      * Return an array of resource objects, themselves in array format.
      *
@@ -162,19 +180,13 @@ class ReturPembelian extends ResourceController
      */
     public function new()
     {
-        // Ambil kode kas dan setara di interface
-        $kodeKas = $this->objAntarmuka->getKodeKas();
 
-        if ($kodeKas) {
-            // pisah kodekas dengan koma
-            $kodeKas = explode(',', $kodeKas);
-        }
+        $data = $this->getCommonData();
+        $data['formAction'] = site_url('transaksi/pembelian/pembelian');
+        $data['formMethod'] = '';
+        $data['data'] = null;
+        $data['isEdit'] = false;
 
-
-        // Menggunakan Query Builder untuk join tabel lokasi1 dan satuan1
-        $data['dtlokasi'] = $this->objLokasi->getAll();
-        $data['dtsetupsupplier'] = $this->objSetupsupplier->getAll();
-        $data['dtrekening'] = $this->objSetupBuku->getRekeningKas($kodeKas);
 
         return view('transaksi/pembelian_v/returpembelian/new', $data);
     }

@@ -12,22 +12,35 @@ class ModelSetupsalesman extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_salesman', 'nama_salesman', 'id_lokasi', 'saldo', 'saldo_awal'];
+    protected $allowedFields    = ['kode_salesman', 'nama_salesman', 'id_lokasi'];
 
-
-    public function getSalesmanwithLokasi()
+    public function getAllSalesman()
     {
-        return $this->select('setupsalesman1.*, lokasi1.nama_lokasi')
-            ->join('lokasi1', 'lokasi1.id_lokasi = setupsalesman1.id_lokasi', 'left')
-            ->findAll();
+        $builder = $this->db->table('setupsalesman1 s');
+        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo, lokasi1.nama_lokasi');
+        $builder->join(
+            'piutang p',
+            "s.id_salesman = p.id_relasional AND p.relasi_tipe = 'salesman'",
+            'left'
+        );
+        $builder->join('lokasi1', 'lokasi1.id_lokasi = s.id_lokasi', 'left');
+        $builder->groupBy('s.id_salesman');
+
+        $query = $builder->get();
+        return $query->getResult();
     }
 
     public function getSalesmanById($id)
     {
-        return $this->select('setupsalesman1.*, lokasi1.nama_lokasi')
-            ->join('lokasi1', 'lokasi1.id_lokasi = setupsalesman1.id_lokasi', 'left')
-            ->where('id_salesman', $id)
-            ->first();
+        // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
+        $builder = $this->db->table('setupsalesman1 s');
+        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo, lokasi1.nama_lokasi');
+        $builder->join('piutang p', "s.id_salesman = p.id_relasional AND p.relasi_tipe = 'salesman'", 'left');
+        $builder->join('lokasi1', 'lokasi1.id_lokasi = s.id_lokasi', 'left');
+        $builder->where('s.id_salesman', $id);
+        $builder->groupBy('s.id_salesman');
+        $query = $builder->get();
+        return $query->getRow();
     }
 
     // protected bool $allowEmptyInserts = false;

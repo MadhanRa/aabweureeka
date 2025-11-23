@@ -2,76 +2,80 @@
  *
  * You can write your CSS code here, DO NOT touch the default JavaScript file
  * because it will make it harder for you to update.
- * 
+ *
  */
 
 /*# sourceMappingURL=custom.css.map */
 
 table.table.eureeka-table {
-    border: 2px solid #009548;
+  border: 2px solid #009548;
 }
 
 table.table thead tr.eureeka-table-header th {
-    background-color: #009548;
-    color: white;
+  background-color: #009548;
+  color: white;
 }
 
 table thead>tr>th.sorting_asc::before,
 table thead>tr>th.sorting_asc::after,
 table thead>tr>th.sorting_desc::before,
 table thead>tr>th.sorting_desc::after {
-    color: yellow;
+  color: yellow;
+}
+
+#tabelDetail tr td {
+  padding: 0.1rem;
 }
 
 .form-container {
-    max-width: 600px;
-    margin: 0 auto;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .ui-autocomplete {
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 9999 !important;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 9999 !important;
 }
 
 .ui-menu-item {
-    padding: 3px 0;
+  padding: 3px 0;
 }
 
 .ui-menu-item div {
-    padding: 5px 8px;
-    border-bottom: 1px solid #f0f0f0;
+  padding: 5px 8px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .ui-menu-item:last-child div {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 div.table-wrapper {
-    max-height: 250px;
-    overflow: auto;
+  max-height: 250px;
+  overflow: auto;
 }
 
 div.table-wrapper-medium {
-    max-height: 400px;
-    overflow: auto;
+  max-height: 400px;
+  overflow: auto;
 }
 
 .neraca .table th,
 .neraca .table td {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 .neraca .bg-header {
-    background-color: #dff0d8;
+  background-color: #dff0d8;
 }
 
 .neraca .text-bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .neraca .table-total {
-    background-color: #f8d7da;
-    font-weight: bold;
+  background-color: #f8d7da;
+  font-weight: bold;
 }

@@ -4,18 +4,20 @@ namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetupsalesman;
 use App\Models\setup\ModelHutangPiutang;
+use App\Models\transaksi\ModelPiutang;
 use App\Models\setup_persediaan\ModelLokasi;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupSalesman extends ResourceController
 {
-    protected $salesmanModel, $hutangPiutangModel, $lokasiModel, $db;
+    protected $salesmanModel, $hutangPiutangModel, $lokasiModel, $db, $piutangModel;
     // INISIALISASI OBJECT DATA
     function __construct()
     {
         $this->salesmanModel = new ModelSetupsalesman();
         $this->hutangPiutangModel = new ModelHutangPiutang();
+        $this->piutangModel = new ModelPiutang();
         $this->lokasiModel = new ModelLokasi();
         $this->db = \Config\Database::connect();
     }
@@ -41,7 +43,7 @@ class SetupSalesman extends ResourceController
         } else {
             $data['is_closed'] = 'FALSE';
         }
-        $data['dtsetupsalesman'] = $this->salesmanModel->getSalesmanwithLokasi();
+        $data['dtsetupsalesman'] = $this->salesmanModel->getAllSalesman();
         return view('setup/salesman/index', $data);
     }
 
@@ -62,7 +64,7 @@ class SetupSalesman extends ResourceController
 
         if ($this->request->isAJAX()) {
             $msg = [
-                'data' => view('setup/salesman/detail', $data)
+                'data' => view('setup/salesman/piutang/detail', $data)
             ];
 
             return $this->response->setJSON($msg);
@@ -177,10 +179,10 @@ class SetupSalesman extends ResourceController
 
     public function getPiutang($id = null)
     {
-        $data['dtpiutang'] = $this->hutangPiutangModel->getHutangPiutang($id, 'salesman');
+        $data['dtpiutang'] = $this->piutangModel->getRiwayatPiutangById($id, 'salesman');
         if ($this->request->isAJAX()) {
             $msg = [
-                'data' => view('setup/salesman/data_piutang', $data)
+                'data' => view('setup/salesman/piutang/data_piutang', $data)
             ];
             return $this->response->setJSON($msg);
         }
@@ -192,32 +194,38 @@ class SetupSalesman extends ResourceController
             $this->db->transBegin();
 
             try {
-                $saldoPiutang = $this->request->getVar('saldo');
+                $nominalPiutang = $this->request->getVar('saldo');
 
                 $data = [
+                    'id_relasional' => $id,
+                    'relasi_tipe' => 'salesman',
+                    'sumber' => 'manual',
                     'tanggal' => $this->request->getVar('tanggal'),
                     'nota' => $this->request->getVar('nota'),
                     'tanggal_jt' => $this->request->getVar('tanggal_jt'),
-                    'saldo' => $saldoPiutang,
-                    'relasi_id' => $id,
-                    'relasi_tipe' => 'salesman',
-                    'jenis' => 'piutang'
+                    'nominal' => $nominalPiutang,
+                    'saldo' => $nominalPiutang
                 ];
 
+                $id_piutang = $this->piutangModel->insert($data);
                 // Masukkan data ke dalam tabel
-                if ($this->hutangPiutangModel->insert($data)) {
-                    // Ambil data salesman yang bersangkutan
-                    $salesman = $this->salesmanModel->find($id);
+                if ($id_piutang) {
+                    $updatedSaldo = $this->piutangModel->getSaldoPiutangById($id, 'salesman') + $nominalPiutang;
 
-                    if (!$salesman) {
-                        throw new \Exception('Salesman tidak ditemukan');
-                    }
+                    // Simpan data riwayat transaksi piutang
+                    $riwayatData = [
+                        'id_piutang' => $id_piutang,
+                        'tanggal' => $this->request->getVar('tanggal'),
+                        'pelaku' => 'salesman',
+                        'jenis_transaksi' => 'manual',
+                        'nota' => $this->request->getVar('nota'),
+                        'nominal' => $nominalPiutang,
+                        'saldo_setelah' => $updatedSaldo,
+                        'deskripsi' => 'Penambahan piutang manual',
+                    ];
 
-                    // Hitung saldo baru
-                    $updatedSaldo = (float)$salesman->saldo + (float)$saldoPiutang;
-                    // Update saldo salesman
-                    $this->salesmanModel->update($id, ['saldo' => $updatedSaldo]);
-                    // Commit transaksi jika semua berhasil
+                    $this->db->table('riwayat_transaksi_piutang')->insert($riwayatData);
+
                     $this->db->transCommit();
 
                     return $this->response->setJSON([

@@ -1,79 +1,47 @@
-<form id="formPembelian" action="<?= $formAction ?>" data-stock-url="<?= site_url('setup_persediaan/stock/pilihItem') ?>" method="POST">
+<form id="formReturPembelian" action="<?= $formAction ?>" data-stock-url="<?= site_url('setup_persediaan/stock/pilihItem') ?>">
     <?= $formMethod ?>
     <input type="hidden" id="main_csrf" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+    <input type="hidden" name="id_pembelian" value="<?= $data->id_pembelian ?? '' ?>">
 
     <div class="row">
         <div class="col-lg-2">
             <div class="form-group">
                 <!-- Tanggal -->
-                <label for="tanggal">Tanggal</label>
+                <label>Tanggal</label>
                 <input type="date" class="form-control" name="tanggal" value="<?= old('tanggal') ?>" required>
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <!-- Supplier -->
-                <label for="id_setupsupplier">Supplier</label>
+                <label>Supplier</label>
                 <select class="form-control" name="id_setupsupplier" id="id_setupsupplier" required>
                     <option value="" hidden>-- Pilih Supplier --</option>
                     <?php foreach ($dtsetupsupplier as $key => $value) : ?>
-                        <option value="<?= esc($value->id_setupsupplier) ?>"
-                            data-ppn="<?= esc($value->tipe) ?>"
-                            <?= ($data->id_setupsupplier ?? old('id_setupsupplier')) == $value->id_setupsupplier ? 'selected' : '' ?>>
+                        <option value="<?= esc($value->id_setupsupplier) ?>" <?= ($data->id_setupsupplier ?? old('id_setupsupplier')) == $value->id_setupsupplier ? 'selected' : '' ?>>
                             <?= esc($value->kode . ' - ' . $value->nama) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
         </div>
-        <div class="col-lg-1">
-            <div class="form-group">
-                <!-- TOP -->
-                <label for="TOP">TOP</label>
-                <input type="text" class="form-control" name="TOP" value="<?= ($data->TOP ?? old('TOP')) ?>" required>
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="form-group">
-                <!-- Tanggal Jatuh Tempo -->
-                <label for="tgl_jatuhtempo">Tanggal Jatuh Tempo</label>
-                <input type="date" class="form-control" name="tgl_jatuhtempo" value="<?= ($data->tgl_jatuhtempo ?? old('tgl_jatuhtempo')) ?>" readonly>
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="form-group">
-                <!-- Tanggal Invoice -->
-                <label for="tgl_invoice">Tanggal Invoice</label>
-                <input type="date" class="form-control" name="tgl_invoice" value="<?= ($data->tgl_invoice ?? old('tgl_invoice')) ?>" required>
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="form-group">
-                <!-- No Invoice -->
-                <label for="no_invoice">No Invoice</label>
-                <input type="text" class="form-control" name="no_invoice" value="<?= ($data->no_invoice ?? old('no_invoice')) ?>" required>
-            </div>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label for="nota">Nota</label>
-                <input type="text" class="form-control" name="nota" value="<?= ($data->nota ?? old('nota')) ?>" required>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="id_lokasi">Lokasi</label>
+                <label>Lokasi</label>
                 <select class="form-control" name="id_lokasi" required>
                     <option value="" hidden>-- Pilih Lokasi --</option>
                     <?php foreach ($dtlokasi as $key => $value) : ?>
-                        <option value="<?= esc($value->id_lokasi) ?>"
-                            <?= ($data->id_lokasi ?? old('id_lokasi')) == $value->id_lokasi ? 'selected' : '' ?>>
+                        <option value="<?= esc($value->id_lokasi) ?>" <?= ($data->id_lokasi ?? old('id_lokasi')) == $value->id_lokasi ? 'selected' : '' ?>>
                             <?= esc($value->kode_lokasi . ' - ' . $value->nama_lokasi) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Nota</label>
+                <input type="text" class="form-control" name="nota" value="<?= old('nota') ?>" required>
             </div>
         </div>
     </div>
@@ -134,70 +102,75 @@
         </div>
     </div>
     <hr>
-    <div class="row mt-3 justify-content-between">
+    <div class="row mt-5 justify-content-between">
         <div class="col-md-4">
+            <div class="form-group p-3 w-50 border">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="opsi_return" id="inlineRadio1" value="kredit" checked>
+                    <label class="form-check-label" for="inlineRadio1">Kredit</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="opsi_return" id="inlineRadio2" value="tunai">
+                    <label class="form-check-label" for="inlineRadio2">Tunai</label>
+                </div>
+            </div>
             <div class="form-group">
-                <label for="id_setupbuku">Rekening</label>
-                <select class="form-control" name="id_setupbuku" required>
-                    <option value="" hidden>-- Pilih Rekening --</option>
-                    <?php foreach ($dtrekening as $key => $value) : ?>
-                        <option value="<?= esc($value->id_setupbuku) ?>" <?= ($data->id_setupbuku ?? old('id_setupbuku')) == $value->id_setupbuku ? 'selected' : '' ?>>
-                            <?= esc($value->kode_setupbuku . '-' . $value->nama_setupbuku) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <!-- Tanggal Pembelian -->
+                <label>Tanggal Pembelian</label>
+                <input type="date" class="form-control" name="tanggal_pembelian" value="<?= ($data->tanggal_pembelian ?? old('tanggal_pembelian')) ?>" readonly>
+            </div>
+            <div class="form-group">
+                <label>Nota Pembelian</label>
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="nota_pembelian" value="<?= ($data->nota_pembelian ?? old('nota_pembelian')) ?>" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalNotaPembelian">cari</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="sub_total">Sub Total</label>
-                <input type="text" id="sub_total" class="form-control" name="sub_total" value="<?= number_format(($data->sub_total ?? old('sub_total')) ?: 0, 0, ',', '.') ?>" readonly>
+                <label>Sub Total</label>
+                <input type="text" id="sub_total" class="form-control" name="sub_total" value="<?= number_format($data->sub_total ?? old('sub_total') ?: 0, 0, ',', '.') ?>" readonly>
             </div>
             <div class="form-row">
                 <div class="form-group col-lg-6">
-                    <label for="disc_cash">Disc Cash %</label>
-                    <input type="number" id="disc_cash" class="form-control " name="disc_cash" value="<?= ($data->disc_cash ?? old('disc_cash')) ?>">
+                    <label>Disc Cash %</label>
+                    <input type="number" id="disc_cash" class="form-control " name="disc_cash" value="<?= $data->disc_cash ?? old('disc_cash') ?>">
                 </div>
                 <div class="form-group col-lg-6">
-                    <label for="disc_cash_rp">Disc</label>
-                    <input type="text" class="form-control" id="disc_cash_rp" name="disc_cash_rp" readonly value="<?= number_format(($data->disc_cash_rp ?? old('disc_cash_rp')) ?: 0, 0, ',', '.') ?>">
+                    <label>Disc Cash Rp</label>
+                    <input type="text" class="form-control" id="disc_cash_rp" name="disc_cash_rp" value="<?= number_format(old('disc_cash_rp') ?: 0, 0, ',', '.') ?>">
                 </div>
             </div>
             <div class="form-group">
-                <label for="dpp">DPP</label>
-                <input type="text" class="form-control" readonly name="dpp" value="<?= $data->dpp ?? 0 ?>">
+                <label>DPP</label>
+                <input type="text" class="form-control" readonly name="dpp" id="dpp" value="<?= number_format($data->dpp ?? old('dpp') ?: 0, 0, ',', '.') ?>">
             </div>
 
             <div class="form-row justify-content-between">
                 <div class="form-group col-lg-4 ">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ppn_option" value="exclude" <?= ($data->ppn_option ?? '' == 'exclude') ? 'checked' : '' ?>> Exclude
+                        <input class="form-check-input" type="radio" name="ppn_option" value="exclude" <?= ($data->ppn_option ?? old('ppn_option')) == 'exclude' ? 'checked' : '' ?>> Exclude
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ppn_option" value="include" <?= ($data->ppn_option ?? '' == 'include') ? 'checked' : '' ?>> Include
+                        <input class="form-check-input" type="radio" name="ppn_option" value="include" <?= ($data->ppn_option ?? old('ppn_option')) == 'include' ? 'checked' : '' ?>> Include
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ppn_option" value="non_ppn" <?= ($data->ppn_option ?? '' == 'non_ppn') ? 'checked' : '' ?>> Non PPN
+                        <input class="form-check-input" type="radio" name="ppn_option" value="non_ppn" <?= ($data->ppn_option ?? old('ppn_option')) == 'non_ppn' ? 'checked' : '' ?>> Non PPN
                     </div>
                 </div>
-                <div class="form-group col-lg-8">
-                    <label for="ppn">PPN (%)</label>
-                    <input type="number" id="ppn" class="form-control" name="ppn" value="<?= ($data->ppn ?? old('ppn')) ?>">
+                <div class="form-group col-lg-6">
+                    <label>PPN (%)</label>
+                    <input type="number" id="ppn" class="form-control" name="ppn" value="<?= $data->ppn ?? old('ppn') ?>">
                 </div>
             </div>
             <div class="form-group">
-                <label for="grand_total">Grand Total</label>
-                <input type="text" id="grand_total" class="form-control" name="grand_total" value="<?= number_format(($data->grand_total ?? old('grand_total')) ?: 0, 0, ',', '.') ?>" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Tunai</label>
-                <input type="text" id="tunai" class="form-control" name="tunai" value="<?= number_format(($data->tunai ?? old('tunai')) ?: 0, 0, ',', '.') ?>">
-            </div>
-
-            <div class="form-group">
-                <label for="hutang">Hutang</label>
-                <input type="text" id="hutang" class="form-control" name="hutang" value="<?= number_format(($data->hutang ?? old('hutang')) ?: 0, 0, ',', '.') ?>" readonly>
+                <label>Grand Total</label>
+                <input type="text" id="grand_total" class="form-control" name="grand_total" value="<?= number_format($data->grand_total ?? old('grand_total') ?: 0, 0, ',', '.') ?>" readonly>
             </div>
         </div>
     </div>
@@ -206,7 +179,6 @@
         <?php if ($isEdit ?? false): ?>
             <button type="submit" class="btn btn-success">Update</button>
         <?php else: ?>
-            <button type="reset" class="btn btn-danger mr-3">Reset</button>
             <button type="submit" class="btn btn-success">Simpan</button>
         <?php endif; ?>
     </div>

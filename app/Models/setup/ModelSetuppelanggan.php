@@ -12,36 +12,32 @@ class ModelSetuppelanggan extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe', 'saldo', 'saldo_awal'];
+    protected $allowedFields    = ['kode_pelanggan', 'nama_pelanggan', 'alamat_pelanggan', 'kota_pelanggan', 'telp_pelanggan', 'plafond', 'npwp', 'class_pelanggan', 'tipe'];
 
+    public function getAllPelanggan()
+    {
+        $builder = $this->db->table('setuppelanggan1 s');
+        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo');
+        $builder->join(
+            'piutang p',
+            "s.id_pelanggan = p.id_relasional AND p.relasi_tipe = 'pelanggan'",
+            'left'
+        );
+        $builder->groupBy('s.id_pelanggan');
 
-    // protected bool $allowEmptyInserts = false;
-    // protected bool $updateOnlyChanged = true;
+        $query = $builder->get();
+        return $query->getResult();
+    }
 
-    // protected array $casts = [];
-    // protected array $castHandlers = [];
-
-    // // Dates
-    // protected $useTimestamps = false;
-    // protected $dateFormat    = 'datetime';
-    // protected $createdField  = 'created_at';
-    // protected $updatedField  = 'updated_at';
-    // protected $deletedField  = 'deleted_at';
-
-    // // Validation
-    // protected $validationRules      = [];
-    // protected $validationMessages   = [];
-    // protected $skipValidation       = false;
-    // protected $cleanValidationRules = true;
-
-    // // Callbacks
-    // protected $allowCallbacks = true;
-    // protected $beforeInsert   = [];
-    // protected $afterInsert    = [];
-    // protected $beforeUpdate   = [];
-    // protected $afterUpdate    = [];
-    // protected $beforeFind     = [];
-    // protected $afterFind      = [];
-    // protected $beforeDelete   = [];
-    // protected $afterDelete    = [];
+    public function getPelangganById($id)
+    {
+        // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
+        $builder = $this->db->table('setuppelanggan1 s');
+        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo');
+        $builder->join('piutang p', "s.id_pelanggan = p.id_relasional AND p.relasi_tipe = 'pelanggan'", 'left');
+        $builder->where('s.id_pelanggan', $id);
+        $builder->groupBy('s.id_pelanggan');
+        $query = $builder->get();
+        return $query->getRow();
+    }
 }

@@ -107,12 +107,6 @@
             <!-- INI CARA MEMANGGIL MENU -->
             <?= $this->include("layout/menu") ?>
           </ul>
-
-          <div class="mt-2 mb-2 p-3 hide-sidebar-mini">
-            <a href="https://getstisla.com/docs" class="btn btn-primary btn-lg btn-block btn-icon-split">
-              <i class="fas fa-rocket"></i> Documentation
-            </a>
-          </div>
         </aside>
       </div>
 
