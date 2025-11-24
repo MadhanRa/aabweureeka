@@ -63,7 +63,7 @@ table thead>tr>th.sorting_desc::after {
 
 .col-dis1r,
 .col-dis2r {
-  min-width: 90px;
+  min-width: 100px;
 }
 
 .col-total {
