@@ -27,6 +27,53 @@ table thead>tr>th.sorting_desc::after {
   padding: 0.1rem;
 }
 
+/* Ukuran kolom */
+.col-stock {
+  width: 100px;
+  min-width: 100px;
+}
+
+.col-nama {
+  min-width: 200px;
+}
+
+.col-satuan {
+  width: 100px;
+  min-width: 80px;
+}
+
+.col-hrg {
+  min-width: 120px;
+}
+
+.col-qty1,
+.col-qty2 {
+  width: 80px;
+  min-width: 70px;
+}
+
+.col-jmlhrg {
+  min-width: 120px;
+}
+
+.col-dis1p,
+.col-dis2p {
+  width: 60px;
+}
+
+.col-dis1r,
+.col-dis2r {
+  min-width: 90px;
+}
+
+.col-total {
+  min-width: 120px;
+}
+
+.col-action {
+  width: 60px;
+}
+
 .form-container {
   max-width: 600px;
   margin: 0 auto;

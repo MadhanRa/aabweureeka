@@ -87,21 +87,22 @@
                 <table class="table table-bordered table-sm w-100" id="tabelDetail">
                     <thead>
                         <tr>
-                            <th style="width: 100px; min-width: 100px">Stock#</th>
-                            <th style="width: auto; min-width: 200px;">Nama Stock</th>
-                            <th style="width: 100px; min-width: 80px">Satuan</th>
-                            <th style="min-width: 120px;">Hrg.Sat</th>
-                            <th style="width: 60px; min-width: 50px">Qty1</th>
-                            <th style="width: 60px; min-width: 50px;">Qty2</th>
-                            <th style="min-width: 130px;">Jml.Harga</th>
-                            <th style="width: 60px;">Dis.1(%)</th>
-                            <th style="min-width: 100px;">Dis.1(Rp.)</th>
-                            <th style="width: 60px;">Dis.2(%)</th>
-                            <th style="min-width: 100px;">Dis.2(Rp.)</th>
-                            <th style="min-width: 130px;">Total</th>
-                            <th>Action</th>
+                            <th class="col-stock">Stock#</th>
+                            <th class="col-nama">Nama Stock</th>
+                            <th class="col-satuan">Satuan</th>
+                            <th class="col-hrg">Hrg.Sat</th>
+                            <th class="col-qty1">Qty1</th>
+                            <th class="col-qty2">Qty2</th>
+                            <th class="col-jmlhrg">Jml.Harga</th>
+                            <th class="col-dis1p">Dis.1(%)</th>
+                            <th class="col-dis1r">Dis.1(Rp.)</th>
+                            <th class="col-dis2p">Dis.2(%)</th>
+                            <th class="col-dis2r">Dis.2(Rp.)</th>
+                            <th class="col-total">Total</th>
+                            <th class="col-action">Action</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php if (isset($dtdetail) && $dtdetail): ?>
                             <?php foreach ($dtdetail as $key => $value) : ?>
