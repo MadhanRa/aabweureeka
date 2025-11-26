@@ -21,32 +21,20 @@ class LaporanHutangSupplierDaftar extends BaseController
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : date('Y-m-01');
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : date('Y-m-d');
 
         // Panggil model untuk mendapatkan data laporan
         $riwayat_hutang = $this->objRiwayatHutang->get_laporan_daftar($tglawal, $tglakhir);
         $riwayat_hutang_summary = $this->objRiwayatHutang->get_laporan_summary_daftar($tglawal, $tglakhir);
 
-        $saldo_awal_total = 0;
-        $debit_total = 0;
-        $kredit_total = 0;
-        $saldo_akhir_total = 0;
-
-        foreach ($riwayat_hutang_summary as $row) {
-            $saldo_awal_total += isset($row->saldo_awal) ? floatval($row->saldo_awal) : 0;
-            $debit_total += floatval($row->debit);
-            $kredit_total += floatval($row->kredit);
-            $saldo_akhir_total +=  floatval($row->saldo);
-        }
-
         // Ambil data tambahan untuk dropdown filter
         $data = [
             'dtdaftar_hutang'    => $riwayat_hutang,
-            'saldo_awal_total'      => $saldo_awal_total,
-            'debit_total'       => $debit_total,
-            'kredit_total'  => $kredit_total,
-            'saldo_akhir_total'       => $saldo_akhir_total,
+            'saldo_awal_total'      => $riwayat_hutang_summary->saldo_awal,
+            'debit_total'       => $riwayat_hutang_summary->debit,
+            'kredit_total'  => $riwayat_hutang_summary->kredit,
+            'saldo_akhir_total'       => $riwayat_hutang_summary->saldo_akhir,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
         ];

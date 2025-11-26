@@ -6,6 +6,10 @@
 
 <?= $this->section("content") ?>
 
+<?php
+$saldo = $saldo_awal_total;
+?>
+
 <section class="section">
   <div class="section-header">
     <h1>Kartu Hutang Usaha Supplier</h1>
@@ -39,8 +43,8 @@
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="col-md-3">
-            <button type="submit" class="btn btn-primary mt-4">Filter</button>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
           </div>
         </div>
       </form>
@@ -60,7 +64,9 @@
           </thead>
           <tbody>
             <!-- Iterasi Data -->
-            <?php foreach ($dtkartu_hutang as $key => $value) : ?>
+            <?php foreach ($dtkartu_hutang as $key => $value) :
+              $saldo = $saldo + $value->kredit - $value->debit;
+            ?>
               <tr>
                 <td><?= $key + 1 ?></td>
                 <td><?= $value->tanggal ?></td>
@@ -68,7 +74,7 @@
                 <td><?= $value->deskripsi ?></td>
                 <td><?= "Rp " . number_format($value->debit, 0, ',', '.') ?></td>
                 <td><?= "Rp " . number_format($value->kredit, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->saldo_setelah, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($saldo, 0, ',', '.') ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>

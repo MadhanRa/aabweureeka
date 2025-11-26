@@ -11,120 +11,167 @@ class ModelRiwayatHutang extends Model
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['id_hutang', 'tanggal', 'jenis_transaksi', 'nota', 'nominal', 'saldo_setelah', 'deskripsi'];
-
-    protected $useTimestamps    = true;
-    protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
+    protected $allowedFields    = [
+        'id_hutang',
+        'id_setupsupplier',
+        'tanggal',
+        'jenis_transaksi',
+        'nota',
+        'debit',
+        'kredit',
+        'deskripsi'
+    ];
 
     public function get_laporan($tglawal = '', $tglakhir = '', $supplier = '')
     {
-        $builder = $this->db->table('riwayat_transaksi_hutang rh');
+        $builder = $this->db->table('riwayat_transaksi_hutang');
 
-        $builder->select('rh.*, sp.nama, sp.saldo_awal');
-        $builder->join('setupsupplier1 AS sp', 'rh.id_setupsupplier = sp.id_setupsupplier', 'inner');
+        $builder->select('tanggal, nota, deskripsi, debit, kredit');
 
         // Filter tanggal
         if (!empty($tglawal)) {
-            $builder->where('rh.tanggal >=', $tglawal);
+            $builder->where('tanggal >=', $tglawal);
         }
         if (!empty($tglakhir)) {
-            $builder->where('rh.tanggal <=', $tglakhir);
+            $builder->where('tanggal <=', $tglakhir);
         }
 
         // Filter hanya untuk supplier
         if (!empty($supplier)) {
-            $builder->where('sp.id_setupsupplier', $supplier);
+            $builder->where('id_setupsupplier', $supplier);
         }
 
-        $builder->orderBy('rh.tanggal', 'ASC');
+        $builder->orderBy('tanggal', 'ASC');
+        $builder->orderBy('id_riwayat_hutang', 'ASC');
         return $builder->get()->getResult();
     }
 
     public function get_laporan_summary($tglawal = '', $tglakhir = '', $supplier = '')
     {
-        $builder = $this->db->table('riwayat_transaksi_hutang rh');
+        $builder = $this->db->table($this->table);
 
-        $builder->select('sp.nama,
-                          sp.saldo_awal,
-                          sp.saldo,
-                          SUM(rh.debit) AS debit, 
-                          SUM(rh.kredit) AS kredit');
+        $select = "
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal < '{$tglawal}'" : "0") . " 
+                THEN kredit - debit 
+                ELSE 0
+            END
+        ),0) AS saldo_awal,
 
-        $builder->join('setupsupplier1 AS sp', 'rh.id_setupsupplier = sp.id_setupsupplier', 'inner');
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN debit 
+                ELSE 0
+            END
+        ),0) AS total_debit,
 
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rh.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rh.tanggal <=', $tglakhir);
-        }
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN kredit 
+                ELSE 0
+            END
+        ),0) AS total_kredit
+    ";
+
+        $builder->select($select, false);
 
         // Filter supplier
         if (!empty($supplier)) {
-            $builder->where('sp.id_setupsupplier', $supplier);
+            $builder->where('id_setupsupplier', $supplier);
         }
 
-        $builder->groupBy(
-            'sp.nama, sp.saldo_awal, sp.saldo'
-        );
+        $row = $builder->get()->getRow();
 
-        return $builder->get()->getResult();
+        // hitung saldo akhir
+        $saldo_awal = (float) ($row->saldo_awal ?? 0);
+        $total_debit = (float) ($row->total_debit ?? 0);
+        $total_kredit = (float) ($row->total_kredit ?? 0);
+        $saldo_akhir = $saldo_awal + $total_kredit - $total_debit;
+
+        return (object) [
+            'saldo_awal' => $saldo_awal,
+            'debit' => $total_debit,
+            'kredit' => $total_kredit,
+            'saldo_akhir' => $saldo_akhir,
+        ];
     }
 
     public function get_laporan_daftar($tglawal = '', $tglakhir = '')
     {
         $builder = $this->db->table('setupsupplier1 ss');
 
-        $builder->select('
+        $builder->select("
+            ss.id_setupsupplier,
             ss.kode, 
             ss.nama,
-            ss.saldo_awal,
-            SUM(rh.debit) AS debit,
-            SUM(rh.kredit) AS kredit,
-            ss.saldo
-        ');
+            SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END) AS saldo_awal,
+            SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END) AS debit,
+            SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END) AS kredit,
+            (SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END)
+            + SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END)
+            - SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END)
+            ) AS saldo
+        ");
         $builder->join('riwayat_transaksi_hutang AS rh', 'ss.id_setupsupplier = rh.id_setupsupplier', 'left');
 
+
+        $builder->groupBy('ss.id_setupsupplier');
+
         // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rh.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rh.tanggal <=', $tglakhir);
-        }
 
-        $builder->groupBy('ss.id_setupsupplier, ss.kode, ss.nama, ss.saldo_awal, ss.saldo');
-
-        $builder->orderBy('ss.id_setupsupplier', 'ASC');
+        $builder->orderBy('ss.nama', 'ASC');
         return $builder->get()->getResult();
     }
 
     public function get_laporan_summary_daftar($tglawal = '', $tglakhir = '')
     {
-        $builder = $this->db->table('setupsupplier1 ss');
+        $builder = $this->db->table($this->table);
 
-        $builder->select('ss.nama,
-                          ss.saldo_awal,
-                          ss.saldo,
-                          SUM(rh.debit) AS debit, 
-                          SUM(rh.kredit) AS kredit');
+        $select = "
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal < '{$tglawal}'" : "0") . " 
+                THEN kredit - debit 
+                ELSE 0
+            END
+        ),0) AS saldo_awal,
 
-        $builder->join('riwayat_transaksi_hutang AS rh', 'ss.id_setupsupplier =rh.id_setupsupplier', 'left');
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN debit 
+                ELSE 0
+            END
+        ),0) AS total_debit,
 
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rh.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rh.tanggal <=', $tglakhir);
-        }
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN kredit 
+                ELSE 0
+            END
+        ),0) AS total_kredit
+    ";
 
+        $builder->select($select, false);
 
-        $builder->groupBy('ss.nama, ss.saldo_awal, ss.saldo');
+        $row = $builder->get()->getRow();
 
-        return $builder->get()->getResult();
+        // hitung saldo akhir
+        $saldo_awal = (float) ($row->saldo_awal ?? 0);
+        $total_debit = (float) ($row->total_debit ?? 0);
+        $total_kredit = (float) ($row->total_kredit ?? 0);
+        $saldo_akhir = $saldo_awal + $total_kredit - $total_debit;
+
+        return (object) [
+            'saldo_awal' => $saldo_awal,
+            'debit' => $total_debit,
+            'kredit' => $total_kredit,
+            'saldo_akhir' => $saldo_akhir,
+        ];
     }
 
     public function get_laporan_daftar_nota($tglawal = '', $tglakhir = '')

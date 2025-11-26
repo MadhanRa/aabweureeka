@@ -4,8 +4,7 @@
             <th>Tanggal</th>
             <th>Nota</th>
             <th>Tanggal. JT</th>
-            <th>Nominal</th>
-            <th>Saldo Setelah</th>
+            <th>Saldo</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -18,8 +17,7 @@
                 <td><?= $data->tanggal ?></td>
                 <td><?= $data->nota ?></td>
                 <td><?= $data->tgl_jatuhtempo ?></td>
-                <td>Rp <?= number_format((float)$data->nominal, 0, ',', '.') ?></td>
-                <td>Rp <?= number_format((float)$data->saldo_setelah, 0, ',', '.') ?></td>
+                <td>Rp <?= number_format((float)$data->saldo, 0, ',', '.') ?></td>
 
                 <td class="text-center">
                     <!-- Tombol Edit Data -->

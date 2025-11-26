@@ -14,18 +14,17 @@ class ModelSetupsupplier extends Model
     // protected $protectFields    = true;
     protected $allowedFields    = ['kode', 'nama', 'alamat', 'telepon', 'contact_person', 'npwp', 'tanggal', 'tipe'];
 
-    public function getAll()
-    {
-        return $this->findAll();
-    }
-
     public function getAllSupplier()
     {
-        // Mengambil semua data supplier dari tabel setupsupplier1 dan hutang
-        $builder = $this->db->table('setupsupplier1 s');
-        $builder->select('s.*, IFNULL(SUM(h.saldo), 0) AS saldo');
-        $builder->join('hutang h', 's.id_setupsupplier = h.id_setupsupplier', 'left');
+        // Mengambil semua data supplier dari tabel setupsupplier1 dan riwayat transaksi hutang
+        $builder = $this->db->table($this->table . ' s');
+        $builder->select('
+            s.*,
+            COALESCE(SUM(hd.kredit - hd.debit), 0) AS saldo
+        ');
+        $builder->join('riwayat_transaksi_hutang hd', 's.id_setupsupplier = hd.id_setupsupplier', 'left');
         $builder->groupBy('s.id_setupsupplier');
+        $builder->orderBy('s.nama', 'ASC');
         $query = $builder->get();
         return $query->getResult();
     }
@@ -33,10 +32,12 @@ class ModelSetupsupplier extends Model
     public function getSupplierById($id)
     {
         // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
-        $builder = $this->db->table('setupsupplier1 s');
-        $builder->select('s.*, IFNULL(SUM(h.saldo), 0)
-                    AS saldo');
-        $builder->join('hutang h', 's.id_setupsupplier = h.id_setupsupplier', 'left');
+        $builder = $this->db->table($this->table . ' s');
+        $builder->select('
+            s.*,
+            COALESCE(SUM(hd.kredit - hd.debit), 0) AS saldo
+        ');
+        $builder->join('riwayat_transaksi_hutang hd', 's.id_setupsupplier = hd.id_setupsupplier', 'left');
         $builder->where('s.id_setupsupplier', $id);
         $builder->groupBy('s.id_setupsupplier');
         $query = $builder->get();

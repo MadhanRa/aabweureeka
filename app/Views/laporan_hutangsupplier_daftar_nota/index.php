@@ -43,8 +43,8 @@
               <th>No</th>
               <th>Supplier#</th>
               <th>Nama Supplier</th>
-              <th>Tgl.Jual</th>
-              <th>Nota.Jual</th>
+              <th>Tgl.Beli</th>
+              <th>Nota.Beli</th>
               <th>Tgl.JT</th>
               <th>Awal</th>
               <th>Debet</th>
@@ -62,7 +62,7 @@
                 <td><?= $value->tanggal ?></td>
                 <td><?= $value->nota ?></td>
                 <td><?= $value->tgl_jatuhtempo ?></td>
-                <td><?= "Rp " . number_format($value->saldo_awal, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format((float) $value->awal, 0, ',', '.') ?></td>
                 <td><?= "Rp " . number_format($value->debit, 0, ',', '.') ?></td>
                 <td><?= "Rp " . number_format($value->kredit, 0, ',', '.') ?></td>
                 <td><?= "Rp " . number_format($value->saldo, 0, ',', '.') ?></td>

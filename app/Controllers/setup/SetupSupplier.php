@@ -3,22 +3,22 @@
 namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetupsupplier;
-use App\Models\setup\ModelHutangPiutang;
 use App\Models\transaksi\ModelHutang;
+use App\Models\transaksi\ModelRiwayatHutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupSupplier extends ResourceController
 {
     protected $supplierModel;
-    protected $hutangPiutangModel;
     protected $hutangModel;
+    protected $riwayatHutangModel;
     protected $db;
     function __construct()
     {
         $this->supplierModel = new ModelSetupsupplier();
-        $this->hutangPiutangModel = new ModelHutangPiutang();
         $this->hutangModel = new ModelHutang();
+        $this->riwayatHutangModel = new ModelRiwayatHutang();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -163,7 +163,7 @@ class SetupSupplier extends ResourceController
 
     public function getHutang($id = null)
     {
-        $data['dthutang'] = $this->hutangModel->getHutangBySupplier($id);
+        $data['dthutang'] = $this->hutangModel->getRiwayatHutangBySupplier($id);
         if ($this->request->isAJAX()) {
             $msg = [
                 'data' => view('setup/supplier/hutang/data_hutang', $data)
@@ -195,26 +195,29 @@ class SetupSupplier extends ResourceController
 
                 $data = [
                     'id_setupsupplier' => $id,
-                    'nota' => $this->request->getVar('nota'),
+                    'nota' => $this->request->getVar('nota') ?? '',
                     'sumber' => 'manual',
                     'tanggal' => $this->request->getVar('tanggal'),
                     'tgl_jatuhtempo' => $this->request->getVar('tanggal_jt'),
-                    'nominal' => $this->request->getVar('saldo'),
                     'saldo' => $this->request->getVar('saldo'),
+                    'status' => 'open',
+                    'ref_transaksi' => null,
                 ];
+
                 $idHutang = $this->hutangModel->insert($data);
-                // Masukkan data ke dalam tabel
+                // Masukkan data ke dalam tabel riwayat hutang
                 if ($idHutang) {
                     $updatedSaldo = $this->hutangModel->getSaldoHutangBySupplier($id) + $nominalHutang;
 
                     // Simpan data riwayat transaksi hutang
                     $riwayatData = [
                         'id_hutang' => $idHutang,
+                        'id_setupsupplier' => $id,
                         'tanggal' => $this->request->getVar('tanggal'),
                         'jenis_transaksi' => 'manual',
-                        'nota' => $this->request->getVar('nota'),
-                        'nominal' => $this->request->getVar('saldo'),
-                        'saldo_setelah' => $updatedSaldo,
+                        'nota' => $this->request->getVar('nota') ?? '',
+                        'debit' => 0,
+                        'kredit' => $this->request->getVar('saldo'),
                         'deskripsi' => 'Penambahan hutang manual',
                     ];
 
