@@ -26,15 +26,15 @@ class LaporanHutangSupplierDaftarNota extends BaseController
 
         // Panggil model untuk mendapatkan data laporan
         $riwayat_hutang = $this->modelHutang->getDaftarHutangPerNota($tglawal, $tglakhir);
-        $riwayat_hutang_summary = $this->objRiwayatHutang->get_laporan_summary_daftar($tglawal, $tglakhir);
+        $riwayat_hutang_summary = $this->modelHutang->getTotalHutangPerNota($tglawal, $tglakhir);
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
             'dtdaftar_hutang'    => $riwayat_hutang,
-            'saldo_awal_total'      => $riwayat_hutang_summary->saldo_awal,
+            'saldo_awal_total'      => $riwayat_hutang_summary->awal,
             'debit_total'       => $riwayat_hutang_summary->debit,
             'kredit_total'  => $riwayat_hutang_summary->kredit,
-            'saldo_akhir_total'       => $riwayat_hutang_summary->saldo_akhir,
+            'saldo_akhir_total'       => $riwayat_hutang_summary->saldo,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
         ];

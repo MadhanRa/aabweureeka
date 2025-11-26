@@ -91,4 +91,38 @@ class ModelHutang extends Model
         $builder->orderBy('h.tanggal', 'ASC');
         return $builder->get()->getResult();
     }
+
+    public function getTotalHutangPerNota($tgl_awal = '', $tgl_akhir = '', $supplier = '')
+    {
+        $builder = $this->db->table('hutang h');
+        $builder->select("
+        COALESCE(SUM(h.total_hutang), 0) AS total_awal,
+        COALESCE(SUM(rth.debit), 0) AS total_debit,
+        COALESCE(SUM(rth.kredit), 0) AS total_kredit,
+        COALESCE(SUM(h.total_hutang + (rth.kredit - rth.debit)), 0) AS total_saldo
+    ", false);
+
+        $builder->join('riwayat_transaksi_hutang rth', 'h.id_hutang = rth.id_hutang', 'left');
+
+        if (!empty($tgl_awal)) {
+            $builder->where('h.tanggal >=', $tgl_awal);
+        }
+
+        if (!empty($tgl_akhir)) {
+            $builder->where('h.tanggal <=', $tgl_akhir);
+        }
+
+        if (!empty($supplier)) {
+            $builder->where('h.id_setupsupplier', $supplier);
+        }
+
+        $row = $builder->get()->getRow();
+
+        return (object)[
+            'awal'       => (float) ($row->total_awal ?? 0),
+            'debit'      => (float) ($row->total_debit ?? 0),
+            'kredit'     => (float) ($row->total_kredit ?? 0),
+            'saldo'      => (float) ($row->total_saldo ?? 0),
+        ];
+    }
 }
