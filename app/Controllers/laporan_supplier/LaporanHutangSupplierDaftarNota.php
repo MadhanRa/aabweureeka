@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\laporan_supplier;
 
 use App\Models\transaksi\ModelRiwayatHutang;
 use App\Models\transaksi\ModelHutang;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Controllers\BaseController;
 use TCPDF;
 
 class LaporanHutangSupplierDaftarNota extends BaseController
@@ -12,12 +13,15 @@ class LaporanHutangSupplierDaftarNota extends BaseController
     protected $objRiwayatHutang;
     protected $modelHutang;
     protected $db;
+    protected $view_path;
     function __construct()
     {
         $this->objRiwayatHutang = new ModelRiwayatHutang();
         $this->modelHutang = new ModelHutang();
         $this->db = \Config\Database::connect();
+        $this->view_path = "laporan/laporan_supplier/";
     }
+
 
     public function index()
     {
@@ -39,7 +43,7 @@ class LaporanHutangSupplierDaftarNota extends BaseController
             'tglakhir'       => $tglakhir,
         ];
 
-        return view('laporan_hutangsupplier_daftar_nota/index', $data);
+        return view($this->view_path . 'laporan_hutangsupplier_daftar_nota/index', $data);
     }
 
     public function printPDF()

@@ -349,31 +349,36 @@ $routes->get('/laporandaftarpiutangusahanota/printPDF', 'LaporanPiutangUsahaDaft
 $routes->get('/laporanumurpiutang', 'LaporanPiutangUsahaUmur::index');
 $routes->get('/laporanumurpiutang/printPDF', 'LaporanPiutangUsahaUmur::printPDF');
 
+$router->group('', ['namespace' => 'App\Controllers\laporan_salesman'], function ($routes) {
+    //laporan kartu piutang salesman
+    $routes->get('/laporankartupiutangsalesman', 'LaporanPiutangSalesmanKartu::index');
+    $routes->get('/laporankartupiutangsalesman/printPDF', 'LaporanPiutangSalesmanKartu::printPDF');
 
-//laporan kartu piutang salesman
-$routes->get('/laporankartupiutangsalesman', 'LaporanPiutangSalesmanKartu::index');
-$routes->get('/laporankartupiutangsalesman/printPDF', 'LaporanPiutangSalesmanKartu::printPDF');
+    //laporan daftar piutang salesman
+    $routes->get('/laporandaftarpiutangsalesman', 'LaporanPiutangSalesmanDaftar::index');
+    $routes->get('/laporandaftarpiutangsalesman/printPDF', 'LaporanPiutangSalesmanDaftar::printPDF');
 
-//laporan daftar piutang salesman
-$routes->get('/laporandaftarpiutangsalesman', 'LaporanPiutangSalesmanDaftar::index');
-$routes->get('/laporandaftarpiutangsalesman/printPDF', 'LaporanPiutangSalesmanDaftar::printPDF');
+    //laporan daftar piutang salesman nota
+    $routes->get('/laporandaftarpiutangsalesmannota', 'LaporanPiutangSalesmanDaftarNota::index');
+    $routes->get('/laporandaftarpiutangsalesmannota/printPDF', 'LaporanPiutangSalesmanDaftarNota::printPDF');
+});
 
-//laporan daftar piutang salesman nota
-$routes->get('/laporandaftarpiutangsalesmannota', 'LaporanPiutangSalesmanDaftarNota::index');
-$routes->get('/laporandaftarpiutangsalesmannota/printPDF', 'LaporanPiutangSalesmanDaftarNota::printPDF');
+$routes->group('', ['namespace' => 'App\Controllers\laporan_supplier'], function ($routes) {
+    //laporan kartu hutang supplier
+    $routes->get('/laporankartuhutangsupplier', 'LaporanHutangSupplierKartu::index');
+    $routes->get('/laporankartuhutangsupplier/printPDF', 'LaporanHutangSupplierKartu::printPDF');
+
+    //laporan daftar hutang supplier
+    $routes->get('/laporandaftarhutangsupplier', 'LaporanHutangSupplierDaftar::index');
+    $routes->get('/laporandaftarhutangsupplier/printPDF', 'LaporanHutangSupplierDaftar::printPDF');
+
+    //laporan daftar hutang supplier per nota
+    $routes->get('/laporandaftarhutangsuppliernota', 'LaporanHutangSupplierDaftarNota::index');
+    $routes->get('/laporandaftarhutangsuppliernota/printPDF', 'LaporanHutangSupplierDaftarNota::printPDF');
+});
 
 
-//laporan kartu hutang supplier
-$routes->get('/laporankartuhutangsupplier', 'LaporanHutangSupplierKartu::index');
-$routes->get('/laporankartuhutangsupplier/printPDF', 'LaporanHutangSupplierKartu::printPDF');
 
-//laporan daftar hutang supplier
-$routes->get('/laporandaftarhutangsupplier', 'LaporanHutangSupplierDaftar::index');
-$routes->get('/laporandaftarhutangsupplier/printPDF', 'LaporanHutangSupplierDaftar::printPDF');
-
-//laporan daftar hutang supplier per nota
-$routes->get('/laporandaftarhutangsuppliernota', 'LaporanHutangSupplierDaftarNota::index');
-$routes->get('/laporandaftarhutangsuppliernota/printPDF', 'LaporanHutangSupplierDaftarNota::printPDF');
 
 //laporan kartu stock
 $routes->get('/laporankartustock', 'LaporanStockKartu::index');

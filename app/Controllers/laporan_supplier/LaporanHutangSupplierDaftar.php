@@ -1,61 +1,48 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\laporan_supplier;
 
-use App\Models\setup\ModelSetupsalesman;
-use App\Models\transaksi\ModelRiwayatPiutang;
+use App\Models\setup\ModelSetupsupplier;
+use App\Models\transaksi\ModelRiwayatHutang;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Controllers\BaseController;
 use TCPDF;
 
-class LaporanPiutangSalesmanKartu extends BaseController
+class LaporanHutangSupplierDaftar extends BaseController
 {
-    protected $objSetupSalesman;
-    protected $objRiwayatPiutang;
+    protected $objSetupSupplier;
+    protected $objRiwayatHutang;
     protected $db;
+    protected $view_path;
     function __construct()
     {
-        $this->objSetupSalesman = new ModelSetupsalesman();
-        $this->objRiwayatPiutang = new ModelRiwayatPiutang();
+        $this->objSetupSupplier = new ModelSetupsupplier();
+        $this->objRiwayatHutang = new ModelRiwayatHutang();
         $this->db = \Config\Database::connect();
+        $this->view_path = "laporan/laporan_supplier/";
     }
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
-        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
+        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : date('Y-m-01');
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : date('Y-m-d');
 
         // Panggil model untuk mendapatkan data laporan
-        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_salesman($tglawal, $tglakhir, $salesman);
-        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary_salesman($tglawal, $tglakhir, $salesman);
-
-
-        $saldo_awal_total = 0;
-        $debit_total = 0;
-        $kredit_total = 0;
-        $saldo_akhir_total = 0;
-
-        foreach ($riwayat_piutang_summary as $row) {
-            $saldo_awal_total += isset($row->saldo_awal) ? floatval($row->saldo_awal) : 0;
-            $debit_total += floatval($row->debit);
-            $kredit_total += floatval($row->kredit);
-            $saldo_akhir_total +=  floatval($row->saldo);
-        }
+        $riwayat_hutang = $this->objRiwayatHutang->get_laporan_daftar($tglawal, $tglakhir);
+        $riwayat_hutang_summary = $this->objRiwayatHutang->get_laporan_summary_daftar($tglawal, $tglakhir);
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
-            'dtkartu_piutang'    => $riwayat_piutang,
-            'saldo_awal_total'      => $saldo_awal_total,
-            'debit_total'       => $debit_total,
-            'kredit_total'  => $kredit_total,
-            'saldo_akhir_total'       => $saldo_akhir_total,
+            'dtdaftar_hutang'    => $riwayat_hutang,
+            'saldo_awal_total'      => $riwayat_hutang_summary->saldo_awal,
+            'debit_total'       => $riwayat_hutang_summary->debit,
+            'kredit_total'  => $riwayat_hutang_summary->kredit,
+            'saldo_akhir_total'       => $riwayat_hutang_summary->saldo_akhir,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'dtsalesman'     => $this->objSetupSalesman->findAll(),
         ];
 
-        return view('laporan_piutangsalesman_kartu/index', $data);
+        return view($this->view_path . 'laporan_hutangsupplier_daftar/index', $data);
     }
 
     public function printPDF()

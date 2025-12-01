@@ -1,32 +1,37 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\laporan_salesman;
 
 use App\Models\setup\ModelSetupsalesman;
 use App\Models\transaksi\ModelRiwayatPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Controllers\BaseController;
 use TCPDF;
 
-class LaporanPiutangSalesmanDaftar extends BaseController
+class LaporanPiutangSalesmanKartu extends BaseController
 {
     protected $objSetupSalesman;
     protected $objRiwayatPiutang;
     protected $db;
+    protected $view_path;
     function __construct()
     {
         $this->objSetupSalesman = new ModelSetupsalesman();
         $this->objRiwayatPiutang = new ModelRiwayatPiutang();
         $this->db = \Config\Database::connect();
+        $this->view_path = "laporan/laporan_salesman/";
     }
 
     public function index()
     {
         $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
         $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
 
         // Panggil model untuk mendapatkan data laporan
-        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar_salesman($tglawal, $tglakhir);
-        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary_daftar_salesman($tglawal, $tglakhir);
+        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_salesman($tglawal, $tglakhir, $salesman);
+        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary_salesman($tglawal, $tglakhir, $salesman);
+
 
         $saldo_awal_total = 0;
         $debit_total = 0;
@@ -42,16 +47,18 @@ class LaporanPiutangSalesmanDaftar extends BaseController
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
-            'dtdaftar_piutang'    => $riwayat_piutang,
+            'dtkartu_piutang'    => $riwayat_piutang,
             'saldo_awal_total'      => $saldo_awal_total,
             'debit_total'       => $debit_total,
             'kredit_total'  => $kredit_total,
             'saldo_akhir_total'       => $saldo_akhir_total,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
+            'salesman'       => $salesman,
+            'dtsalesman'     => $this->objSetupSalesman->findAll(),
         ];
 
-        return view('laporan_piutangsalesman_daftar/index', $data);
+        return view($this->view_path . 'laporan_piutangsalesman_kartu/index', $data);
     }
 
     public function printPDF()
