@@ -24,7 +24,7 @@
                     <tr>
                         <td><strong>Saldo</strong></td>
                         <td>:</td>
-                        <td id="saldo-detail"><strong><?= 'Rp ' . number_format($dtsalesman->saldo, 0, ',', '.') ?></strong></td>
+                        <td class="saldo-detail-<?= $dtsalesman->id_salesman ?>"><strong><?= 'Rp ' . number_format($dtsalesman->saldo, 0, ',', '.') ?></strong></td>
                     </tr>
                 </table>
             </div>
@@ -53,7 +53,7 @@
     </div>
     <div class="form-group">
         <label>Tanggal Jatuh Tempo</label>
-        <input type="date" class="form-control" name="tanggal_jt" placeholder="Tanggal JT" required>
+        <input type="date" class="form-control" name="tgl_jatuhtempo" placeholder="Tanggal JT" required>
     </div>
     <div class="form-group">
         <label>Saldo</label>
@@ -94,7 +94,7 @@
                                         maximumFractionDigits: 0,
                                         useGrouping: true
                                     }).format(response.updatedSaldo);
-                                $('#saldo-detail').text(formattedSaldo);
+                                $('.saldo-detail-' + response.id).text(formattedSaldo);
                             }
 
                             form.stopProgress();

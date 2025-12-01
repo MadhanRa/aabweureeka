@@ -15,37 +15,44 @@ class ModelPiutang extends Model
         'id_relasional',
         'relasi_tipe',
         'sumber',
+        'nota',
+        'ref_transaksi',
         'tanggal',
         'tgl_jatuhtempo',
-        'nominal',
-        'saldo'
+        'total_piutang',
+        'status'
     ];
 
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';
-    protected $updatedField     = 'updated_at';
+    protected $updatedField     = '';
 
     public function getRiwayatPiutangById($id_relasional, $tipe)
     {
-        // Mengambil semua data riwayat piutang berdasarkan id relasional dengan jatuh tempo
-        return $this->db->table('riwayat_transaksi_piutang AS rwp')
-            ->select('rwp.*, piutang.tgl_jatuhtempo')
-            ->join('piutang', 'rwp.id_piutang = piutang.id_piutang', 'left')
-            ->where('piutang.id_relasional', $id_relasional)
-            ->where('piutang.relasi_tipe', $tipe)
-            ->get()
-            ->getResult();
+        $builder = $this->db->table($this->table . ' p');
+        $builder->select("
+            p.id_piutang,
+            p.nota,
+            p.tanggal,
+            p.tgl_jatuhtempo,
+            p.total_piutang + COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo
+        ")
+            ->join('riwayat_transaksi_piutang rtp', 'p.id_piutang = rtp.id_piutang', 'left')
+            ->where('p.id_relasional', $id_relasional)
+            ->where('p.relasi_tipe', $tipe)
+            ->groupBy('p.id_piutang, p.nota, p.tanggal, p.tgl_jatuhtempo, p.total_piutang');
+        return $builder->get()->getResult();
     }
 
     public function getSaldoPiutangById($id_relasional, $tipe)
     {
-        // Menghitung total saldo hutang berdasarkan ID supplier
-        $builder = $this->db->table($this->table);
-        $builder->select('IFNULL(SUM(saldo), 0) AS total_saldo');
-        $builder->where('id_relasional', $id_relasional);
-        $builder->where('relasi_tipe', $tipe);
-        $query = $builder->get();
-        $result = $query->getRow();
-        return $result ? $result->total_saldo : 0;
+        // Menghitung total saldo hutang berdasarkan ID dan tipe
+        $builder = $this->db->table('riwayat_transaksi_piutang rtp');
+        $builder->select("COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo", false)
+            ->where('rtp.id_pelaku', $id_relasional)
+            ->where('rtp.jenis_pelaku', $tipe);
+
+        $row = $builder->get()->getRow();
+        return $row ? (float) $row->saldo : 0;
     }
 }

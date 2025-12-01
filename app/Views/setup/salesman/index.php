@@ -55,7 +55,7 @@
                     <td><?= $value->kode_salesman ?></td>
                     <td><?= $value->nama_salesman ?></td>
                     <td><?= $value->nama_lokasi ?></td>
-                    <td><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
+                    <td class="saldo-detail-<?= $value->id_salesman ?>"><?= 'Rp ' . number_format($value->saldo, 0, ',', '.') ?></td>
 
                     <td class="text-center">
                       <!-- Tombol Detail Data -->

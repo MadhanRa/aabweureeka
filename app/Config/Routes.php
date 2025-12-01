@@ -349,7 +349,7 @@ $routes->get('/laporandaftarpiutangusahanota/printPDF', 'LaporanPiutangUsahaDaft
 $routes->get('/laporanumurpiutang', 'LaporanPiutangUsahaUmur::index');
 $routes->get('/laporanumurpiutang/printPDF', 'LaporanPiutangUsahaUmur::printPDF');
 
-$router->group('', ['namespace' => 'App\Controllers\laporan_salesman'], function ($routes) {
+$routes->group('', ['namespace' => 'App\Controllers\laporan_salesman'], function ($routes) {
     //laporan kartu piutang salesman
     $routes->get('/laporankartupiutangsalesman', 'LaporanPiutangSalesmanKartu::index');
     $routes->get('/laporankartupiutangsalesman/printPDF', 'LaporanPiutangSalesmanKartu::printPDF');

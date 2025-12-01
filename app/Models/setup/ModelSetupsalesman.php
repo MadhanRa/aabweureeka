@@ -16,26 +16,37 @@ class ModelSetupsalesman extends Model
 
     public function getAllSalesman()
     {
-        $builder = $this->db->table('setupsalesman1 s');
-        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo, lokasi1.nama_lokasi');
+        $builder = $this->db->table($this->table . ' s');
+        $builder->select('
+            s.*,
+            COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo,
+            lokasi1.nama_lokasi
+        ');
         $builder->join(
-            'piutang p',
-            "s.id_salesman = p.id_relasional AND p.relasi_tipe = 'salesman'",
+            'riwayat_transaksi_piutang rtp',
+            "s.id_salesman = rtp.id_pelaku AND rtp.jenis_pelaku = 'salesman'",
             'left'
         );
         $builder->join('lokasi1', 'lokasi1.id_lokasi = s.id_lokasi', 'left');
         $builder->groupBy('s.id_salesman');
-
+        $builder->orderBy('s.nama_salesman', 'ASC');
         $query = $builder->get();
         return $query->getResult();
     }
 
     public function getSalesmanById($id)
     {
-        // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
-        $builder = $this->db->table('setupsalesman1 s');
-        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo, lokasi1.nama_lokasi');
-        $builder->join('piutang p', "s.id_salesman = p.id_relasional AND p.relasi_tipe = 'salesman'", 'left');
+        $builder = $this->db->table($this->table . ' s');
+        $builder->select('
+            s.*,
+            COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo,
+            lokasi1.nama_lokasi
+        ');
+        $builder->join(
+            'riwayat_transaksi_piutang rtp',
+            "s.id_salesman = rtp.id_pelaku AND rtp.jenis_pelaku = 'salesman'",
+            'left'
+        );
         $builder->join('lokasi1', 'lokasi1.id_lokasi = s.id_lokasi', 'left');
         $builder->where('s.id_salesman', $id);
         $builder->groupBy('s.id_salesman');

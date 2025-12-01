@@ -74,7 +74,7 @@
                                 maximumFractionDigits: 0,
                                 useGrouping: true
                             }).format(response.updatedSaldo);
-                        $('#saldo-detail').text(formattedSaldo);
+                        $('.saldo-detail-' + response.id).text(formattedSaldo);
                     }
                     reload_table();
                 },

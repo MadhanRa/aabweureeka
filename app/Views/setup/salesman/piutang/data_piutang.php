@@ -16,14 +16,14 @@
             <tr>
                 <td><?= $data->tanggal ?></td>
                 <td><?= $data->nota ?></td>
-                <td><?= $data->tanggal_jt ?></td>
+                <td><?= $data->tgl_jatuhtempo ?></td>
                 <td>Rp <?= number_format((float)$data->saldo, 0, ',', '.') ?></td>
 
                 <td class="text-center">
                     <!-- Tombol Edit Data -->
-                    <button type='button' class="btn btn-warning btn-action mr-1" onclick="edit('<?= $data->id_hutang_piutang ?>')"><i class="fas fa-pencil-alt"></i></button>
+                    <button type='button' class="btn btn-warning btn-action mr-1" onclick="edit('<?= $data->id_piutang ?>')"><i class="fas fa-pencil-alt"></i></button>
                     <!-- Tombol Hapus Data -->
-                    <button type='button' class="btn btn-danger btn-action" onclick="hapus(<?= $data->id_hutang_piutang ?>)">
+                    <button type='button' class="btn btn-danger btn-action" onclick="hapus(<?= $data->id_piutang ?>)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>

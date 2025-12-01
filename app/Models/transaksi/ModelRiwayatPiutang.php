@@ -7,11 +7,21 @@ use CodeIgniter\Model;
 class ModelRiwayatPiutang extends Model
 {
     protected $table            = 'riwayat_transaksi_piutang';
-    protected $primaryKey       = 'id';
+    protected $primaryKey       = 'id_riwayat_piutang';
     protected $returnType       = 'object';
     // protected $useSoftDeletes   = false;
     // protected $protectFields    = true;
-    protected $allowedFields    = ['tanggal', 'pelaku', 'id_transaksi', 'jenis_transaksi', 'nota', 'id_pelaku', 'deskripsi', 'debit', 'kredit', 'saldo_setelah'];
+    protected $allowedFields    = [
+        'id_piutang',
+        'id_pelaku',
+        'jenis_pelaku',
+        'tanggal',
+        'jenis_transaksi',
+        'nota',
+        'debit',
+        'kredit',
+        'deskripsi'
+    ];
 
     protected $useTimestamps    = true;
     protected $createdField     = 'created_at';

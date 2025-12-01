@@ -109,7 +109,6 @@ class SetupSalesman extends ResourceController
             'kode_salesman' => $kodeSetupsalesman,
             'nama_salesman' => $namaSetupsalesman,
             'id_lokasi' => $this->request->getVar('id_lokasi'),
-            'saldo' => '0'
         ];
 
         if ($this->salesmanModel->insert($data)) {
@@ -200,27 +199,29 @@ class SetupSalesman extends ResourceController
                     'id_relasional' => $id,
                     'relasi_tipe' => 'salesman',
                     'sumber' => 'manual',
-                    'tanggal' => $this->request->getVar('tanggal'),
                     'nota' => $this->request->getVar('nota'),
+                    'ref_transaksi' => null,
+                    'tanggal' => $this->request->getVar('tanggal'),
                     'tanggal_jt' => $this->request->getVar('tanggal_jt'),
-                    'nominal' => $nominalPiutang,
-                    'saldo' => $nominalPiutang
+                    'total_piutang' => $nominalPiutang,
+                    'status' => 'open'
                 ];
 
                 $id_piutang = $this->piutangModel->insert($data);
                 // Masukkan data ke dalam tabel
                 if ($id_piutang) {
-                    $updatedSaldo = $this->piutangModel->getSaldoPiutangById($id, 'salesman') + $nominalPiutang;
+                    $updatedSaldo = $this->piutangModel->getSaldoPiutangById($id, 'salesman') + (float)$nominalPiutang;
 
                     // Simpan data riwayat transaksi piutang
                     $riwayatData = [
                         'id_piutang' => $id_piutang,
+                        'id_pelaku' => $id,
+                        'jenis_pelaku' => 'salesman',
                         'tanggal' => $this->request->getVar('tanggal'),
-                        'pelaku' => 'salesman',
                         'jenis_transaksi' => 'manual',
                         'nota' => $this->request->getVar('nota'),
-                        'nominal' => $nominalPiutang,
-                        'saldo_setelah' => $updatedSaldo,
+                        'debit' => 0,
+                        'kredit' => $nominalPiutang,
                         'deskripsi' => 'Penambahan piutang manual',
                     ];
 
@@ -231,6 +232,7 @@ class SetupSalesman extends ResourceController
                     return $this->response->setJSON([
                         'success' => true,
                         'message' => 'Data berhasil disimpan!',
+                        'id' => $id,
                         'updatedSaldo' => $updatedSaldo,
                     ]);
                 } else {
