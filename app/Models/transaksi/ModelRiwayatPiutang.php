@@ -27,113 +27,83 @@ class ModelRiwayatPiutang extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
-    public function get_laporan($tglawal = '', $tglakhir = '', $pelanggan = '')
+    public function get_laporan($tipe = 'pelanggan', $tglawal = '', $tglakhir = '', $id = '')
     {
         $builder = $this->db->table('riwayat_transaksi_piutang rp');
 
-        $builder->select('rp.*, sp.nama_pelanggan, sp.saldo_awal');
-        $builder->join('setuppelanggan1 AS sp', 'rp.id_pelaku = sp.id_pelanggan', 'inner');
+        $builder->select('rp.tanggal, rp.nota, rp.deskripsi, rp.debit, rp.kredit');
+
+        if ($tipe === 'pelanggan') {
+            $builder->where('rp.jenis_pelaku', 'pelanggan');
+        } else if ($tipe === 'salesman') {
+            $builder->where('rp.jenis_pelaku', 'salesman');
+        }
 
         // Filter tanggal
-        if (!empty($tglawal)) {
+        if ($tglawal !== '') {
             $builder->where('rp.tanggal >=', $tglawal);
         }
-        if (!empty($tglakhir)) {
+        if ($tglakhir !== '') {
             $builder->where('rp.tanggal <=', $tglakhir);
         }
 
-        // Filter hanya untuk pelanggan
-        if (!empty($pelanggan)) {
-            $builder->where('sp.id_pelanggan', $pelanggan);
+        // Filter ID (pelanggan atau salesman)
+        if ($id !== '') {
+            $builder->where('rp.id_pelaku', $id);
         }
-
-        $builder->where('rp.pelaku', 'pelanggan');
 
         $builder->orderBy('rp.tanggal', 'ASC');
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_salesman($tglawal = '', $tglakhir = '', $salesman = '')
+
+    public function get_laporan_daftar($tipe = 'pelanggan', $tglawal = '', $tglakhir = '')
     {
-        $builder = $this->db->table('riwayat_transaksi_piutang rp');
+        if ($tipe === 'pelanggan') {
+            $builder = $this->db->table('setuppelanggan1 sp');
+            $builder->select("
+                ss.id_setupsupplier,
+                ss.kode, 
+                ss.nama,
+                SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END) AS saldo_awal,
+                SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END) AS debit,
+                SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END) AS kredit,
+                (SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END)
+                + SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END)
+                - SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END)
+                ) AS saldo
+            ");
+            $builder->join('riwayat_transaksi_piutang AS rh', "ss.id_pelanggan = rh.id_pelaku AND rh.jenis_pelaku = 'pelanggan'", 'left');
 
-        $builder->select('rp.*, ss.nama_salesman, ss.saldo_awal');
-        $builder->join('setupsalesman1 AS ss', 'rp.id_pelaku = ss.id_salesman', 'inner');
+            $builder->groupBy('ss.id_pelanggan');
 
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rp.tanggal >=', $tglawal);
+            $builder->orderBy('ss.nama', 'ASC');
+        } else if ($tipe === 'salesman') {
+            $builder = $this->db->table('setupsalesman1 ss');
+            $builder->select("
+                ss.id_salesman,
+                ss.kode_salesman, 
+                ss.nama_salesman,
+                SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END) AS saldo_awal,
+                SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END) AS debit,
+                SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END) AS kredit,
+                (SUM(CASE WHEN rh.tanggal < '$tglawal' THEN rh.kredit - rh.debit ELSE 0 END)
+                + SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.kredit ELSE 0 END)
+                - SUM(CASE WHEN rh.tanggal BETWEEN '$tglawal' AND '$tglakhir' THEN rh.debit ELSE 0 END)
+                ) AS saldo
+            ");
+            $builder->join('riwayat_transaksi_piutang AS rh', "ss.id_salesman = rh.id_pelaku AND rh.jenis_pelaku = 'salesman'", 'left');
+
+
+            $builder->groupBy('ss.id_salesman');
+
+            $builder->orderBy('ss.nama_salesman', 'ASC');
         }
-        if (!empty($tglakhir)) {
-            $builder->where('rp.tanggal <=', $tglakhir);
-        }
 
-        // Filter hanya untuk salesman
-        if (!empty($salesman)) {
-            $builder->where('ss.id_salesman', $salesman);
-        }
 
-        $builder->where('rp.pelaku', 'salesman');
-
-        $builder->orderBy('rp.tanggal', 'ASC');
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_daftar($tglawal = '', $tglakhir = '')
-    {
-        $builder = $this->db->table('setuppelanggan1 sp');
-
-        $builder->select('
-            sp.kode_pelanggan, 
-            sp.nama_pelanggan,
-            sp.saldo_awal,
-            SUM(rw.debit) AS debit,
-            SUM(rw.kredit) AS kredit,
-            sp.saldo
-        ');
-        $builder->join('riwayat_transaksi_piutang AS rw', 'sp.id_pelanggan = rw.id_pelaku', 'left');
-
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rw.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rw.tanggal <=', $tglakhir);
-        }
-
-        $builder->groupBy('sp.id_pelanggan, sp.kode_pelanggan, sp.nama_pelanggan, sp.saldo_awal, sp.saldo');
-
-        $builder->orderBy('sp.id_pelanggan', 'ASC');
-        return $builder->get()->getResult();
-    }
-
-    public function get_laporan_daftar_salesman($tglawal = '', $tglakhir = '')
-    {
-        $builder = $this->db->table('setupsalesman1 ss');
-
-        $builder->select('
-            ss.kode_salesman, 
-            ss.nama_salesman,
-            ss.saldo_awal,
-            SUM(rw.debit) AS debit,
-            SUM(rw.kredit) AS kredit,
-            ss.saldo
-        ');
-        $builder->join('riwayat_transaksi_piutang AS rw', 'ss.id_salesman = rw.id_pelaku', 'left');
-
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rw.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rw.tanggal <=', $tglakhir);
-        }
-
-        $builder->groupBy('ss.id_salesman, ss.kode_salesman, ss.nama_salesman, ss.saldo_awal, ss.saldo');
-
-        $builder->orderBy('ss.id_salesman', 'ASC');
-        return $builder->get()->getResult();
-    }
 
     public function get_laporan_daftar_nota($tglawal = '', $tglakhir = '', $salesman = '', $pelanggan = '')
     {
@@ -254,72 +224,58 @@ class ModelRiwayatPiutang extends Model
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_summary($tglawal = '', $tglakhir = '', $pelanggan = '')
+    public function get_laporan_summary($tipe = 'salesman', $tglawal = '', $tglakhir = '', $id = '')
     {
-        $builder = $this->db->table('riwayat_transaksi_piutang rp');
+        $builder = $this->db->table($this->table);
 
-        $builder->select('sp.nama_pelanggan,
-                          sp.saldo_awal,
-                          sp.saldo,
-                          SUM(rp.debit) AS debit, 
-                          SUM(rp.kredit) AS kredit');
+        $select = "
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal < '{$tglawal}'" : "0") . " 
+                THEN kredit - debit 
+                ELSE 0
+            END
+        ),0) AS saldo_awal,
 
-        $builder->join('setuppelanggan1 AS sp', 'rp.id_pelaku = sp.id_pelanggan', 'inner');
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN debit 
+                ELSE 0
+            END
+        ),0) AS total_debit,
 
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rp.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rp.tanggal <=', $tglakhir);
-        }
+        COALESCE(SUM(
+            CASE 
+                WHEN " . ($tglawal ? "tanggal BETWEEN '{$tglawal}' AND '{$tglakhir}'" : "tanggal <= '{$tglakhir}'") . "
+                THEN kredit 
+                ELSE 0
+            END
+        ),0) AS total_kredit
+    ";
 
-        // Filter pelanggan
-        if (!empty($pelanggan)) {
-            $builder->where('sp.id_pelanggan', $pelanggan);
-        }
+        $builder->select($select, false);
 
-        $builder->where('rp.pelaku', 'pelanggan');
-
-        $builder->groupBy(
-            'sp.nama_pelanggan, sp.saldo_awal, sp.saldo'
-        );
-
-        return $builder->get()->getResult();
-    }
-
-    public function get_laporan_summary_salesman($tglawal = '', $tglakhir = '', $salesman = '')
-    {
-        $builder = $this->db->table('riwayat_transaksi_piutang rp');
-
-        $builder->select('ss.nama_salesman,
-                          ss.saldo_awal,
-                          ss.saldo,
-                          SUM(rp.debit) AS debit, 
-                          SUM(rp.kredit) AS kredit');
-
-        $builder->join('setupsalesman1 AS ss', 'rp.id_pelaku = ss.id_salesman', 'inner');
-
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rp.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rp.tanggal <=', $tglakhir);
+        // Filter supplier
+        if (!empty($id)) {
+            $builder->where('id_pelaku', $id);
+            $builder->where('pelaku', $tipe);
         }
 
-        //filter salesman
-        if (!empty($salesman)) {
-            $builder->where('ss.id_salesman', $salesman);
-        }
+        $row = $builder->get()->getRow();
 
-        $builder->where('rp.pelaku', 'salesman');
+        // hitung saldo akhir
+        $saldo_awal = (float) ($row->saldo_awal ?? 0);
+        $total_debit = (float) ($row->total_debit ?? 0);
+        $total_kredit = (float) ($row->total_kredit ?? 0);
+        $saldo_akhir = $saldo_awal + $total_kredit - $total_debit;
 
-        $builder->groupBy(
-            'ss.nama_salesman, ss.saldo_awal, ss.saldo'
-        );
-
-        return $builder->get()->getResult();
+        return (object) [
+            'saldo_awal' => $saldo_awal,
+            'debit' => $total_debit,
+            'kredit' => $total_kredit,
+            'saldo_akhir' => $saldo_akhir,
+        ];
     }
 
     public function get_laporan_summary_daftar($tglawal = '', $tglakhir = '')
@@ -348,31 +304,6 @@ class ModelRiwayatPiutang extends Model
         return $builder->get()->getResult();
     }
 
-    public function get_laporan_summary_daftar_salesman($tglawal = '', $tglakhir = '')
-    {
-        $builder = $this->db->table('setupsalesman1 ss');
-
-        $builder->select('ss.nama_salesman,
-                          ss.saldo_awal,
-                          ss.saldo,
-                          SUM(rw.debit) AS debit, 
-                          SUM(rw.kredit) AS kredit');
-
-        $builder->join('riwayat_transaksi_piutang AS rw', 'ss.id_salesman =rw.id_pelaku', 'left');
-
-        // Filter tanggal
-        if (!empty($tglawal)) {
-            $builder->where('rw.tanggal >=', $tglawal);
-        }
-        if (!empty($tglakhir)) {
-            $builder->where('rw.tanggal <=', $tglakhir);
-        }
-
-
-        $builder->groupBy('ss.nama_salesman, ss.saldo_awal, ss.saldo');
-
-        return $builder->get()->getResult();
-    }
 
     public function get_laporan_summary_daftar_nota($tglawal = '', $tglakhir = '', $salesman = '', $pelanggan = '')
     {

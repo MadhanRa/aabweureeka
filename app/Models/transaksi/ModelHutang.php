@@ -64,9 +64,7 @@ class ModelHutang extends Model
             h.tanggal,
             h.tgl_jatuhtempo,
             h.total_hutang AS awal,
-            COALESCE(SUM(rth.debit), 0) AS debit,
-            COALESCE(SUM(rth.kredit), 0) AS kredit,
-            h.total_hutang + COALESCE(SUM(rth.kredit - rth.debit), 0) AS saldo
+            h.total_hutang AS saldo
         ", false);
 
         $builder->join('riwayat_transaksi_hutang rth', 'h.id_hutang = rth.id_hutang', 'left');
@@ -99,7 +97,7 @@ class ModelHutang extends Model
         COALESCE(SUM(h.total_hutang), 0) AS total_awal,
         COALESCE(SUM(rth.debit), 0) AS total_debit,
         COALESCE(SUM(rth.kredit), 0) AS total_kredit,
-        COALESCE(SUM(h.total_hutang + (rth.kredit - rth.debit)), 0) AS total_saldo
+        COALESCE(SUM(h.total_hutang), 0) AS total_saldo
     ", false);
 
         $builder->join('riwayat_transaksi_hutang rth', 'h.id_hutang = rth.id_hutang', 'left');

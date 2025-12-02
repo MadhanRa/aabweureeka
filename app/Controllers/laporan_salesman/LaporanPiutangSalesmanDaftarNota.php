@@ -3,7 +3,7 @@
 namespace App\Controllers\laporan_salesman;
 
 use App\Models\transaksi\ModelRiwayatPiutang;
-use App\Models\transaksi\penjualan\ModelPenjualan;
+use App\Models\transaksi\ModelPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Controllers\BaseController;
 use TCPDF;
@@ -11,46 +11,33 @@ use TCPDF;
 class LaporanPiutangSalesmanDaftarNota extends BaseController
 {
     protected $objRiwayatPiutang;
-    protected $objPenjualan;
+    protected $modelPiutang;
     protected $db;
     protected $view_path;
     function __construct()
     {
         $this->objRiwayatPiutang = new ModelRiwayatPiutang();
-        $this->objPenjualan = new ModelPenjualan();
+        $this->modelPiutang = new ModelPiutang();
         $this->db = \Config\Database::connect();
         $this->view_path = "laporan/laporan_salesman/";
     }
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : date('Y-m-01');
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : date('Y-m-d');
 
         // Panggil model untuk mendapatkan data laporan
-        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar_nota_salesman($tglawal, $tglakhir);
-        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary_daftar_nota_salesman($tglawal, $tglakhir);
-
-
-        $saldo_awal_total = 0;
-        $debit_total = 0;
-        $kredit_total = 0;
-        $saldo_akhir_total = 0;
-
-        foreach ($riwayat_piutang_summary as $row) {
-            $saldo_awal_total += isset($row->saldo_awal) ? floatval($row->saldo_awal) : 0;
-            $debit_total += floatval($row->debit);
-            $kredit_total += floatval($row->kredit);
-            $saldo_akhir_total +=  floatval($row->saldo);
-        }
+        $riwayat_piutang = $this->modelPiutang->getDaftarPiutangPerNota($tglawal, $tglakhir, '', 'salesman');
+        $riwayat_piutang_summary = $this->modelPiutang->getTotalPiutangPerNota($tglawal, $tglakhir, 'salesman');
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
             'dtdaftar_piutang'    => $riwayat_piutang,
-            'saldo_awal_total'      => $saldo_awal_total,
-            'debit_total'       => $debit_total,
-            'kredit_total'  => $kredit_total,
-            'saldo_akhir_total'       => $saldo_akhir_total,
+            'saldo_awal_total'      => $riwayat_piutang_summary->awal,
+            'debit_total'       => $riwayat_piutang_summary->debit,
+            'kredit_total'  => $riwayat_piutang_summary->kredit,
+            'saldo_akhir_total'       => $riwayat_piutang_summary->saldo,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
         ];

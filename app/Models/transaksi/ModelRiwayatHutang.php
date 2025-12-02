@@ -120,8 +120,6 @@ class ModelRiwayatHutang extends Model
 
         $builder->groupBy('ss.id_setupsupplier');
 
-        // Filter tanggal
-
         $builder->orderBy('ss.nama', 'ASC');
         return $builder->get()->getResult();
     }

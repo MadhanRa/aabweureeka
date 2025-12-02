@@ -63,8 +63,8 @@
                 <td><?= $value->nota ?></td>
                 <td><?= $value->tgl_jatuhtempo ?></td>
                 <td><?= "Rp " . number_format((float) $value->awal, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->debit, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->kredit, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format(0, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format(0, 0, ',', '.') ?></td>
                 <td><?= "Rp " . number_format($value->saldo, 0, ',', '.') ?></td>
               </tr>
             <?php endforeach; ?>
