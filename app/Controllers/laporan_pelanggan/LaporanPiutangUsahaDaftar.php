@@ -1,121 +1,48 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\laporan_pelanggan;
 
+use App\Controllers\BaseController;
 use App\Models\setup\ModelSetuppelanggan;
-use App\Models\setup\ModelSetupsalesman;
 use App\Models\transaksi\ModelRiwayatPiutang;
-use App\Models\transaksi\penjualan\ModelPenjualan;
 use CodeIgniter\HTTP\ResponseInterface;
 use TCPDF;
 
-class LaporanPiutangUsahaUmur extends BaseController
+class LaporanPiutangUsahaDaftar extends BaseController
 {
     protected $objSetupPelanggan;
-    protected $objSetupSalesman;
     protected $objRiwayatPiutang;
-    protected $objPenjualan;
     protected $db;
+    protected $path_view;
     function __construct()
     {
         $this->objSetupPelanggan = new ModelSetuppelanggan();
-        $this->objSetupSalesman = new ModelSetupsalesman();
         $this->objRiwayatPiutang = new ModelRiwayatPiutang();
-        $this->objPenjualan = new ModelPenjualan();
+        $this->path_view = 'laporan/laporan_pelanggan/';
         $this->db = \Config\Database::connect();
     }
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
-        $salesman = $this->request->getVar('salesman') ? $this->request->getVar('salesman') : '';
+        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : date('Y-m-01');
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : date('Y-m-d');
 
         // Panggil model untuk mendapatkan data laporan
-        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar_umur($tglawal, $tglakhir, $salesman);
-        $dataTerkategori = $this->kategorisasiUmurPiutang($riwayat_piutang);
-
+        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar('pelanggan', $tglawal, $tglakhir);
+        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary('pelanggan', $tglawal, $tglakhir);
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
-            'dtdaftar_piutang'    => $dataTerkategori['data'],
-            'kurang_dari_total'   => $dataTerkategori['total']['kurang_dari'],
-            'antara1_total'       => $dataTerkategori['total']['antara1'],
-            'antara2_total'       => $dataTerkategori['total']['antara2'],
-            'lebih_dari_total'    => $dataTerkategori['total']['lebih_dari'],
-            'grand_total'         => $dataTerkategori['total']['grand_total'],
+            'dtdaftar_piutang'    => $riwayat_piutang,
+            'saldo_awal_total'      => $riwayat_piutang_summary->saldo_awal,
+            'debit_total'       => $riwayat_piutang_summary->debit,
+            'kredit_total'  => $riwayat_piutang_summary->kredit,
+            'saldo_akhir_total'       => $riwayat_piutang_summary->saldo_akhir,
             'tglawal'        => $tglawal,
             'tglakhir'       => $tglakhir,
-            'salesman'       => $salesman,
-            'dtsalesman'     => $this->objSetupSalesman->findAll(),
         ];
 
-        return view('laporan_piutangusaha_umur/index', $data);
-    }
-
-    /**
-     * Mengkategorikan piutang berdasarkan umur jatuh tempo
-     * 
-     * @param array $piutangData Data piutang dari model
-     * @return array Data yang sudah dikategorikan berdasarkan umur
-     */
-    private function kategorisasiUmurPiutang($piutangData)
-    {
-        $today = new \DateTime(date('Y-m-d'));
-        $kategorisasiData = [];
-        $totalUmur = [
-            'kurang_dari' => 0,
-            'antara1' => 0,
-            'antara2' => 0,
-            'lebih_dari' => 0,
-            'grand_total' => 0
-        ];
-
-        foreach ($piutangData as $item) {
-            $tanggalJatuhTempo = new \DateTime($item->tgl_jatuhtempo);
-            $selisihHari = $today->diff($tanggalJatuhTempo)->days;
-            $isOverdue = $today > $tanggalJatuhTempo;
-
-            $sisaPiutang = $item->grand_total - $item->total_pelunasan;
-
-            // Inisialisasi kolom untuk setiap kategori umur
-            $dataKategori = [
-                'kode_pelanggan' => $item->kode_pelanggan,
-                'nama_pelanggan' => $item->nama_pelanggan,
-                'tanggal' => $item->tanggal,
-                'nota' => $item->nota,
-                'tgl_jatuhtempo' => $item->tgl_jatuhtempo,
-                'kurang_dari' => 0,
-                'antara1' => 0,
-                'antara2' => 0,
-                'lebih_dari' => 0,
-                'jumlah' => $sisaPiutang,
-                'umur_piutang' => $isOverdue ? $selisihHari : 0
-            ];
-
-            // Kategorisasi berdasarkan umur piutang
-            if (!$isOverdue || $selisihHari <= 30) {
-                $dataKategori['kurang_dari'] = $sisaPiutang;
-                $totalUmur['kurang_dari'] += $sisaPiutang;
-            } elseif ($selisihHari <= 60) {
-                $dataKategori['antara1'] = $sisaPiutang;
-                $totalUmur['antara1'] += $sisaPiutang;
-            } elseif ($selisihHari <= 90) {
-                $dataKategori['antara2'] = $sisaPiutang;
-                $totalUmur['antara2'] += $sisaPiutang;
-            } else {
-                $dataKategori['lebih_dari'] = $sisaPiutang;
-                $totalUmur['lebih_dari'] += $sisaPiutang;
-            }
-
-            $totalUmur['grand_total'] += $sisaPiutang;
-            $kategorisasiData[] = $dataKategori;
-        }
-
-        return [
-            'data' => $kategorisasiData,
-            'total' => $totalUmur
-        ];
+        return view($this->path_view . 'laporan_piutangusaha_daftar/index', $data);
     }
 
     public function printPDF()

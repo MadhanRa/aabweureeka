@@ -16,27 +16,36 @@ class ModelSetuppelanggan extends Model
 
     public function getAllPelanggan()
     {
-        $builder = $this->db->table('setuppelanggan1 s');
-        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo');
+        $builder = $this->db->table($this->table . ' s');
+        $builder->select('
+            s.id_pelanggan, s.kode_pelanggan, s.nama_pelanggan, s.alamat_pelanggan, s.kota_pelanggan, s.telp_pelanggan,
+            COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo,
+        ');
         $builder->join(
-            'piutang p',
-            "s.id_pelanggan = p.id_relasional AND p.relasi_tipe = 'pelanggan'",
+            'riwayat_transaksi_piutang rtp',
+            "s.id_pelanggan = rtp.id_pelaku AND rtp.jenis_pelaku = 'pelanggan'",
             'left'
         );
         $builder->groupBy('s.id_pelanggan');
-
+        $builder->orderBy('s.nama_pelanggan', 'ASC');
         $query = $builder->get();
         return $query->getResult();
     }
 
     public function getPelangganById($id)
     {
-        // Mengambil data supplier berdasarkan ID dan jumlah saldo hutangnya
-        $builder = $this->db->table('setuppelanggan1 s');
-        $builder->select('s.*, IFNULL(SUM(p.saldo), 0) AS saldo');
-        $builder->join('piutang p', "s.id_pelanggan = p.id_relasional AND p.relasi_tipe = 'pelanggan'", 'left');
-        $builder->where('s.id_pelanggan', $id);
-        $builder->groupBy('s.id_pelanggan');
+        $builder = $this->db->table($this->table . ' p');
+        $builder->select('
+            p.*,
+            COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo,
+        ');
+        $builder->join(
+            'riwayat_transaksi_piutang rtp',
+            "p.id_pelanggan = rtp.id_pelaku AND rtp.jenis_pelaku = 'pelanggan'",
+            'left'
+        );
+        $builder->where('p.id_pelanggan', $id);
+        $builder->groupBy('p.id_pelanggan');
         $query = $builder->get();
         return $query->getRow();
     }

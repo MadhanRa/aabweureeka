@@ -35,7 +35,7 @@ class ModelPiutang extends Model
             p.nota,
             p.tanggal,
             p.tgl_jatuhtempo,
-            p.total_piutang + COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo
+            COALESCE(SUM(rtp.kredit - rtp.debit), 0) AS saldo
         ")
             ->join('riwayat_transaksi_piutang rtp', 'p.id_piutang = rtp.id_piutang', 'left')
             ->where('p.id_relasional', $id_relasional)
@@ -129,6 +129,10 @@ class ModelPiutang extends Model
 
         if (!empty($id)) {
             $builder->where('p.id_relasional', $id);
+        }
+
+        if (!empty($tipe)) {
+            $builder->where('p.relasi_tipe', $tipe);
         }
 
         $row = $builder->get()->getRow();

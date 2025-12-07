@@ -1,34 +1,43 @@
 <?= $this->extend("layout/backend") ?>
 
 <?= $this->section("content") ?>
-<title>Akuntansi Eureeka &mdash; Laporan Kartu Piutang Usaha</title>
+<title>Akuntansi Eureeka &mdash; Laporan Daftar Piutang Usaha Per Nota</title>
 <?= $this->endSection(); ?>
 
 <?= $this->section("content") ?>
 
 <section class="section">
   <div class="section-header">
-    <h1>Kartu Piutang Usaha</h1>
+    <h1>Daftar Piutang Usaha Per Nota</h1>
   </div>
 
   <div class="card">
     <div class="card-header">
       <div class="card-header-action">
-        <a href="<?= base_url('laporankartupiutangusaha/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&pelanggan=' . $pelanggan) ?>" class="btn btn-success" target="_blank">
+        <a href="<?= base_url('laporandaftarpiutangusahanota/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&salesman=' . $salesman . '&pelanggan=' . $pelanggan) ?>" class="btn btn-success" target="_blank">
           <i class="fas fa-print"></i> Cetak PDF
         </a>
       </div>
     </div>
     <div class="card-body">
-      <form method="GET" action="<?= base_url('laporankartupiutangusaha') ?>">
+      <form method="GET" action="<?= base_url('laporandaftarpiutangusahanota') ?>">
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label for="tglawal">Tanggal Awal</label>
             <input type="date" name="tglawal" class="form-control" value="<?= $tglawal ?>">
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label for="tglakhir">Tanggal Akhir</label>
             <input type="date" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
+          </div>
+          <div class="col-md-3">
+            <label for="salesman">Salesman</label>
+            <select name="salesman" class="form-control">
+              <option value="">Semua Salesman</option>
+              <?php foreach ($dtsalesman as $sales): ?>
+                <option value="<?= $sales->id_salesman ?>" <?= $sales->id_salesman == $salesman ? 'selected' : '' ?>><?= $sales->nama_salesman ?></option>
+              <?php endforeach; ?>
+            </select>
           </div>
           <div class="col-md-3">
             <label for="pelanggan">Pelanggan</label>
@@ -50,25 +59,37 @@
           <thead>
             <tr class="eureeka-table-header">
               <th>No</th>
-              <th>Tanggal</th>
-              <th>Nota</th>
-              <th>Keterangan</th>
+              <th>Pelanggan#</th>
+              <th>Nama Pelanggan</th>
+              <th>Salesman#</th>
+              <th>Nama Salesman</th>
+              <th>Tgl.Jual</th>
+              <th>Nota.Jual</th>
+              <th>Tgl.JT</th>
+              <th>Awal</th>
               <th>Debet</th>
               <th>Kredit</th>
               <th>Saldo</th>
+              <th>Tgl.Bayar</th>
             </tr>
           </thead>
           <tbody>
             <!-- Iterasi Data -->
-            <?php foreach ($dtkartu_piutang as $key => $value) : ?>
+            <?php foreach ($dtdaftar_piutang as $key => $value) : ?>
               <tr>
                 <td><?= $key + 1 ?></td>
+                <td><?= $value->kode_pelanggan ?></td>
+                <td><?= $value->nama_pelanggan ?></td>
+                <td><?= $value->kode_salesman ?></td>
+                <td><?= $value->nama_salesman ?></td>
                 <td><?= $value->tanggal ?></td>
                 <td><?= $value->nota ?></td>
-                <td><?= $value->deskripsi ?></td>
-                <td><?= "Rp " . number_format($value->debit, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->kredit, 0, ',', '.') ?></td>
-                <td><?= "Rp " . number_format($value->saldo_setelah, 0, ',', '.') ?></td>
+                <td><?= $value->tgl_jatuhtempo ?></td>
+                <td><?= "Rp " . number_format($value->saldo, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format(0, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format(0, 0, ',', '.') ?></td>
+                <td><?= "Rp " . number_format($value->saldo, 0, ',', '.') ?></td>
+                <td><?= $value->tgl_bayar ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>

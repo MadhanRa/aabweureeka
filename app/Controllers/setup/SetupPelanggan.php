@@ -3,20 +3,23 @@
 namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetuppelanggan;
-use App\Models\setup\ModelHutangPiutang;
+use App\Models\transaksi\ModelPiutang;
+use App\Models\transaksi\ModelRiwayatPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupPelanggan extends ResourceController
 {
     protected $pelangganModel;
-    protected $hutangPiutangModel;
+    protected $piutangModel;
+    protected $piutangRiwayatModel;
     protected $db;
     // INISIALISASI OBJECT DATA
     function __construct()
     {
         $this->pelangganModel = new ModelSetuppelanggan();
-        $this->hutangPiutangModel = new ModelHutangPiutang();
+        $this->piutangModel = new ModelPiutang();
+        $this->piutangRiwayatModel = new ModelRiwayatPiutang();
         $this->db = \Config\Database::connect();
     }
     /**
@@ -98,8 +101,8 @@ class SetupPelanggan extends ResourceController
             'npwp' => $this->request->getVar('npwp'),
             'class_pelanggan' => $this->request->getVar('class_pelanggan'),
             'tipe' => $this->request->getVar('tipe'),
-            'saldo' => '0',
         ];
+
         if ($this->pelangganModel->insert($data)) {
             return redirect()->to(site_url('setup/pelanggan'))->with('Sukses', 'Data Berhasil Disimpan');
         }
@@ -172,10 +175,10 @@ class SetupPelanggan extends ResourceController
 
     public function getPiutang($id = null)
     {
-        $data['dtpiutang'] = $this->hutangPiutangModel->getHutangPiutang($id, 'pelanggan');
+        $data['dtpiutang'] = $this->piutangModel->getRiwayatPiutangById($id, 'pelanggan');
         if ($this->request->isAJAX()) {
             $msg = [
-                'data' => view('setup/pelanggan/data_piutang', $data)
+                'data' => view('setup/pelanggan/piutang/data_piutang', $data)
             ];
             return $this->response->setJSON($msg);
         }
@@ -201,31 +204,41 @@ class SetupPelanggan extends ResourceController
             $this->db->transBegin();
 
             try {
-                $saldoPiutang = $this->request->getVar('saldo');
+                $nominalPiutang = $this->request->getVar('saldo');
 
                 $data = [
-                    'tanggal' => $this->request->getVar('tanggal'),
-                    'nota' => $this->request->getVar('nota'),
-                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
-                    'saldo' => $saldoPiutang,
-                    'relasi_id' => $id,
+                    'id_relasional' => $id,
                     'relasi_tipe' => 'pelanggan',
-                    'jenis' => 'piutang'
+                    'sumber' => 'manual',
+                    'nota' => $this->request->getVar('nota'),
+                    'ref_transaksi' => null,
+                    'tanggal' => $this->request->getVar('tanggal'),
+                    'tgl_jatuhtempo' => $this->request->getVar('tanggal_jt'),
+                    'total_piutang' => $nominalPiutang,
+                    'status' => 'open',
                 ];
 
+                $id_piutang = $this->piutangModel->insert($data);
+
                 // Masukkan data ke dalam tabel
-                if ($this->hutangPiutangModel->insert($data)) {
-                    // Ambil data pelanggan yang bersangkutan
-                    $pelanggan = $this->pelangganModel->find($id);
+                if ($id_piutang) {
+                    $updatedSaldo = $this->piutangModel->getSaldoPiutangById($id, 'pelanggan') + (float)$nominalPiutang;
 
-                    if (!$pelanggan) {
-                        throw new \Exception('Pelanggan tidak ditemukan');
-                    }
+                    // Simpan data riwayat transaksi piutang
+                    $riwayatData = [
+                        'id_piutang' => $id_piutang,
+                        'id_pelaku' => $id,
+                        'jenis_pelaku' => 'pelanggan',
+                        'tanggal' => $this->request->getVar('tanggal'),
+                        'jenis_transaksi' => 'manual',
+                        'nota' => $this->request->getVar('nota'),
+                        'debit' => 0,
+                        'kredit' => $nominalPiutang,
+                        'deskripsi' => 'Penambahan piutang manual',
+                    ];
 
-                    // Hitung saldo baru
-                    $updatedSaldo = (float)$pelanggan->saldo + (float)$saldoPiutang;
-                    // Update saldo pelanggan
-                    $this->pelangganModel->update($id, ['saldo' => $updatedSaldo]);
+                    $this->piutangRiwayatModel->insert($riwayatData);
+
                     // Commit transaksi jika semua berhasil
                     $this->db->transCommit();
 
@@ -257,22 +270,22 @@ class SetupPelanggan extends ResourceController
         helper('form');
 
         if ($this->request->isAJAX()) {
-            $data['data'] = $this->hutangPiutangModel->find($piutang_id);
+            $data['data'] = $this->piutangModel->find($piutang_id);
             $msg = [
-                'data' => view('setup/pelanggan/edit_piutang', $data)
+                'data' => view('setup/pelanggan/piutang/edit_piutang', $data)
             ];
             return $this->response->setJSON($msg);
         }
     }
 
-    public function updatePiutang($id_hutang_piutang = null)
+    public function updatePiutang($id_piutang = null)
     {
         if ($this->request->isAJAX()) {
             $this->db->transBegin();
 
             try {
                 // Ambil data asli
-                $originalPiutang = $this->hutangPiutangModel->find($id_hutang_piutang);
+                $originalPiutang = $this->piutangModel->find($id_piutang);
                 $originalAmount = (float)$originalPiutang->saldo;
                 $newAmount = (float)$this->request->getVar('saldo');
                 $pelangganId = $originalPiutang->relasi_id;
@@ -285,7 +298,7 @@ class SetupPelanggan extends ResourceController
                 ];
 
                 // Update data berdasarkan ID
-                if ($this->hutangPiutangModel->update($id_hutang_piutang, $data)) {
+                if ($this->piutangModel->update($id_piutang, $data)) {
                     // Ambil data pelanggan yang bersangkutan
                     $pelanggan = $this->pelangganModel->find($pelangganId);
 
@@ -321,19 +334,19 @@ class SetupPelanggan extends ResourceController
         }
     }
 
-    public function deletePiutang($id_hutang_piutang = null)
+    public function deletePiutang($id_piutang = null)
     {
         if ($this->request->isAJAX()) {
             $this->db->transBegin();
 
             try {
                 // Ambil data piutang sebelum dihapus
-                $piutang = $this->hutangPiutangModel->find($id_hutang_piutang);
+                $piutang = $this->piutangModel->find($id_piutang);
                 $jumlahPiutang = (float)$piutang->saldo;
                 $pelangganId = $piutang->relasi_id;
 
                 // Hapus data piutang
-                if ($this->hutangPiutangModel->delete($id_hutang_piutang)) {
+                if ($this->piutangModel->delete($id_piutang)) {
                     // Ambil data pelanggan
                     $pelanggan = $this->pelangganModel->find($pelangganId);
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\laporan_pelanggan;
 
+use App\Controllers\BaseController;
 use App\Models\setup\ModelSetuppelanggan;
 use App\Models\transaksi\ModelRiwayatPiutang;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -12,49 +13,54 @@ class LaporanPiutangUsahaKartu extends BaseController
     protected $objSetupPelanggan;
     protected $objRiwayatPiutang;
     protected $db;
+    protected $path_view;
+
     function __construct()
     {
         $this->objSetupPelanggan = new ModelSetuppelanggan();
         $this->objRiwayatPiutang = new ModelRiwayatPiutang();
+        $this->path_view = 'laporan/laporan_pelanggan/';
         $this->db = \Config\Database::connect();
     }
 
     public function index()
     {
-        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : '';
-        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : '';
+        $tglawal = $this->request->getVar('tglawal') ? $this->request->getVar('tglawal') : date('Y-m-01');
+        $tglakhir = $this->request->getVar('tglakhir') ? $this->request->getVar('tglakhir') : date('Y-m-d');
         $pelanggan = $this->request->getVar('pelanggan') ? $this->request->getVar('pelanggan') : '';
 
-        // Panggil model untuk mendapatkan data laporan
-        $riwayat_piutang = $this->objRiwayatPiutang->get_laporan($tglawal, $tglakhir, $pelanggan);
-        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary($tglawal, $tglakhir, $pelanggan);
+        if (!empty($pelanggan)) {
+            // Panggil model untuk mendapatkan data laporan
+            $riwayat_piutang = $this->objRiwayatPiutang->get_laporan('pelanggan', $tglawal, $tglakhir, $pelanggan);
+            $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary('pelanggan', $tglawal, $tglakhir, $pelanggan);
 
-        $saldo_awal_total = 0;
-        $debit_total = 0;
-        $kredit_total = 0;
-        $saldo_akhir_total = 0;
-
-        foreach ($riwayat_piutang_summary as $row) {
-            $saldo_awal_total += isset($row->saldo_awal) ? floatval($row->saldo_awal) : 0;
-            $debit_total += floatval($row->debit);
-            $kredit_total += floatval($row->kredit);
-            $saldo_akhir_total +=  floatval($row->saldo);
+            // Ambil data tambahan untuk dropdown filter
+            $data = [
+                'dtkartu_piutang'    => $riwayat_piutang,
+                'saldo_awal_total'      => $riwayat_piutang_summary->saldo_awal,
+                'debit_total'       => $riwayat_piutang_summary->debit,
+                'kredit_total'  => $riwayat_piutang_summary->kredit,
+                'saldo_akhir_total'       => $riwayat_piutang_summary->saldo_akhir,
+                'tglawal'        => $tglawal,
+                'tglakhir'       => $tglakhir,
+                'pelanggan'       => $pelanggan,
+                'dtpelanggan'     => $this->objSetupPelanggan->findAll(),
+            ];
+        } else {
+            $data = [
+                'dtkartu_piutang'    => [],
+                'saldo_awal_total'      => 0,
+                'debit_total'       => 0,
+                'kredit_total'  => 0,
+                'saldo_akhir_total' => 0,
+                'tglawal'        => $tglawal,
+                'tglakhir'       => $tglakhir,
+                'pelanggan'       => $pelanggan,
+                'dtpelanggan'     => $this->objSetupPelanggan->findAll(),
+            ];
         }
 
-        // Ambil data tambahan untuk dropdown filter
-        $data = [
-            'dtkartu_piutang'    => $riwayat_piutang,
-            'saldo_awal_total'      => $saldo_awal_total,
-            'debit_total'       => $debit_total,
-            'kredit_total'  => $kredit_total,
-            'saldo_akhir_total'       => $saldo_akhir_total,
-            'tglawal'        => $tglawal,
-            'tglakhir'       => $tglakhir,
-            'pelanggan'       => $pelanggan,
-            'dtpelanggan'     => $this->objSetupPelanggan->findAll(),
-        ];
-
-        return view('laporan_piutangusaha_kartu/index', $data);
+        return view($this->path_view . 'laporan_piutangusaha_kartu/index', $data);
     }
 
     public function printPDF()

@@ -14,7 +14,7 @@
   <div class="card">
     <div class="card-header">
       <div class="card-header-action">
-        <a href="<?= base_url('laporanumurpiutang/printPDF?tglawal=' . $tglawal . '&tglakhir=' . $tglakhir . '&salesman=' . $salesman) ?>" class="btn btn-success" target="_blank">
+        <a href="<?= base_url('laporanumurpiutang/printPDF?per_tanggal=' . $per_tanggal . '&salesman=' . $salesman) ?>" class="btn btn-success" target="_blank">
           <i class="fas fa-print"></i> Cetak PDF
         </a>
       </div>
@@ -23,12 +23,8 @@
       <form method="GET" action="<?= base_url('laporanumurpiutang') ?>">
         <div class="row">
           <div class="col-md-2">
-            <label for="tglawal">Tanggal Awal</label>
-            <input type="date" name="tglawal" class="form-control" value="<?= $tglawal ?>">
-          </div>
-          <div class="col-md-2">
-            <label for="tglakhir">Tanggal Akhir</label>
-            <input type="date" name="tglakhir" class="form-control" value="<?= $tglakhir ?>">
+            <label for="tglawal">Per Tanggal</label>
+            <input type="date" name="per_tanggal" class="form-control" value="<?= $per_tanggal ?>">
           </div>
           <div class="col-md-3">
             <label for="salesman">Salesman</label>

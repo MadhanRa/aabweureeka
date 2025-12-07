@@ -45,7 +45,7 @@ class ModelHutang extends Model
             h.nota,
             h.tanggal,
             h.tgl_jatuhtempo,
-            h.total_hutang + COALESCE(SUM(rth.kredit - rth.debit), 0) AS saldo
+            COALESCE(SUM(rth.kredit - rth.debit), 0) AS saldo
         ")
             ->join('riwayat_transaksi_hutang rth', 'h.id_hutang = rth.id_hutang', 'left')
             ->where('h.id_setupsupplier', $id_supplier)

@@ -7,7 +7,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <?= form_open('setup/salesman/piutang/' . $data->id_hutang_piutang . '/edit', ['id' => 'form-edit-piutang']) ?>
+            <?= form_open('setup/salesman/piutang/' . $data->id_piutang . '/edit', ['id' => 'form-edit-piutang']) ?>
             <input type="hidden" name="_method" value="PUT">
             <div class="modal-body">
                 <div class="form-group">
@@ -20,12 +20,12 @@
                 </div>
                 <div class="form-group">
                     <label>Tanggal Jatuh Tempo</label>
-                    <input type="date" class="form-control" name="tanggal_jt" placeholder="Tanggal JT" value="<?= $data->tanggal_jt ?>" required>
+                    <input type="date" class="form-control" name="tgl_jatuhtempo" placeholder="Tanggal JT" value="<?= $data->tgl_jatuhtempo ?>" required>
                 </div>
                 <div class="form-group">
                     <label>Saldo</label>
-                    <input type="text" class="form-control display-price" id="display_saldo" placeholder="Saldo" oninput="formatHarga(this, 'saldo')" value="Rp <?= number_format(floatval($data->saldo), 0, ',', '.') ?>" required>
-                    <input type="hidden" name="saldo" id="saldo" value="<?= $data->saldo ?>">
+                    <input type="text" class="form-control display-price" id="display_saldo" placeholder="Saldo" oninput="formatHarga(this, 'saldo')" value="Rp <?= number_format(floatval($data->total_piutang), 0, ',', '.') ?>" required>
+                    <input type="hidden" name="saldo" id="saldo" value="<?= $data->total_piutang ?>">
                 </div>
             </div>
             <div class="modal-footer bg-whitesmoke br">

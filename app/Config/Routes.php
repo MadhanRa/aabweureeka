@@ -333,21 +333,23 @@ $routes->get('/laporanbankkartu/printPDF', 'LaporanBankKartu::printPDF');
 $routes->get('/laporanbankdaftar', 'LaporanBankDaftar::index');
 $routes->get('/laporanbankdaftar/printPDF', 'LaporanBankDaftar::printPDF');
 
-//laporan kartu piutang usaha
-$routes->get('/laporankartupiutangusaha', 'LaporanPiutangUsahaKartu::index');
-$routes->get('/laporankartupiutangusaha/printPDF', 'LaporanPiutangUsahaKartu::printPDF');
+$routes->group('', ['namespace' => 'App\Controllers\laporan_pelanggan'], function ($routes) {
+    //laporan kartu piutang usaha
+    $routes->get('/laporankartupiutangusaha', 'LaporanPiutangUsahaKartu::index');
+    $routes->get('/laporankartupiutangusaha/printPDF', 'LaporanPiutangUsahaKartu::printPDF');
 
-//laporan daftar piutang usaha
-$routes->get('/laporandaftarpiutangusaha', 'LaporanPiutangUsahaDaftar::index');
-$routes->get('/laporandaftarpiutangusaha/printPDF', 'LaporanPiutangUsahaDaftar::printPDF');
+    //laporan daftar piutang usaha
+    $routes->get('/laporandaftarpiutangusaha', 'LaporanPiutangUsahaDaftar::index');
+    $routes->get('/laporandaftarpiutangusaha/printPDF', 'LaporanPiutangUsahaDaftar::printPDF');
 
-//laporan daftar piutang usaha nota
-$routes->get('/laporandaftarpiutangusahanota', 'LaporanPiutangUsahaDaftarNota::index');
-$routes->get('/laporandaftarpiutangusahanota/printPDF', 'LaporanPiutangUsahaDaftarNota::printPDF');
+    //laporan daftar piutang usaha nota
+    $routes->get('/laporandaftarpiutangusahanota', 'LaporanPiutangUsahaDaftarNota::index');
+    $routes->get('/laporandaftarpiutangusahanota/printPDF', 'LaporanPiutangUsahaDaftarNota::printPDF');
 
-//laporan umur piutang usaha
-$routes->get('/laporanumurpiutang', 'LaporanPiutangUsahaUmur::index');
-$routes->get('/laporanumurpiutang/printPDF', 'LaporanPiutangUsahaUmur::printPDF');
+    //laporan umur piutang usaha
+    $routes->get('/laporanumurpiutang', 'LaporanPiutangUsahaUmur::index');
+    $routes->get('/laporanumurpiutang/printPDF', 'LaporanPiutangUsahaUmur::printPDF');
+});
 
 $routes->group('', ['namespace' => 'App\Controllers\laporan_salesman'], function ($routes) {
     //laporan kartu piutang salesman

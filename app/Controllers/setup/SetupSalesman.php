@@ -3,20 +3,20 @@
 namespace App\Controllers\setup;
 
 use App\Models\setup\ModelSetupsalesman;
-use App\Models\setup\ModelHutangPiutang;
 use App\Models\transaksi\ModelPiutang;
+use App\Models\transaksi\ModelRiwayatPiutang;
 use App\Models\setup_persediaan\ModelLokasi;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class SetupSalesman extends ResourceController
 {
-    protected $salesmanModel, $hutangPiutangModel, $lokasiModel, $db, $piutangModel;
+    protected $salesmanModel, $hutangPiutangModel, $lokasiModel, $db, $piutangModel, $riwayatPiutangModel;
     // INISIALISASI OBJECT DATA
     function __construct()
     {
         $this->salesmanModel = new ModelSetupsalesman();
-        $this->hutangPiutangModel = new ModelHutangPiutang();
+        $this->riwayatPiutangModel = new ModelRiwayatPiutang();
         $this->piutangModel = new ModelPiutang();
         $this->lokasiModel = new ModelLokasi();
         $this->db = \Config\Database::connect();
@@ -249,75 +249,68 @@ class SetupSalesman extends ResourceController
         }
     }
 
-    public function editPiutang($id_hutang_piutang = null)
+    public function editPiutang($id_piutang = null)
     {
         helper('form');
 
-        $data['data'] = $this->hutangPiutangModel->find($id_hutang_piutang);
+        $data['data'] = $this->piutangModel->find($id_piutang);
 
         if ($this->request->isAJAX()) {
             $msg = [
-                'data' => view('setup/salesman/edit_piutang', $data)
+                'data' => view('setup/salesman/piutang/edit_piutang', $data)
             ];
 
             return $this->response->setJSON($msg);
         }
     }
 
-    public function updatePiutang($id_hutang_piutang = null)
-    {
-        if ($this->request->isAJAX()) {
-            $this->db->transBegin();
+    // public function updatePiutang($id_piutang = null)
+    // {
+    //     if ($this->request->isAJAX()) {
+    //         $this->db->transBegin();
 
-            try {
-                // Ambil data asli
-                $originalPiutang = $this->hutangPiutangModel->find($id_hutang_piutang);
-                $originalAmount = (float)$originalPiutang->saldo;
-                $newAmount = (float)$this->request->getVar('saldo');
-                $salesmanId = $originalPiutang->relasi_id;
+    //         try {
+    //             $newAmount = (float)$this->request->getVar('saldo');
 
-                $data = [
-                    'tanggal' => $this->request->getVar('tanggal'),
-                    'nota' => $this->request->getVar('nota'),
-                    'tanggal_jt' => $this->request->getVar('tanggal_jt'),
-                    'saldo' => $newAmount,
-                ];
+    //             $data = [
+    //                 'tanggal' => $this->request->getVar('tanggal'),
+    //                 'nota' => $this->request->getVar('nota'),
+    //                 'tgl_jatuhtempo' => $this->request->getVar('tgl_jatuhtempo'),
+    //                 'saldo' => $newAmount,
+    //             ];
 
-                // Update data berdasarkan ID
-                if ($this->hutangPiutangModel->update($id_hutang_piutang, $data)) {
-                    // Ambil data salesman yang bersangkutan
-                    $salesman = $this->salesmanModel->find($salesmanId);
+    //             // Update data berdasarkan ID
+    //             if ($this->piutangModel->update($id_piutang, $data)) {
+    //                 // Ambil data salesman yang bersangkutan
 
-                    if (!$salesman) {
-                        throw new \Exception('Salesman tidak ditemukan');
-                    }
 
-                    // Hitung perbedaan saldo dan update
-                    $saldoDifference = $newAmount - $originalAmount;
-                    $updatedSaldo = (float)$salesman->saldo + $saldoDifference;
+    //                 // Hitung perbedaan saldo dan update
+    //                 $saldoDifference = $newAmount - $originalAmount;
+    //                 $updatedSaldo = (float)$salesman->saldo + $saldoDifference;
 
-                    // Update saldo salesman
-                    $this->salesmanModel->update($salesmanId, ['saldo' => $updatedSaldo]);
-                    // Commit transaksi jika semua berhasil
-                    $this->db->transCommit();
+    //                 // Update saldo salesman
+    //                 $this->salesmanModel->update($salesmanId, ['saldo' => $updatedSaldo]);
+    //                 // Commit transaksi jika semua berhasil
+    //                 $this->db->transCommit();
 
-                    return $this->response->setJSON([
-                        'success' => true,
-                        'message' => 'Data berhasil diupdate!',
-                        'updatedSaldo' => $updatedSaldo,
-                    ]);
-                } else {
-                    throw new \Exception('Data gagal diupdate!');
-                }
-            } catch (\Exception $e) {
-                $this->db->transRollback();
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Data gagal diupdate: ' . $e->getMessage()
-                ]);
-            }
-        }
-    }
+    //                 return $this->response->setJSON([
+    //                     'success' => true,
+    //                     'message' => 'Data berhasil diupdate!',
+    //                     'id' => $salesmanId,
+    //                     'updatedSaldo' => $updatedSaldo,
+    //                 ]);
+    //             } else {
+    //                 throw new \Exception('Data gagal diupdate!');
+    //             }
+    //         } catch (\Exception $e) {
+    //             $this->db->transRollback();
+    //             return $this->response->setJSON([
+    //                 'success' => false,
+    //                 'message' => 'Data gagal diupdate: ' . $e->getMessage()
+    //             ]);
+    //         }
+    //     }
+    // }
 
     public function deletePiutang($id_hutang_piutang = null)
     {

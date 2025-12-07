@@ -29,7 +29,7 @@ class LaporanPiutangSalesmanDaftar extends BaseController
 
         // Panggil model untuk mendapatkan data laporan
         $riwayat_piutang = $this->objRiwayatPiutang->get_laporan_daftar('salesman', $tglawal, $tglakhir);
-        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary($tglawal, $tglakhir);
+        $riwayat_piutang_summary = $this->objRiwayatPiutang->get_laporan_summary('salesman', $tglawal, $tglakhir);
 
         // Ambil data tambahan untuk dropdown filter
         $data = [
