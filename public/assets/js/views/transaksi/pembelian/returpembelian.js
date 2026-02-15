@@ -23,7 +23,8 @@ const SELECTORS = {
     kodeInput: 'input[name$="[kode]"]',
     form: '#formReturPembelian',
     tabelDetail: '#tabelDetail tbody',
-    supplierDropdown: '#id_setupsupplier'
+    supplierDropdown: '#id_setupsupplier',
+    locationDropdown: '#id_lokasi'
 };
 
 let rowCounter = 0;
@@ -183,6 +184,7 @@ function initDataTablesItem() {
 
                 // Add supplier ID to filter the data
                 data.supplier_id = $(SELECTORS.supplierDropdown).val();
+                data.location_id = $(SELECTORS.locationDropdown).val();
                 // Add CSRF token directly to data object
                 data[csrfName] = csrfHash;
 

@@ -131,7 +131,7 @@ class Stock extends ResourceController
 
         if ($this->request->isAJAX()) {
 
-            $validation =  \Config\Services::validation();
+            $validation = \Config\Services::validation();
             $valid = $this->validate([
                 'kode' => [
                     'label' => 'Kode',
@@ -261,22 +261,26 @@ class Stock extends ResourceController
     public function lookupStock()
     {
         $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
-        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
-        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int) $_REQUEST['length'] : 10;
         $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
         $param['supplier_id'] = isset($_REQUEST['supplier_id']) ? $_REQUEST['supplier_id'] : null;
+        $param['location_id'] = isset($_REQUEST['location_id']) ? $_REQUEST['location_id'] : null;
+
 
         $results = $this->objStock->searchAndDisplay(
             $param['search_value'],
             $param['start'],
             $param['length'],
-            $param['supplier_id']
+            $param['supplier_id'],
+            $param['location_id']
         );
         $total_count = $this->objStock->searchAndDisplay(
             $param['search_value'],
             null,
             null,
-            $param['supplier_id']
+            $param['supplier_id'],
+            $param['location_id']
         );
 
         $json_data = array(

@@ -85,16 +85,11 @@ class ReturPembelian extends ResourceController
 
         return [
             'dtlokasi' => $this->objLokasi->getAll(),
-            'dtsetupsupplier' => $this->objSetupsupplier->getAll(),
+            'dtsetupsupplier' => $this->objSetupsupplier->findAll(),
             'dtrekening' => $this->objSetupBuku->getRekeningKas($kodeKas),
         ];
     }
 
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
     public function index()
     {
         $month = date('m');
@@ -173,11 +168,6 @@ class ReturPembelian extends ResourceController
         //
     }
 
-    /**
-     * Return a new resource object, with default properties.
-     *
-     * @return ResponseInterface
-     */
     public function new()
     {
 
@@ -321,8 +311,8 @@ class ReturPembelian extends ResourceController
     public function lookupReturPembelian()
     {
         $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
-        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
-        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int) $_REQUEST['length'] : 10;
         $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
 
         $results = $this->objReturPembelian->searchAndDisplay(
