@@ -77,16 +77,11 @@ class Pembelian extends ResourceController
         return [
             'dtlokasi' => $this->objLokasi->getAll(),
             'dtsatuan' => $this->objSatuan->getAll(),
-            'dtsetupsupplier' => $this->objSetupsupplier->getAll(),
+            'dtsetupsupplier' => $this->objSetupsupplier->findAll(),
             'dtrekening' => $this->objSetupBuku->getRekeningKas($kodeKas),
         ];
     }
 
-    /**
-     * Return an array of resource, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
     public function index()
     {
         $month = date('m');
@@ -194,11 +189,6 @@ class Pembelian extends ResourceController
         }
     }
 
-    /**
-     * Return a new resource object, with default properties.
-     *
-     * @return ResponseInterface
-     */
     public function new()
     {
         $data = $this->getCommonData();
@@ -346,8 +336,8 @@ class Pembelian extends ResourceController
     public function lookupPembelian()
     {
         $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
-        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
-        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int) $_REQUEST['length'] : 10;
         $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
 
         $results = $this->objPembelian->searchAndDisplay(
@@ -373,8 +363,8 @@ class Pembelian extends ResourceController
     public function lookupPembelianHutang()
     {
         $param['draw'] = isset($_REQUEST['draw']) ? $_REQUEST['draw'] : '';
-        $param['start'] = isset($_REQUEST['start']) ? (int)$_REQUEST['start'] : 0;
-        $param['length'] = isset($_REQUEST['length']) ? (int)$_REQUEST['length'] : 10;
+        $param['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+        $param['length'] = isset($_REQUEST['length']) ? (int) $_REQUEST['length'] : 10;
         $param['search_value'] = isset($_REQUEST['search']['value']) ? $_REQUEST['search']['value'] : '';
         $param['supplier_id'] = isset($_REQUEST['supplier_id']) ? $_REQUEST['supplier_id'] : null;
 

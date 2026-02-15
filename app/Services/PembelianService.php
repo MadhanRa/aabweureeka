@@ -11,7 +11,6 @@ use App\Models\transaksi\ModelHutang;
 use App\Models\setup_persediaan\ModelStockGudang;
 use App\Models\setup\ModelSetupBuku;
 use App\Models\setup\ModelSetupsupplier;
-use App\Models\setup\ModelHutangPiutang;
 use App\ValueObjects\DetailItem;
 
 use CodeIgniter\Database\ConnectionInterface;
@@ -130,7 +129,8 @@ class PembelianService
 
         foreach ($newDetails as $detail) {
             // Skip empty rows (where there's no stock ID)
-            if (empty($detail['id_stock'])) continue;
+            if (empty($detail['id_stock']))
+                continue;
 
             $detailPembelian = new DetailItem($detail);
 
@@ -438,30 +438,19 @@ class PembelianService
 
         $dataHutang = [
             'id_setupsupplier' => $headerData['id_setupsupplier'],
-            'id_pembelian' => $idPembelian,
             'nota' => $headerData['nota'],
             'sumber' => 'pembelian',
+            'ref_transaksi' => $idPembelian,
             'tanggal' => $headerData['tanggal'],
             'tgl_jatuhtempo' => $headerData['tgl_jatuhtempo'],
-            'nominal' => $hutang,
-            'saldo' => $hutang,
+            'total_hutang' => $hutang,
+            'status' => 'lunas'
         ];
 
         //Cari data hutang yang sudah ada (jika ada)
-        $existingHutang = $this->hutang->where('id_pembelian', $idPembelian)->first();
-
-        // Hitung total saldo hutang supplier sebelum perubahan
-        $totalBeforeObj = $this->hutang
-            ->select('COALESCE(SUM(saldo),0) as total')
-            ->where('id_setupsupplier', $headerData['id_setupsupplier'])
-            ->first();
-        $totalBefore = floatval($totalBeforeObj->total ?? 0);
+        $existingHutang = $this->hutang->where(['ref_transaksi' => $idPembelian, 'id_setupsupplier' => $headerData['id_setupsupplier'], 'sumber' => 'pembelian'])->first();
 
         if ($existingHutang) {
-            // Jika update: kurangi saldo lama dari total sebelum, lalu tambahkan saldo baru
-            $totalExcludingCurrent = $totalBefore - floatval($existingHutang->saldo);
-            $saldoSetelah = $totalExcludingCurrent + floatval($dataHutang['saldo']);
-
             // Update data hutang yang sudah ada
             $this->hutang->update($existingHutang->id_hutang, $dataHutang);
             $idHutang = $existingHutang->id_hutang;
@@ -469,18 +458,17 @@ class PembelianService
             // Insert data hutang baru
             $idHutang = $this->hutang->insert($dataHutang);
 
-            // Jika insert, saldo setelah = total sebelum + saldo baru
-            $saldoSetelah = $totalBefore + floatval($dataHutang['saldo']);
         }
 
         $riwayatHutangData = [
             'id_hutang' => $idHutang,
+            'id_setupsupplier' => $headerData['id_setupsupplier'],
             'tanggal' => $headerData['tanggal'],
             'jenis_transaksi' => 'pembelian',
             'nota' => $headerData['nota'],
-            'nominal' => $hutang,
-            'saldo_setelah' => $saldoSetelah,
-            'deskripsi' => 'Hutang pembelian'
+            'deskripsi' => 'Hutang pembelian',
+            'debit' => 0,
+            'kredit' => $hutang,
         ];
 
         // Cari riwayat hutang yang sudah ada (jika ada)
